@@ -4,45 +4,54 @@
 #include<iostream>
 
 std::set<std::string> Lexer::types = {"int", "float", "double", "char", "bool", "size_t"};
-std::unordered_map<std::string, TokenType> Lexer::operators = {{"+", TokenType::LOPERATOR},
-                                                        {"-", TokenType::LOPERATOR},
-                                                        {"*", TokenType::LOPERATOR},
-                                                        {"/", TokenType::LOPERATOR},
-                                                        {"%", TokenType::LOPERATOR},
-                                                        {"^^", TokenType::ROPERATOR},
-                                                        {"=", TokenType::ROPERATOR},
-                                                        {"+=", TokenType::ROPERATOR},
-                                                        {"-=", TokenType::ROPERATOR},
-                                                        {"*=", TokenType::ROPERATOR},
-                                                        {"/=", TokenType::ROPERATOR},
-                                                        {"%=", TokenType::ROPERATOR},
-                                                        {">>=", TokenType::ROPERATOR},
-                                                        {"<<=", TokenType::ROPERATOR},
-                                                        {"&=", TokenType::ROPERATOR},
-                                                        {"^=", TokenType::ROPERATOR},
-                                                        {"|=", TokenType::ROPERATOR},
-                                                        {"==", TokenType::ROPERATOR},
-                                                        {"!=", TokenType::ROPERATOR},
-                                                        {">", TokenType::ROPERATOR},
-                                                        {"<", TokenType::ROPERATOR},
-                                                        {">=", TokenType::ROPERATOR},
-                                                        {"<=", TokenType::ROPERATOR},
-                                                        {"!", TokenType::LOPERATOR},
-                                                        {"&&", TokenType::LOPERATOR},
-                                                        {"||", TokenType::LOPERATOR},
-                                                        {"?", TokenType::LOPERATOR},
-                                                        {"&", TokenType::LOPERATOR},
-                                                        {"|", TokenType::LOPERATOR},
-                                                        {"^", TokenType::LOPERATOR},
-                                                        {"~", TokenType::LOPERATOR},
-                                                        {"<<", TokenType::ROPERATOR},
-                                                        {">>", TokenType::LOPERATOR},
-                                                        {"++", TokenType::LOPERATOR},
-                                                        {"--", TokenType::LOPERATOR},
-                                                        {"[]", TokenType::ROPERATOR},
-                                                        {".", TokenType::LOPERATOR},
-                                                        {"->", TokenType::LOPERATOR},};
-std::set<std::string> Lexer::punctuators = {",", ".", ";"};
+std::unordered_map<std::string, TokenType> Lexer::operators = {
+    {"+", TokenType::PLUS},
+    {"-", TokenType::MINUS},
+    {"*", TokenType::MULTIPLY},
+    {"/", TokenType::DIVIDE},
+    {"%", TokenType::MODULO},
+    {"^^", TokenType::POWER},
+    {"=", TokenType::ASSIGN},
+    {"+=", TokenType::PLUS_ASSIGN},
+    {"-=", TokenType::MINUS_ASSIGN},
+    {"*=", TokenType::MULTIPLY_ASSIGN},
+    {"/=", TokenType::DIVIDE_ASSIGN},
+    {"%=", TokenType::MODULO_ASSIGN},
+    {">>=", TokenType::RIGHT_SHIFT_ASSIGN},
+    {"<<=", TokenType::LEFT_SHIFT_ASSIGN},
+    {"&=", TokenType::AND_ASSIGN},
+    {"^=", TokenType::XOR_ASSIGN},
+    {"|=", TokenType::OR_ASSIGN},
+    {"==", TokenType::EQUAL},
+    {"!=", TokenType::NOT_EQUAL},
+    {">", TokenType::GREATER},
+    {"<", TokenType::LESS},
+    {">=", TokenType::GREATER_EQUAL},
+    {"<=", TokenType::LESS_EQUAL},
+    {"!", TokenType::NOT},
+    {"&&", TokenType::AND},
+    {"||", TokenType::OR},
+    {"?", TokenType::QUESTION},
+    {"&", TokenType::BIT_AND},
+    {"|", TokenType::BIT_OR},
+    {"^", TokenType::BIT_XOR},
+    {"~", TokenType::BIT_NOT},
+    {"<<", TokenType::LEFT_SHIFT},
+    {">>", TokenType::RIGHT_SHIFT},
+    {"++", TokenType::INCREMENT},
+    {"--", TokenType::DECREMENT},
+    {"[", TokenType::INDEX_LEFT},
+    {"]", TokenType::INDEX_RIGHT},
+    {".", TokenType::DOT},
+    {"->", TokenType::ARROW}
+};
+std::unordered_map<std::string, TokenType> Lexer::punctuators = {
+    {",", TokenType::COMMA},
+    {".", TokenType::DOT},
+    {";", TokenType::SEMICOLON},
+    {"{", TokenType::BRACE_LEFT},
+    {"}", TokenType::BRACE_RIGHT}
+};
 std::set<std::string> Lexer::keywords = {"if", "else", "for", "while", "struct", "break", "continue", "const", "do", "false", "true", "return"};
 std::string Lexer::spec_symbols = "()-=+*&-><%^[]?";
 
@@ -129,7 +138,7 @@ Token Lexer::extract_literal() {
         }
         int size = tmp - index + 1;
         int prev = index;
-        index += tmp + 1;
+        index = tmp + 1;
         return {TokenType::LITERAL, std::string {input, prev, size}};
     }
 
@@ -148,10 +157,15 @@ Token Lexer::extract_type() {
 }
 
 Token Lexer::extract_puctuator() {
-    if (punctuators.contains({input[index]})){
-        return {TokenType::PUCTUATOR, {input[index++]}};
+    for (auto punctuator_data : punctuators){
+        if (input.find(punctuator_data.first, index) == index){
+            int prev = index;
+            index += punctuator_data.first.size();
+            std::cout<<"HERE \n";
+            return {punctuator_data.second, std::string{input, prev, punctuator_data.first.size()}};
+        }
     }
-    throw erroneous_extract_exception("puctuator");
+    throw erroneous_extract_exception("punctuator");
 }
 
 Token Lexer::extract_keyword() {

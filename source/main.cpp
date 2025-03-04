@@ -3,7 +3,7 @@
 #include"token.hpp"
 
 int main(){
-    Lexer lexer = Lexer("int a = \"c\"");
+    Lexer lexer = Lexer("int a = \"c\" ;");
     std::vector<Token>tokens = lexer();
     for (auto i : tokens){
         std::cout<<"["<<i.value<<"]";
