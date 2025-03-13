@@ -80,7 +80,6 @@ Token Lexer::extract(){
     } catch (const erroneous_extract_exception&) {}
 
     try {
-        std::cout<<"ENTER IN EXTRACT TYPE IN "<<index<<"\n";
         return extract_type();
     } catch (const erroneous_extract_exception&) {}
 
