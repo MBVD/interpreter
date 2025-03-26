@@ -8,11 +8,6 @@
 class InitDeclarator;
 class IdDeclorator;
 class ParamDeclarator;
-class Declaration : public ASTNode {
-public:
-    virtual ~Declaration() = default;
-    Declaration() = default;
-};
 
 class VarDeclaration : public Declaration {
 public:
@@ -43,16 +38,16 @@ private:
     std::unique_ptr<Expression> expression;
 };
 
-class FuncDeclorator : public Declaration {
-public:
-    FuncDeclorator(const Token& type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params, std::unique_ptr<BlockStatement>& statement);
-private:
-    Token type; // может быть и id
-    Token name;
-    std::vector<std::unique_ptr<ParamDeclarator>> params;
-    std::unique_ptr<BlockStatement> statement;
-};
-
+class FuncDeclarator : public Declaration {
+    public:
+        FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params);
+    private:
+        Token returnable_type;
+        Token name;
+        std::vector<std::unique_ptr<ParamDeclarator>>params;
+        Token semicolon;
+        std::unique_ptr<BlockStatement> block;
+    };
 class ParamDeclarator : public Declaration {
 public:
     ParamDeclarator(const Token& type, std::unique_ptr<IdDeclorator>& declorator);
@@ -69,19 +64,3 @@ private:
     std::vector<std::unique_ptr<VarDeclaration>> vars;
 };
 
-class FuncDeclaration : public Declaration {
-public:
-    FuncDeclaration(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params);
-private:
-    Token returnable_type;
-    Token name;
-    std::vector<std::unique_ptr<ParamDeclarator>>params;
-    Token semicolon;
-    std::unique_ptr<BlockStatement> block;
-};
-
-class StructDeclaration : public Declaration {
-private:
-    Token struct_name;
-    std::vector<std::unique_ptr<VarDeclaration>>vars;
-};

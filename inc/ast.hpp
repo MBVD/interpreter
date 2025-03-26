@@ -15,5 +15,10 @@ public:
     ~Expression() = default;
 };
 
+class Declaration : public ASTNode {
+public:
+    virtual ~Declaration() = default;
+};
+
 
 
