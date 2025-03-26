@@ -32,17 +32,31 @@ private:
     std::string _msg;
 };
 
-class parse_var_decl_error : parsing_errors {
+class declaration_parsing_error : parsing_errors{
 public:
-    explicit parse_var_decl_error(const char* message) : parsing_errors(message) {};
-    explicit parse_var_decl_error(std::string message) : parsing_errors(message) {};
+    explicit declaration_parsing_error(const char* message) : parsing_errors(message) {};
+    explicit declaration_parsing_error(std::string message) : parsing_errors(message) {};
     virtual const char* what() const noexcept override;
 };
 
-class parse_init_decl_error : parsing_errors {
+class parse_var_decl_error : declaration_parsing_error {
 public:
-    explicit parse_init_decl_error(const char* message) : parsing_errors(message) {};
-    explicit parse_init_decl_error(std::string message) : parsing_errors(message) {};
+    explicit parse_var_decl_error(const char* message) : declaration_parsing_error(message) {};
+    explicit parse_var_decl_error(std::string message) : declaration_parsing_error(message) {};
+    virtual const char* what() const noexcept override;
+};
+
+class parse_func_decl_error : declaration_parsing_error {
+public:
+    explicit parse_func_decl_error(const char* message) : declaration_parsing_error(message) {};
+    explicit parse_func_decl_error(std::string message) : declaration_parsing_error(message) {};
+    virtual const char* what() const noexcept override;
+};
+
+class parse_struct_decl_error : declaration_parsing_error {
+public:
+    explicit parse_struct_decl_error(const char* message) : declaration_parsing_error(message) {};
+    explicit parse_struct_decl_error(std::string message) : declaration_parsing_error(message) {};
     virtual const char* what() const noexcept override;
 };
 

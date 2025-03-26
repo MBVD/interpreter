@@ -8,9 +8,17 @@ enum class TokenType {
 struct Token {
     TokenType type;
     std::string value;
+
+    bool operator == (const Token& other) {
+        return *this == other.type;
+    }
     
     bool operator== (const TokenType type){
         return this->type == type;
+    }
+
+    bool operator != (const TokenType type) {
+        return !(*this == type);
     }
 
     Token(const Token& other) : type(other.type), value(other.value) {};

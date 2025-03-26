@@ -11,7 +11,7 @@ class ParamDeclarator;
 
 class VarDeclaration : public Declaration {
 public:
-    VarDeclaration(const Token& token);
+    VarDeclaration(const Token& token, std::vector<std::unique_ptr<InitDeclarator>>& init_declarators);
 private:
     Token type; // может быть типом или id
     std::vector<std::unique_ptr<InitDeclarator>> init_declarators;
@@ -19,6 +19,7 @@ private:
 
 class InitDeclarator : public Declaration {
 public:
+    InitDeclarator(std::unique_ptr<IdDeclorator>& declarator);
     InitDeclarator(std::unique_ptr<IdDeclorator>& declarator, std::unique_ptr<Expression>& expression);
 private:
     std::unique_ptr<IdDeclorator> declarator;
@@ -31,7 +32,9 @@ enum class IDDeclaratorType {
 
 class IdDeclorator : public Declaration {
 public:
-    IdDeclorator(const Token& token, IDDeclaratorType type, std::unique_ptr<Expression>& expression);
+    IdDeclorator(const Token& id, IDDeclaratorType type, std::unique_ptr<Expression>& expression);
+    IdDeclorator(const Token& id, IDDeclaratorType type);
+    IdDeclorator(const Token& id);
 private:
     Token id;
     IDDeclaratorType type;
