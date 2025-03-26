@@ -5,6 +5,9 @@
 #include "token.hpp"
 #include "statement.hpp"
 
+class InitDeclarator;
+class IdDeclorator;
+class ParamDeclarator;
 class Declaration : public ASTNode {
 public:
     virtual ~Declaration() = default;

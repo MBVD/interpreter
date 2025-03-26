@@ -1,4 +1,5 @@
 #include "statement.hpp"
+#include "declaration.hpp"
 
 ExpressionStatement::ExpressionStatement(std::unique_ptr<Expression>& expression)
     : expression(std::move(expression)) {}

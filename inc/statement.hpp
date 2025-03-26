@@ -1,7 +1,9 @@
+#pragma once
 #include "ast.hpp"
-#include "declaration.hpp"
 #include <vector>
 #include <memory>
+
+class VarDeclaration;
 
 class ExpressionStatement : public Statement {
 public:

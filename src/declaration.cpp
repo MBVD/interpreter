@@ -1,4 +1,5 @@
 #include "declaration.hpp"
+#include "statement.hpp"
 
 VarDeclaration::VarDeclaration(const Token& token) : type(token) {}
 
