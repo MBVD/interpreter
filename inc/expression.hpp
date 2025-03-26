@@ -5,8 +5,7 @@
 
 class BinaryExpression : public Expression {
 public:
-    BinaryExpression(std::unique_ptr<Expression>& left, std::unique_ptr<Expression>& right)
-        : left(std::move(left)), right(std::move(right)) {}
+    BinaryExpression(std::unique_ptr<Expression>& left, std::unique_ptr<Expression>& right);
 private:
     std::unique_ptr<Expression> left;
     std::unique_ptr<Expression> right;
@@ -16,10 +15,7 @@ class TernaryExpression : public Expression {
 public:
     TernaryExpression(std::unique_ptr<Expression>& cond_expression,
                       std::unique_ptr<Expression>& true_expression,
-                      std::unique_ptr<Expression>& false_expression)
-        : cond_expression(std::move(cond_expression)),
-          true_expression(std::move(true_expression)),
-          false_expression(std::move(false_expression)) {}
+                      std::unique_ptr<Expression>& false_expression);
 private:
     std::unique_ptr<Expression> cond_expression;
     std::unique_ptr<Expression> true_expression;
@@ -28,8 +24,7 @@ private:
 
 class UnaryExpression : public Expression {
 public:
-    UnaryExpression(std::unique_ptr<Expression>& base, const Token& op)
-        : base(std::move(base)), op(op) {}
+    UnaryExpression(std::unique_ptr<Expression>& base, const Token& op);
 private:
     std::unique_ptr<Expression> base;
     Token op; // unary op or cast
@@ -37,8 +32,7 @@ private:
 
 class PostfixExpression : public Expression {
 public:
-    PostfixExpression(std::unique_ptr<Expression>& expression, const Token& op)
-        : expression(std::move(expression)), op(op) {}
+    PostfixExpression(std::unique_ptr<Expression>& expression, const Token& op);
 private:
     std::unique_ptr<Expression> expression;
     Token op;
@@ -47,8 +41,7 @@ private:
 class SubscriptExpression : public Expression {
 public:
     SubscriptExpression(std::unique_ptr<Expression>& expression,
-                        std::vector<std::unique_ptr<Expression>>& indexes)
-        : expression(std::move(expression)), indexes(std::move(indexes)) {}
+                        std::vector<std::unique_ptr<Expression>>& indexes);
 private:
     std::unique_ptr<Expression> expression;
     std::vector<std::unique_ptr<Expression>> indexes;
@@ -57,8 +50,7 @@ private:
 class CallExpression : public Expression {
 public:
     CallExpression(std::unique_ptr<Expression>& expression,
-                   std::vector<std::unique_ptr<Expression>>& args)
-        : expression(std::move(expression)), args(std::move(args)) {}
+                   std::vector<std::unique_ptr<Expression>>& args);
 private:
     std::unique_ptr<Expression> expression;
     std::vector<std::unique_ptr<Expression>> args;
@@ -67,8 +59,7 @@ private:
 class AccessExpression : public Expression {
 public:
     AccessExpression(std::unique_ptr<Expression>& expression,
-                     std::unique_ptr<AccessExpression>& expression_to_access)
-        : expression(std::move(expression)), expression_to_access(std::move(expression_to_access)) {}
+                     std::unique_ptr<AccessExpression>& expression_to_access);
 private:
     std::unique_ptr<Expression> expression;
     std::unique_ptr<AccessExpression> expression_to_access;
@@ -90,8 +81,7 @@ private:
 
 class GroupExpression : public Expression {
 public:
-    GroupExpression(std::unique_ptr<Expression>& base)
-        : base(std::move(base)) {}
+    GroupExpression(std::unique_ptr<Expression>& base);
 private:
     std::unique_ptr<Expression> base;
 };
