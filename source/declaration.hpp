@@ -1,7 +1,9 @@
-#pragma once 
-#include <bits/stdc++.h>
+#pragma once
+#include <vector>
+#include <memory>
 #include "ast.hpp"
 #include "token.hpp"
+#include "statement.hpp"
 
 class Declaration : public ASTNode {
 public:
@@ -11,74 +13,68 @@ public:
 
 class VarDeclaration : public Declaration {
 public:
-    VarDeclaration(Token token) : type(type) {};
-private:    
+    VarDeclaration(const Token& token) : type(token) {}
+private:
     Token type; // может быть типом или id
-    std::vector<InitDeclarator*> init_declarators;
+    std::vector<std::unique_ptr<InitDeclarator>> init_declarators;
 };
 
 class InitDeclarator : public Declaration {
 public:
-    InitDeclarator(IdDeclorator* declarator, Expression* expression) : declarator(declarator), expression(expression) {}
-    IdDeclorator* declarator;
-    Expression* expression;
+    InitDeclarator(std::unique_ptr<IdDeclorator>& declarator, std::unique_ptr<Expression>& expression)
+        : declarator(std::move(declarator)), expression(std::move(expression)) {}
+private:
+    std::unique_ptr<IdDeclorator> declarator;
+    std::unique_ptr<Expression> expression;
 };
 
-enum class IDDeclaratorType {   
+enum class IDDeclaratorType {
     REF, POINTER, ARRAY
 };
 
-class IdDeclorator : public Declaration{
+class IdDeclorator : public Declaration {
 public:
-    IdDeclorator(Token token, IDDeclaratorType type, Expression* expression) : id(token), type(type), expression(expression){}
+    IdDeclorator(const Token& token, IDDeclaratorType type, std::unique_ptr<Expression>& expression)
+        : id(token), type(type), expression(std::move(expression)) {}
+private:
     Token id;
-    IDDeclaratorType type; 
-    Expression* expression;
+    IDDeclaratorType type;
+    std::unique_ptr<Expression> expression;
 };
-
 
 class FuncDeclorator : public Declaration {
 public:
-
+    FuncDeclorator(const Token& type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params, std::unique_ptr<BlockStatement>& statement)
+        : type(type), name(name), params(std::move(params)), statement(std::move(statement)) {}
 private:
     Token type; // может быть и id
     Token name;
-    std::vector<ParamDeclarator*> params;
-    // BlockStatement* statement;
+    std::vector<std::unique_ptr<ParamDeclarator>> params;
+    std::unique_ptr<BlockStatement> statement;
 };
 
-class ParamDeclarator : Declaration {
+class ParamDeclarator : public Declaration {
+public:
+    ParamDeclarator(const Token& type, std::unique_ptr<IdDeclorator>& declorator)
+        : type(type), declorator(std::move(declorator)) {}
 private:
     Token type; // может быть и id
-    IdDeclorator* declorator;
+    std::unique_ptr<IdDeclorator> declorator;
 };
 
-
-class StructDecloration : Declaration {
+class StructDecloration : public Declaration {
+public:
+    StructDecloration(const Token& id, std::vector<std::unique_ptr<VarDeclaration>>& vars)
+        : id(id), vars(std::move(vars)) {}
 private:
     Token id;
-    std::vector<VarDeclaration*> vars;
+    std::vector<std::unique_ptr<VarDeclaration>> vars;
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class FuncDeclaration : public Declaration {
-
+    
 };
 
 class StructDeclaration : public Declaration {
-
+    
 };
