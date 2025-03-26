@@ -13,5 +13,11 @@ struct Token {
         return this->type == type;
     }
 
+    Token(const Token& other) : type(other.type), value(other.value) {};
+
+    Token(Token&& other) : type(type), value(std::move(value)) {};
+
+    Token(TokenType type) : type(type) {};
+
     Token(TokenType type, std::string value) : type(type), value(value) {};
 };

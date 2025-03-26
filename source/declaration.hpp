@@ -72,9 +72,19 @@ private:
 };
 
 class FuncDeclaration : public Declaration {
-    
+public:
+    FuncDeclaration(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params)
+        : returnable_type(returnable_type), name(name), params(std::move(params)), semicolon(TokenType::SEMICOLON) {};
+private:
+    Token returnable_type;
+    Token name;
+    std::vector<std::unique_ptr<ParamDeclarator>>params;
+    Token semicolon;
+    std::unique_ptr<BlockStatement> block;
 };
 
 class StructDeclaration : public Declaration {
-    
+private:
+    Token struct_name;
+    std::vector<std::unique_ptr<VarDeclaration>>vars;
 };
