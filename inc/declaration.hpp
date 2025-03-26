@@ -13,7 +13,7 @@ public:
 
 class VarDeclaration : public Declaration {
 public:
-    VarDeclaration(const Token& token) : type(token) {}
+    VarDeclaration(const Token& token);
 private:
     Token type; // может быть типом или id
     std::vector<std::unique_ptr<InitDeclarator>> init_declarators;
@@ -21,8 +21,7 @@ private:
 
 class InitDeclarator : public Declaration {
 public:
-    InitDeclarator(std::unique_ptr<IdDeclorator>& declarator, std::unique_ptr<Expression>& expression)
-        : declarator(std::move(declarator)), expression(std::move(expression)) {}
+    InitDeclarator(std::unique_ptr<IdDeclorator>& declarator, std::unique_ptr<Expression>& expression);
 private:
     std::unique_ptr<IdDeclorator> declarator;
     std::unique_ptr<Expression> expression;
@@ -34,8 +33,7 @@ enum class IDDeclaratorType {
 
 class IdDeclorator : public Declaration {
 public:
-    IdDeclorator(const Token& token, IDDeclaratorType type, std::unique_ptr<Expression>& expression)
-        : id(token), type(type), expression(std::move(expression)) {}
+    IdDeclorator(const Token& token, IDDeclaratorType type, std::unique_ptr<Expression>& expression);
 private:
     Token id;
     IDDeclaratorType type;
@@ -44,8 +42,7 @@ private:
 
 class FuncDeclorator : public Declaration {
 public:
-    FuncDeclorator(const Token& type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params, std::unique_ptr<BlockStatement>& statement)
-        : type(type), name(name), params(std::move(params)), statement(std::move(statement)) {}
+    FuncDeclorator(const Token& type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params, std::unique_ptr<BlockStatement>& statement);
 private:
     Token type; // может быть и id
     Token name;
@@ -55,8 +52,7 @@ private:
 
 class ParamDeclarator : public Declaration {
 public:
-    ParamDeclarator(const Token& type, std::unique_ptr<IdDeclorator>& declorator)
-        : type(type), declorator(std::move(declorator)) {}
+    ParamDeclarator(const Token& type, std::unique_ptr<IdDeclorator>& declorator);
 private:
     Token type; // может быть и id
     std::unique_ptr<IdDeclorator> declorator;
@@ -64,8 +60,7 @@ private:
 
 class StructDecloration : public Declaration {
 public:
-    StructDecloration(const Token& id, std::vector<std::unique_ptr<VarDeclaration>>& vars)
-        : id(id), vars(std::move(vars)) {}
+    StructDecloration(const Token& id, std::vector<std::unique_ptr<VarDeclaration>>& vars);
 private:
     Token id;
     std::vector<std::unique_ptr<VarDeclaration>> vars;
@@ -73,8 +68,7 @@ private:
 
 class FuncDeclaration : public Declaration {
 public:
-    FuncDeclaration(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params)
-        : returnable_type(returnable_type), name(name), params(std::move(params)), semicolon(TokenType::SEMICOLON) {};
+    FuncDeclaration(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params);
 private:
     Token returnable_type;
     Token name;
