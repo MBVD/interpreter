@@ -44,6 +44,7 @@ private:
 class FuncDeclarator : public Declaration {
     public:
         FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params);
+        FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params, std::unique_ptr<BlockStatement> block);
     private:
         Token returnable_type;
         Token name;
@@ -59,9 +60,9 @@ private:
     std::unique_ptr<IdDeclorator> declorator;
 };
 
-class StructDecloration : public Declaration {
+class StructDeclaration : public Declaration {
 public:
-    StructDecloration(const Token& id, std::vector<std::unique_ptr<VarDeclaration>>& vars);
+    StructDeclaration(const Token& id, std::vector<std::unique_ptr<VarDeclaration>>& vars);
 private:
     Token id;
     std::vector<std::unique_ptr<VarDeclaration>> vars;

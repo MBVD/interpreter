@@ -20,5 +20,5 @@ FuncDeclarator::FuncDeclarator(const Token& returnable_type, const Token& name, 
 ParamDeclarator::ParamDeclarator(const Token& type, std::unique_ptr<IdDeclorator>& declorator)
     : type(type), declorator(std::move(declorator)) {}
 
-StructDecloration::StructDecloration(const Token& id, std::vector<std::unique_ptr<VarDeclaration>>& vars)
+StructDeclaration::StructDeclaration(const Token& id, std::vector<std::unique_ptr<VarDeclaration>>& vars)
     : id(id), vars(std::move(vars)) {}

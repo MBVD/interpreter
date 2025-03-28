@@ -50,7 +50,9 @@ std::unordered_map<std::string, TokenType> Lexer::punctuators = {
     {".", TokenType::DOT},
     {";", TokenType::SEMICOLON},
     {"{", TokenType::BRACE_LEFT},
-    {"}", TokenType::BRACE_RIGHT}
+    {"}", TokenType::BRACE_RIGHT},
+    {"(", TokenType::PARENTHESIS_LEFT},
+    {")", TokenType::PARENTHESIS_RIGHT}
 };
 std::set<std::string> Lexer::keywords = {"if", "else", "for", "while", "struct", "break", "continue", "const", "do", "false", "true", "return"};
 std::string Lexer::spec_symbols = "()-=+*&-><%^[]?";
