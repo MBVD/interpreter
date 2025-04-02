@@ -12,11 +12,11 @@ public:
     Parser(const std::vector<Token>& tokens) : tokens(tokens) {};
     std::unique_ptr<ASTNode> parse();
     using decl_ptr = std::unique_ptr<Declaration>;
-    using var_ptr = std::unique_ptr<VarDeclaration>;
+    using var_ptr = std::unique_ptr<VarDeclarator>;
     using init_ptr = std::unique_ptr<InitDeclarator>;
     using id_ptr = std::unique_ptr<IdDeclorator>;
     using param_ptr = std::unique_ptr<ParamDeclarator>;
-    using struct_ptr = std::unique_ptr<StructDeclaration>;
+    using struct_ptr = std::unique_ptr<StructDeclarator>;
     
     using expr_ptr = std::unique_ptr<Expression>;
     using ternary_expr_ptr = std::unique_ptr<TernaryExpression>;

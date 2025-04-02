@@ -92,7 +92,7 @@ runtime ошибки
 
 
 
-declarations
+declarators
 
 var 
 

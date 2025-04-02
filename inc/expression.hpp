@@ -7,6 +7,7 @@
 class BinaryExpression : public Expression {
 public:
     BinaryExpression(std::unique_ptr<Expression>& left, Token op, std::unique_ptr<Expression>& right);
+    void accept(Visitor& visitor);
 private:
     Token op;
     std::unique_ptr<Expression> left;
@@ -18,6 +19,7 @@ public:
     TernaryExpression(std::unique_ptr<Expression>& cond_expression,
                       std::unique_ptr<Expression>& true_expression,
                       std::unique_ptr<Expression>& false_expression);
+    void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> cond_expression;
     std::unique_ptr<Expression> true_expression;
@@ -27,6 +29,7 @@ private:
 class UnaryExpression : public Expression {
 public:
     UnaryExpression(std::unique_ptr<Expression>& base, const Token& op);
+    void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> base;
     Token op; // unary op or cast
@@ -35,6 +38,7 @@ private:
 class PostfixExpression : public Expression {
 public:
     PostfixExpression(std::unique_ptr<Expression>& expression, const Token& op);
+    void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> expression;
     Token op;
@@ -44,6 +48,7 @@ class SubscriptExpression : public PostfixExpression {
 public:
     SubscriptExpression(std::unique_ptr<Expression>& expression,
                         std::vector<std::unique_ptr<Expression>>& indexes);
+    void accept(Visitor& visitor);
 private:
     std::vector<std::unique_ptr<Expression>> indexes;
 };
@@ -52,6 +57,7 @@ class CallExpression : public PostfixExpression {
 public:
     CallExpression(std::unique_ptr<Expression>& expression,
                    std::vector<std::unique_ptr<Expression>>& args);
+    void accept(Visitor& visitor);
 private:
     std::vector<std::unique_ptr<Expression>> args;
 };
@@ -81,6 +87,7 @@ private:
 class GroupExpression : public Expression {
 public:
     GroupExpression(std::unique_ptr<Expression>& base);
+    void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> base;
 };

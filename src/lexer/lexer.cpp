@@ -76,9 +76,7 @@ std::vector<Token> Lexer::operator() (){
 
     while (index < input.size()) {
         Token token = extract();
-        std::cout<<"TOKEN \n"<<token.value<<"\n";
         tokens.push_back(token);
-        std::cout<<"extracted token "<< index<<"\n";
     }
     tokens.push_back({TokenType::END, ""});
     return tokens;
@@ -176,7 +174,6 @@ Token Lexer::extract_puctuator() {
         if (input.find(punctuator_data.first, index) == index){
             int prev = index;
             index += punctuator_data.first.size();
-            std::cout<<"HERE \n";
             return {punctuator_data.second, std::string{input, prev, punctuator_data.first.size()}};
         }
     }

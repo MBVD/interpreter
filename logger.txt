@@ -1,0 +1,26 @@
+In file included from /usr/include/c++/13/memory:78,
+                 from inc/expression.hpp:5,
+                 from src/parser/parse_expressions.cpp:1:
+/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = LiteralExpression; _Args = {Token&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<LiteralExpression>]’:
+src/parser/parse_expressions.cpp:96:51:   required from here
+/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: invalid new-expression of abstract class type ‘LiteralExpression’
+ 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+inc/expression.hpp:73:7: note:   because the following virtual functions are pure within ‘LiteralExpression’:
+   73 | class LiteralExpression : public Expression {
+      |       ^~~~~~~~~~~~~~~~~
+In file included from inc/expression.hpp:2:
+inc/ast.hpp:19:18: note:     ‘virtual void Expression::accept(Visitor&)’
+   19 |     virtual void accept(Visitor& visitor) = 0;
+      |                  ^~~~~~
+/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = IDexpression; _Args = {Token&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<IDexpression>]’:
+src/parser/parse_expressions.cpp:99:46:   required from here
+/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: invalid new-expression of abstract class type ‘IDexpression’
+ 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+inc/expression.hpp:80:7: note:   because the following virtual functions are pure within ‘IDexpression’:
+   80 | class IDexpression : public Expression {
+      |       ^~~~~~~~~~~~
+inc/ast.hpp:19:18: note:     ‘virtual void Expression::accept(Visitor&)’
+   19 |     virtual void accept(Visitor& visitor) = 0;
+      |                  ^~~~~~

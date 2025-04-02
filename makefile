@@ -35,8 +35,8 @@ $(BIN_DIR) $(OBJ_DIR) $(DEP_DIR):
 
 run: $(TARGET)
 	@echo "Running $<..."
-	@$(TARGET)
-
+	@cat ./file.gpp | $(TARGET)
+ 
 debug: $(TARGET)
 	@echo "Debugging $<..."
 	@gdb $(TARGET)

@@ -89,7 +89,7 @@ Parser::struct_ptr Parser::parse_struct_declaration() {
     if (this->tokens[index] != TokenType::BRACE_RIGHT){
         throw parse_struct_decl_error("");
     }
-    return std::make_unique<StructDeclaration>(id, vars);
+    return std::make_unique<StructDeclarator>(id, vars);
 }
 
 Parser::var_ptr Parser::parse_var_declaration() {
@@ -116,7 +116,7 @@ Parser::var_ptr Parser::parse_var_declaration() {
 
     }
 
-    return std::make_unique<VarDeclaration>(type, declared);
+    return std::make_unique<VarDeclarator>(type, declared);
 }
 
 Parser::init_ptr Parser::parse_init_declaration() {

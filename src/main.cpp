@@ -4,13 +4,16 @@
 #include "parser.hpp"
 
 int main(){
-    Lexer lexer = Lexer("int a = \"c\" ;");
+    std::string source_code((std::istreambuf_iterator<char>(std::cin)),
+                            std::istreambuf_iterator<char>());
+    std::cout<<source_code<<"\n";
+    Lexer lexer = Lexer(source_code);
     std::vector<Token>tokens = lexer();
     for (auto i : tokens){
         std::cout<<"["<<i.value<<"]";
     }
 
-    std::cout<<"start parsing ... \n";
+    std::cout<<"\n Start parsing ... \n";
     Parser parser = Parser(tokens);
     parser.parse();
 }
