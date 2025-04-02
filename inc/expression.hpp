@@ -6,8 +6,9 @@
 
 class BinaryExpression : public Expression {
 public:
-    BinaryExpression(std::unique_ptr<Expression>& left, std::unique_ptr<Expression>& right);
+    BinaryExpression(std::unique_ptr<Expression>& left, Token op, std::unique_ptr<Expression>& right);
 private:
+    Token op;
     std::unique_ptr<Expression> left;
     std::unique_ptr<Expression> right;
 };
@@ -39,31 +40,28 @@ private:
     Token op;
 };
 
-class SubscriptExpression : public Expression {
+class SubscriptExpression : public PostfixExpression {
 public:
     SubscriptExpression(std::unique_ptr<Expression>& expression,
                         std::vector<std::unique_ptr<Expression>>& indexes);
 private:
-    std::unique_ptr<Expression> expression;
     std::vector<std::unique_ptr<Expression>> indexes;
 };
 
-class CallExpression : public Expression {
+class CallExpression : public PostfixExpression {
 public:
     CallExpression(std::unique_ptr<Expression>& expression,
                    std::vector<std::unique_ptr<Expression>>& args);
 private:
-    std::unique_ptr<Expression> expression;
     std::vector<std::unique_ptr<Expression>> args;
 };
 
-class AccessExpression : public Expression {
+class AccessExpression : public PostfixExpression {
 public:
     AccessExpression(std::unique_ptr<Expression>& expression,
-                     std::unique_ptr<AccessExpression>& expression_to_access);
+                     std::unique_ptr<Expression>& expression_to_access);
 private:
-    std::unique_ptr<Expression> expression;
-    std::unique_ptr<AccessExpression> expression_to_access;
+    std::unique_ptr<Expression> expression_to_access;
 };
 
 class LiteralExpression : public Expression {

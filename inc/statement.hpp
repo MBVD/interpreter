@@ -27,16 +27,19 @@ private:
 };
 
 class BreakStatement : public Statement {
+public:
     ~BreakStatement() = default;
 };
 
 class ContinueStatement : public Statement {
+public:
     ~ContinueStatement() = default;
 };
 
 class BlockStatement : public Statement {
 public:
     BlockStatement(std::vector<std::unique_ptr<Statement>>& statements);
+    BlockStatement() = default;
 private:
     std::vector<std::unique_ptr<Statement>> statements;
 };
@@ -46,6 +49,8 @@ public:
     ConditionalStatement(std::unique_ptr<Expression>& conditional,
                          std::unique_ptr<Statement>& true_statement,
                          std::unique_ptr<Statement>& false_statement);
+    ConditionalStatement(std::unique_ptr<Expression>& conditional,
+                         std::unique_ptr<Statement>& true_statement);
 private:
     std::unique_ptr<Expression> conditional;
     std::unique_ptr<Statement> true_statement;
@@ -77,12 +82,14 @@ private:
 
 class ForStatement : public LoopStatement {
 public:
-    ForStatement(std::unique_ptr<VarDeclaration>& vars,
-                 std::unique_ptr<Expression>& init_expr,
+    ForStatement(std::unique_ptr<VarDeclaration>& var,
+                 std::unique_ptr<Expression>& cond_expr,
+                 std::unique_ptr<Expression>& iter_expr);
+    ForStatement(std::unique_ptr<Expression>& init_expr,
                  std::unique_ptr<Expression>& cond_expr,
                  std::unique_ptr<Expression>& iter_expr);
 private:
-    std::unique_ptr<VarDeclaration> vars;
+    std::unique_ptr<VarDeclaration> var;
     std::unique_ptr<Expression> init_expr;
     std::unique_ptr<Expression> cond_expr;
     std::unique_ptr<Expression> iter_expr;

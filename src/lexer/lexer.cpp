@@ -48,13 +48,27 @@ std::unordered_map<std::string, TokenType> Lexer::operators = {
 std::unordered_map<std::string, TokenType> Lexer::punctuators = {
     {",", TokenType::COMMA},
     {".", TokenType::DOT},
+    {":", TokenType::COLON},
     {";", TokenType::SEMICOLON},
     {"{", TokenType::BRACE_LEFT},
     {"}", TokenType::BRACE_RIGHT},
     {"(", TokenType::PARENTHESIS_LEFT},
     {")", TokenType::PARENTHESIS_RIGHT}
 };
-std::set<std::string> Lexer::keywords = {"if", "else", "for", "while", "struct", "break", "continue", "const", "do", "false", "true", "return"};
+std::unordered_map<std::string, TokenType> Lexer::keywords = {
+    {"if", TokenType::IF},
+    {"else", TokenType::ELSE},
+    {"for", TokenType::FOR},
+    {"while", TokenType::WHILE},
+    {"struct", TokenType::STRUCT},
+    {"break", TokenType::BREAK},
+    {"continue", TokenType::CONTINUE},
+    {"const", TokenType::CONST},
+    {"do", TokenType::DO},
+    {"false", TokenType::FALSE},
+    {"true", TokenType::TRUE},
+    {"return", TokenType::RETURN}
+};
 std::string Lexer::spec_symbols = "()-=+*&-><%^[]?";
 
 std::vector<Token> Lexer::operator() (){
@@ -117,16 +131,16 @@ Token Lexer::extract_literal() {
 
         std::string value(input, index, size);
         index += size;
-        return {TokenType::LITERAL, value};
+        return {TokenType::LITERAL_NUM, value};
     }
 
     if (input[index] == '\'') {
         if (index + 2 >= input.size() || input[index + 2] != '\''){
             throw syntax_error_exception("unclosed \' for char");
         }
-        int prev = index;
+        auto prev = index;
         index += 3;
-        return {TokenType::LITERAL, std::string {input, prev, 3}};
+        return {TokenType::LITERAL_CHAR, std::string {input, prev, 3}};
     }
 
     if (input[index] == '\"'){
@@ -137,10 +151,10 @@ Token Lexer::extract_literal() {
             }
             tmp++;
         }
-        int size = tmp - index + 1;
-        int prev = index;
+        auto size = tmp - index + 1;
+        auto prev = index;
         index = tmp + 1;
-        return {TokenType::LITERAL, std::string {input, prev, size}};
+        return {TokenType::LITERAL_STRING, std::string {input, prev, size}};
     }
 
     throw erroneous_extract_exception("literal");
@@ -171,11 +185,11 @@ Token Lexer::extract_puctuator() {
 
 Token Lexer::extract_keyword() {
     for (auto word : keywords){
-        if (input.find(word, index) == index){
+        if (input.find(word.first, index) == index){
             int prev = index;
-            index += word.size();
+            index += word.first.size();
 
-            return {TokenType::KEYWORD, std::string{input, prev, word.size()}};
+            return {word.second, std::string{input, prev, word.first.size()}};
         }
     }
     throw erroneous_extract_exception("keyword");

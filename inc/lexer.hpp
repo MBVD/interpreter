@@ -14,7 +14,7 @@ private:
     static std::set<std::string> types;
     static std::unordered_map<std::string, TokenType> operators;
     static std::unordered_map<std::string, TokenType> punctuators;
-    static std::set<std::string> keywords;
+    static std::unordered_map<std::string, TokenType> keywords;
     static std::string spec_symbols;
 
     Token extract();

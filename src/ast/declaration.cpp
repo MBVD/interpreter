@@ -14,10 +14,13 @@ IdDeclorator::IdDeclorator(const Token& id, IDDeclaratorType type, std::unique_p
 IdDeclorator::IdDeclorator(const Token& id, IDDeclaratorType type) : id(id), type(type) {}
 IdDeclorator::IdDeclorator(const Token& id) : id(id) {}
 
-FuncDeclarator::FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params)
-    : returnable_type(returnable_type), name(name), params(std::move(params)), semicolon(TokenType::SEMICOLON) {};
+FuncDeclarator::FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params)
+    : returnable_type(returnable_type), name(name), params(std::move(params)) {};
 
-ParamDeclarator::ParamDeclarator(const Token& type, std::unique_ptr<IdDeclorator>& declorator)
+FuncDeclarator::FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params, std::unique_ptr<BlockStatement>& block)
+    : returnable_type(returnable_type), name(name), params(std::move(params)), block(std::move(block)) {};
+
+ParamDeclarator::ParamDeclarator(const Token& type, std::unique_ptr<Declaration>& declorator)
     : type(type), declorator(std::move(declorator)) {}
 
 StructDeclaration::StructDeclaration(const Token& id, std::vector<std::unique_ptr<VarDeclaration>>& vars)

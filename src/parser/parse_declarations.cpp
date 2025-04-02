@@ -7,7 +7,7 @@ Parser::decl_ptr Parser::parse_func_declaration() {
     auto func_index = this->index;
     auto returnable_type = this->tokens[index];
     if (returnable_type != TokenType::ID || returnable_type != TokenType::TYPE){
-        throw parse_func_decl_error(""); // потом придумать кокой то умный message
+        throw parse_func_decl_error(""); // TODO потом придумать кокой то умный message
     }
     index++;
     auto name = this->tokens[index];
@@ -35,7 +35,7 @@ Parser::decl_ptr Parser::parse_func_declaration() {
         return std::make_unique<FuncDeclarator>(returnable_type, name, params);
     } else {
         try {
-            Parser::block_ptr block = parse_block_statement();
+            Parser::block_st_ptr block = parse_block_statement();
             return std::make_unique<FuncDeclarator>(returnable_type, name, params, block);
         } catch (const parse_block_st_error&) {
             index = func_index;
@@ -84,7 +84,7 @@ Parser::struct_ptr Parser::parse_struct_declaration() {
             index = struct_index;
             throw parse_struct_decl_error("");
         }
-        vars.push_back(var);
+        vars.push_back(std::move(var));
     }
     if (this->tokens[index] != TokenType::BRACE_RIGHT){
         throw parse_struct_decl_error("");
@@ -109,9 +109,9 @@ Parser::var_ptr Parser::parse_var_declaration() {
     std::vector<std::unique_ptr<InitDeclarator>> declared;
     declared.push_back(std::move(first_declared));
     while(this->tokens[index] == TokenType::COMMA){
-        declared.push_back(parse_init_declaration());
+        declared.push_back(std::move(parse_init_declaration()));
     }
-    // проверка на ;
+    // TODO кинуть exception проверка на ; 
     if (this->tokens[index++] != TokenType::SEMICOLON){
 
     }
@@ -150,8 +150,8 @@ Parser::id_ptr Parser::parse_id_declaration() {
         throw parse_id_decl_error("");
     }
     index++;
-    if (id_modifiers.contains(id)){
-        auto id_type = id_modifiers[id];
+    if (id_modifiers.contains(id.type)){
+        auto id_type = id_modifiers[id.type];
         if (id == TokenType::INDEX_LEFT){
             auto expr = parse_expression();
             return std::make_unique<IdDeclorator>(id, id_type, expr);

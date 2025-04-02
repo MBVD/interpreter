@@ -43,21 +43,20 @@ private:
 
 class FuncDeclarator : public Declaration {
     public:
-        FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params);
-        FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>&& params, std::unique_ptr<BlockStatement> block);
+        FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params);
+        FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params, std::unique_ptr<BlockStatement>& block);
     private:
         Token returnable_type;
         Token name;
         std::vector<std::unique_ptr<ParamDeclarator>>params;
-        Token semicolon;
         std::unique_ptr<BlockStatement> block;
     };
 class ParamDeclarator : public Declaration {
 public:
-    ParamDeclarator(const Token& type, std::unique_ptr<IdDeclorator>& declorator);
+    ParamDeclarator(const Token& type, std::unique_ptr<Declaration>& declorator);
 private:
     Token type; // может быть и id
-    std::unique_ptr<IdDeclorator> declorator;
+    std::unique_ptr<Declaration> declorator;
 };
 
 class StructDeclaration : public Declaration {
