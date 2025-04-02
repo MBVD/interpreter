@@ -64,4 +64,10 @@ ForStatement::ForStatement(std::unique_ptr<Expression>& init_expr,
     cond_expr(std::move(cond_expr)),
     iter_expr(std::move(iter_expr)) {}
 
-void ForStatement::accept(Visitor& visitor) { visitor.visit(*this); }
+void BreakStatement::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}
+
+void ContinueStatement::accept(Visitor& visitor) {
+    visitor.visit(*this);
+}

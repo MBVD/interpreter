@@ -67,7 +67,7 @@ private:
 class LoopStatement : public Statement {
 public:
     virtual ~LoopStatement() = default;
-    virtual void accept(Visitor& visitor);
+    virtual void accept(Visitor& visitor) = 0;
 };
 
 class WhileStatement : public LoopStatement {

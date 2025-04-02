@@ -38,7 +38,7 @@ private:
 class PostfixExpression : public Expression {
 public:
     PostfixExpression(std::unique_ptr<Expression>& expression, const Token& op);
-    void accept(Visitor& visitor);
+    virtual void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> expression;
     Token op;
@@ -66,6 +66,7 @@ class AccessExpression : public PostfixExpression {
 public:
     AccessExpression(std::unique_ptr<Expression>& expression,
                      std::unique_ptr<Expression>& expression_to_access);
+    void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> expression_to_access;
 };
@@ -73,6 +74,7 @@ private:
 class LiteralExpression : public Expression {
 public:
     LiteralExpression(const Token& token) : token(token) {}
+    void accept(Visitor&);
 private:
     Token token;
 };
@@ -80,6 +82,7 @@ private:
 class IDexpression : public Expression {
 public:
     IDexpression(const Token& token) : token(token) {}
+    void accept(Visitor&);
 private:
     Token token;
 };

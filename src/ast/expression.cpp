@@ -47,3 +47,7 @@ GroupExpression::GroupExpression(std::unique_ptr<Expression>& base)
     : base(std::move(base)) {}
 
 void GroupExpression::accept(Visitor& visitor) { visitor.visit(*this); }
+
+void LiteralExpression::accept(Visitor& visitor) { visitor.visit(*this); }
+
+void IDexpression::accept(Visitor& visitor) { visitor.visit(*this); }
