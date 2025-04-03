@@ -6,33 +6,70 @@
 
 class Visitor {
 public:
-    virtual void visit(VarDeclarator&) = 0;
-    virtual void visit(InitDeclarator& ) = 0;
-    virtual void visit(IdDeclorator& ) = 0;
-    virtual void visit(FuncDeclarator& ) = 0;
-    virtual void visit(ParamDeclarator& ) = 0;
-    virtual void visit(StructDeclarator& ) = 0;
+    virtual void visit(std::unique_ptr<Declaration>&) = 0;
+    virtual void visit(std::unique_ptr<VarDeclarator>&) = 0;
+    virtual void visit(std::unique_ptr<InitDeclarator>& ) = 0;
+    virtual void visit(std::unique_ptr<IdDeclorator>& ) = 0;
+    virtual void visit(std::unique_ptr<FuncDeclarator>& ) = 0;
+    virtual void visit(std::unique_ptr<ParamDeclarator>& ) = 0;
+    virtual void visit(std::unique_ptr<StructDeclarator>& ) = 0;
 
-    virtual void visit(BinaryExpression&) = 0;
-    virtual void visit(TernaryExpression&) = 0;
-    virtual void visit(UnaryExpression&) = 0;
-    virtual void visit(PostfixExpression&) = 0;
-    virtual void visit(SubscriptExpression&) = 0;
-    virtual void visit(CallExpression&) = 0;
-    virtual void visit(AccessExpression&) = 0;
-    virtual void visit(LiteralExpression&) = 0;
-    virtual void visit(IDexpression&) = 0;
-    virtual void visit(GroupExpression&) = 0;
+    virtual void visit(std::unique_ptr<Expression>&) = 0;
+    virtual void visit(std::unique_ptr<BinaryExpression>&) = 0;
+    virtual void visit(std::unique_ptr<TernaryExpression>&) = 0;
+    virtual void visit(std::unique_ptr<UnaryExpression>&) = 0;
+    virtual void visit(std::unique_ptr<PostfixExpression>&) = 0;
+    virtual void visit(std::unique_ptr<SubscriptExpression>&) = 0;
+    virtual void visit(std::unique_ptr<CallExpression>&) = 0;
+    virtual void visit(std::unique_ptr<AccessExpression>&) = 0;
+    virtual void visit(std::unique_ptr<LiteralExpression>&) = 0;
+    virtual void visit(std::unique_ptr<IDexpression>&) = 0;
+    virtual void visit(std::unique_ptr<GroupExpression>&) = 0;
 
-    virtual void visit(ExpressionStatement&) = 0;
-    virtual void visit(DeclorationStatement&) = 0;
-    virtual void visit(ReturnStatement&) = 0;
-    virtual void visit(BreakStatement&) = 0;
-    virtual void visit(ContinueStatement&) = 0;
-    virtual void visit(BlockStatement&) = 0;
-    virtual void visit(ConditionalStatement&) = 0;
-    virtual void visit(WhileStatement&) = 0;
-    virtual void visit(DoWhileStatement&) = 0;
-    virtual void visit(ForStatement&) = 0;
+    virtual void visit(std::unique_ptr<Statement>&) = 0;
+    virtual void visit(std::unique_ptr<ExpressionStatement>&) = 0;
+    virtual void visit(std::unique_ptr<DeclorationStatement>&) = 0;
+    virtual void visit(std::unique_ptr<ReturnStatement>&) = 0;
+    virtual void visit(std::unique_ptr<BreakStatement>&) = 0;
+    virtual void visit(std::unique_ptr<ContinueStatement>&) = 0;
+    virtual void visit(std::unique_ptr<BlockStatement>&) = 0;
+    virtual void visit(std::unique_ptr<ConditionalStatement>&) = 0;
+    virtual void visit(std::unique_ptr<WhileStatement>&) = 0;
+    virtual void visit(std::unique_ptr<DoWhileStatement>&) = 0;
+    virtual void visit(std::unique_ptr<ForStatement>&) = 0;
+
+    
+    virtual void visit(const std::unique_ptr<Declaration>&) = 0;
+    virtual void visit(const std::unique_ptr<VarDeclarator>&) = 0;
+    virtual void visit(const std::unique_ptr<InitDeclarator>& ) = 0;
+    virtual void visit(const std::unique_ptr<IdDeclorator>& ) = 0;
+    virtual void visit(const std::unique_ptr<FuncDeclarator>& ) = 0;
+    virtual void visit(const std::unique_ptr<ParamDeclarator>& ) = 0;
+    virtual void visit(const std::unique_ptr<StructDeclarator>& ) = 0;
+    
+    virtual void visit(const std::unique_ptr<Expression>&) = 0;
+    virtual void visit(const std::unique_ptr<BinaryExpression>&) = 0;
+    virtual void visit(const std::unique_ptr<TernaryExpression>&) = 0;
+    virtual void visit(const std::unique_ptr<UnaryExpression>&) = 0;
+    virtual void visit(const std::unique_ptr<PostfixExpression>&) = 0;
+    virtual void visit(const std::unique_ptr<SubscriptExpression>&) = 0;
+    virtual void visit(const std::unique_ptr<CallExpression>&) = 0;
+    virtual void visit(const std::unique_ptr<AccessExpression>&) = 0;
+    virtual void visit(const std::unique_ptr<LiteralExpression>&) = 0;
+    virtual void visit(const std::unique_ptr<IDexpression>&) = 0;
+    virtual void visit(const std::unique_ptr<GroupExpression>&) = 0;
+
+    virtual void visit(const std::unique_ptr<Statement>&) = 0;
+    virtual void visit(const std::unique_ptr<ExpressionStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<DeclorationStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<ReturnStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<BreakStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<ContinueStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<BlockStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<ConditionalStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<LoopStatement>& node) = 0;
+    virtual void visit(const std::unique_ptr<WhileStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<DoWhileStatement>&) = 0;
+    virtual void visit(const std::unique_ptr<ForStatement>&) = 0;
 private:
 };

@@ -25,4 +25,10 @@ struct Token {
     Token(TokenType type) : type(type) {}
 
     Token(TokenType type, std::string value) : type(type), value(value) {}
+
 };
+
+std::ostream& operator<< (std::ostream& out, const Token& token) {
+    out<<token.value;
+    return out;
+}
