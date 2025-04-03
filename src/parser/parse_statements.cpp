@@ -1,6 +1,7 @@
 #include "exceptions.hpp"
 #include "parser.hpp"
 #include <iostream>
+#include "exceptions.hpp"
 
 
 Parser::expr_st_ptr Parser::parse_expression_stetement(){
@@ -200,8 +201,15 @@ Parser::for_st_prt Parser::parse_for_statement() {
     if (this->tokens[index++] != TokenType::PARENTHESIS_RIGHT){
         throw parse_for_statement_error("");
     }
+    Parser::statement_ptr statement;
+    try {
+        statement = parse_statement();
+    } catch (const statement_parsing_error& ){
+        index = for_index;
+        throw parse_for_statement_error("");
+    }
     
-    return is_var ? std::make_unique<ForStatement>(var, cond_expression, iter_expression) : std::make_unique<ForStatement>(init_expression, cond_expression, iter_expression);
+    return is_var ? std::make_unique<ForStatement>(var, cond_expression, iter_expression, statement) : std::make_unique<ForStatement>(init_expression, cond_expression, iter_expression, statement);
 }
 
 Parser::return_st_ptr Parser::parse_return_statement() {

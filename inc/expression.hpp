@@ -8,6 +8,9 @@ class BinaryExpression : public Expression {
 public:
     BinaryExpression(std::unique_ptr<Expression>& left, Token op, std::unique_ptr<Expression>& right);
     void accept(Visitor& visitor);
+    const Token& get_op();
+    const std::unique_ptr<Expression>& get_left();
+    const std::unique_ptr<Expression>& get_right();
 private:
     Token op;
     std::unique_ptr<Expression> left;
@@ -20,6 +23,9 @@ public:
                       std::unique_ptr<Expression>& true_expression,
                       std::unique_ptr<Expression>& false_expression);
     void accept(Visitor& visitor);
+    const std::unique_ptr<Expression>& get_cond_expression();
+    const std::unique_ptr<Expression>& get_true_expression();
+    const std::unique_ptr<Expression>& get_false_expression();
 private:
     std::unique_ptr<Expression> cond_expression;
     std::unique_ptr<Expression> true_expression;
@@ -30,6 +36,8 @@ class UnaryExpression : public Expression {
 public:
     UnaryExpression(std::unique_ptr<Expression>& base, const Token& op);
     void accept(Visitor& visitor);
+    const Token& get_op();
+    const std::unique_ptr<Expression>& get_base();
 private:
     std::unique_ptr<Expression> base;
     Token op; // unary op or cast
@@ -39,6 +47,8 @@ class PostfixExpression : public Expression {
 public:
     PostfixExpression(std::unique_ptr<Expression>& expression, const Token& op);
     virtual void accept(Visitor& visitor);
+    const Token& get_op();
+    const std::unique_ptr<Expression>& get_expression();
 private:
     std::unique_ptr<Expression> expression;
     Token op;
@@ -49,6 +59,7 @@ public:
     SubscriptExpression(std::unique_ptr<Expression>& expression,
                         std::vector<std::unique_ptr<Expression>>& indexes);
     void accept(Visitor& visitor);
+    const std::vector<std::unique_ptr<Expression>>& get_indexes();
 private:
     std::vector<std::unique_ptr<Expression>> indexes;
 };
@@ -58,6 +69,7 @@ public:
     CallExpression(std::unique_ptr<Expression>& expression,
                    std::vector<std::unique_ptr<Expression>>& args);
     void accept(Visitor& visitor);
+    const std::vector<std::unique_ptr<Expression>>& get_args();
 private:
     std::vector<std::unique_ptr<Expression>> args;
 };
@@ -67,6 +79,7 @@ public:
     AccessExpression(std::unique_ptr<Expression>& expression,
                      std::unique_ptr<Expression>& expression_to_access);
     void accept(Visitor& visitor);
+    const std::unique_ptr<Expression>& get_expression_to_access();    
 private:
     std::unique_ptr<Expression> expression_to_access;
 };
@@ -75,6 +88,7 @@ class LiteralExpression : public Expression {
 public:
     LiteralExpression(const Token& token) : token(token) {}
     void accept(Visitor&);
+    const Token& get_token();
 private:
     Token token;
 };
@@ -83,6 +97,7 @@ class IDexpression : public Expression {
 public:
     IDexpression(const Token& token) : token(token) {}
     void accept(Visitor&);
+    const Token& get_token();
 private:
     Token token;
 };
@@ -91,6 +106,7 @@ class GroupExpression : public Expression {
 public:
     GroupExpression(std::unique_ptr<Expression>& base);
     void accept(Visitor& visitor);
+    const std::unique_ptr<Expression>& get_base();
 private:
     std::unique_ptr<Expression> base;
 };
