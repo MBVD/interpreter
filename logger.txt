@@ -1,112 +1,188 @@
+src/visitor/printer.cpp:92:6: error: redefinition of ‘void Printer::visit(const std::unique_ptr<Expression>&)’
+   92 | void Printer::visit(const std::unique_ptr<Expression>& node){
+      |      ^~~~~~~
+src/visitor/printer.cpp:24:6: note: ‘virtual void Printer::visit(const std::unique_ptr<Expression>&)’ previously defined here
+   24 | void Printer::visit(const std::unique_ptr<Expression>& node){
+      |      ^~~~~~~
+In file included from /usr/include/c++/13/vector:65,
+                 from inc/declaration.hpp:2,
+                 from inc/visitor.hpp:3,
+                 from inc/printer.hpp:1,
+                 from src/visitor/printer.cpp:2:
+/usr/include/c++/13/bits/stl_uninitialized.h: In instantiation of ‘constexpr bool std::__check_constructible() [with _ValueType = unique_ptr<ParamDeclarator>; _Tp = const unique_ptr<ParamDeclarator>&]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:182:4:   required from ‘_ForwardIterator std::uninitialized_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<ParamDeclarator>*, vector<unique_ptr<ParamDeclarator> > >; _ForwardIterator = unique_ptr<ParamDeclarator>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:373:37:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<ParamDeclarator>*, vector<unique_ptr<ParamDeclarator> > >; _ForwardIterator = unique_ptr<ParamDeclarator>*; _Tp = unique_ptr<ParamDeclarator>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<ParamDeclarator>; _Alloc = std::allocator<std::unique_ptr<ParamDeclarator> >]’
+src/visitor/printer.cpp:55:41:   required from here
+/usr/include/c++/13/bits/stl_uninitialized.h:90:56: error: static assertion failed: result type must be constructible from input type
+   90 |       static_assert(is_constructible<_ValueType, _Tp>::value,
+      |                                                        ^~~~~
+/usr/include/c++/13/bits/stl_uninitialized.h:90:56: note: ‘std::integral_constant<bool, false>::value’ evaluates to false
+/usr/include/c++/13/bits/stl_uninitialized.h: In instantiation of ‘constexpr bool std::__check_constructible() [with _ValueType = unique_ptr<VarDeclarator>; _Tp = const unique_ptr<VarDeclarator>&]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:182:4:   required from ‘_ForwardIterator std::uninitialized_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<VarDeclarator>*, vector<unique_ptr<VarDeclarator> > >; _ForwardIterator = unique_ptr<VarDeclarator>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:373:37:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<VarDeclarator>*, vector<unique_ptr<VarDeclarator> > >; _ForwardIterator = unique_ptr<VarDeclarator>*; _Tp = unique_ptr<VarDeclarator>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<VarDeclarator>; _Alloc = std::allocator<std::unique_ptr<VarDeclarator> >]’
+src/visitor/printer.cpp:81:32:   required from here
+/usr/include/c++/13/bits/stl_uninitialized.h:90:56: error: static assertion failed: result type must be constructible from input type
+/usr/include/c++/13/bits/stl_uninitialized.h:90:56: note: ‘std::integral_constant<bool, false>::value’ evaluates to false
+/usr/include/c++/13/bits/stl_uninitialized.h: In instantiation of ‘constexpr bool std::__check_constructible() [with _ValueType = unique_ptr<Expression>; _Tp = const unique_ptr<Expression>&]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:182:4:   required from ‘_ForwardIterator std::uninitialized_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Expression>*, vector<unique_ptr<Expression> > >; _ForwardIterator = unique_ptr<Expression>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:373:37:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Expression>*, vector<unique_ptr<Expression> > >; _ForwardIterator = unique_ptr<Expression>*; _Tp = unique_ptr<Expression>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<Expression>; _Alloc = std::allocator<std::unique_ptr<Expression> >]’
+src/visitor/printer.cpp:131:38:   required from here
+/usr/include/c++/13/bits/stl_uninitialized.h:90:56: error: static assertion failed: result type must be constructible from input type
+/usr/include/c++/13/bits/stl_uninitialized.h:90:56: note: ‘std::integral_constant<bool, false>::value’ evaluates to false
+/usr/include/c++/13/bits/stl_uninitialized.h: In instantiation of ‘constexpr bool std::__check_constructible() [with _ValueType = unique_ptr<Statement>; _Tp = const unique_ptr<Statement>&]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:182:4:   required from ‘_ForwardIterator std::uninitialized_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Statement>*, vector<unique_ptr<Statement> > >; _ForwardIterator = unique_ptr<Statement>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:373:37:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Statement>*, vector<unique_ptr<Statement> > >; _ForwardIterator = unique_ptr<Statement>*; _Tp = unique_ptr<Statement>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<Statement>; _Alloc = std::allocator<std::unique_ptr<Statement> >]’
+src/visitor/printer.cpp:209:44:   required from here
+/usr/include/c++/13/bits/stl_uninitialized.h:90:56: error: static assertion failed: result type must be constructible from input type
+/usr/include/c++/13/bits/stl_uninitialized.h:90:56: note: ‘std::integral_constant<bool, false>::value’ evaluates to false
+In file included from /usr/include/c++/13/bits/char_traits.h:57,
+                 from /usr/include/c++/13/ios:42,
+                 from /usr/include/c++/13/ostream:40,
+                 from /usr/include/c++/13/iostream:41,
+                 from src/visitor/printer.cpp:1:
+/usr/include/c++/13/bits/stl_construct.h: In instantiation of ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<ParamDeclarator>; _Args = {const unique_ptr<ParamDeclarator, default_delete<ParamDeclarator> >&}]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<ParamDeclarator>*, vector<unique_ptr<ParamDeclarator> > >; _ForwardIterator = unique_ptr<ParamDeclarator>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<ParamDeclarator>*, vector<unique_ptr<ParamDeclarator> > >; _ForwardIterator = unique_ptr<ParamDeclarator>*; _Tp = unique_ptr<ParamDeclarator>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<ParamDeclarator>; _Alloc = std::allocator<std::unique_ptr<ParamDeclarator> >]’
+src/visitor/printer.cpp:55:41:   required from here
+/usr/include/c++/13/bits/stl_construct.h:115:28: error: no matching function for call to ‘construct_at(std::unique_ptr<ParamDeclarator>*&, const std::unique_ptr<ParamDeclarator>&)’
+  115 |           std::construct_at(__p, std::forward<_Args>(__args)...);
+      |           ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h:94:5: note: candidate: ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...)’
+   94 |     construct_at(_Tp* __location, _Args&&... __args)
+      |     ^~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h:94:5: note:   template argument deduction/substitution failed:
+/usr/include/c++/13/bits/stl_construct.h: In substitution of ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...) [with _Tp = std::unique_ptr<ParamDeclarator>; _Args = {const std::unique_ptr<ParamDeclarator, std::default_delete<ParamDeclarator> >&}]’:
+/usr/include/c++/13/bits/stl_construct.h:115:21:   required from ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<ParamDeclarator>; _Args = {const unique_ptr<ParamDeclarator, default_delete<ParamDeclarator> >&}]’
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<ParamDeclarator>*, vector<unique_ptr<ParamDeclarator> > >; _ForwardIterator = unique_ptr<ParamDeclarator>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<ParamDeclarator>*, vector<unique_ptr<ParamDeclarator> > >; _ForwardIterator = unique_ptr<ParamDeclarator>*; _Tp = unique_ptr<ParamDeclarator>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<ParamDeclarator>; _Alloc = std::allocator<std::unique_ptr<ParamDeclarator> >]’
+src/visitor/printer.cpp:55:41:   required from here
+/usr/include/c++/13/bits/stl_construct.h:96:17: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = ParamDeclarator; _Dp = std::default_delete<ParamDeclarator>]’
+   96 |     -> decltype(::new((void*)0) _Tp(std::declval<_Args>()...))
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In file included from /usr/include/c++/13/memory:78,
-                 from inc/expression.hpp:5,
-                 from src/ast/expression.cpp:1:
-/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = BinaryExpression; _Args = {BinaryExpression&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<BinaryExpression>]’:
-src/ast/expression.cpp:8:53:   required from here
-/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: use of deleted function ‘BinaryExpression::BinaryExpression(const BinaryExpression&)’
- 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:7:7: note: ‘BinaryExpression::BinaryExpression(const BinaryExpression&)’ is implicitly deleted because the default definition would be ill-formed:
-    7 | class BinaryExpression : public Expression {
-      |       ^~~~~~~~~~~~~~~~
-inc/expression.hpp:7:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
+                 from inc/declaration.hpp:3:
 /usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
   522 |       unique_ptr(const unique_ptr&) = delete;
       |       ^~~~~~~~~~
-inc/expression.hpp:7:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
-    7 | class BinaryExpression : public Expression {
-      |       ^~~~~~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h: In instantiation of ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<ParamDeclarator>; _Args = {const unique_ptr<ParamDeclarator, default_delete<ParamDeclarator> >&}]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<ParamDeclarator>*, vector<unique_ptr<ParamDeclarator> > >; _ForwardIterator = unique_ptr<ParamDeclarator>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<ParamDeclarator>*, vector<unique_ptr<ParamDeclarator> > >; _ForwardIterator = unique_ptr<ParamDeclarator>*; _Tp = unique_ptr<ParamDeclarator>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<ParamDeclarator>; _Alloc = std::allocator<std::unique_ptr<ParamDeclarator> >]’
+src/visitor/printer.cpp:55:41:   required from here
+/usr/include/c++/13/bits/stl_construct.h:119:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = ParamDeclarator; _Dp = std::default_delete<ParamDeclarator>]’
+  119 |       ::new((void*)__p) _Tp(std::forward<_Args>(__args)...);
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
   522 |       unique_ptr(const unique_ptr&) = delete;
       |       ^~~~~~~~~~
-/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = TernaryExpression; _Args = {TernaryExpression&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<TernaryExpression>]’:
-src/ast/expression.cpp:31:54:   required from here
-/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: use of deleted function ‘TernaryExpression::TernaryExpression(const TernaryExpression&)’
- 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:20:7: note: ‘TernaryExpression::TernaryExpression(const TernaryExpression&)’ is implicitly deleted because the default definition would be ill-formed:
-   20 | class TernaryExpression : public Expression {
-      |       ^~~~~~~~~~~~~~~~~
-inc/expression.hpp:20:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
+/usr/include/c++/13/bits/stl_construct.h: In instantiation of ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<VarDeclarator>; _Args = {const unique_ptr<VarDeclarator, default_delete<VarDeclarator> >&}]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<VarDeclarator>*, vector<unique_ptr<VarDeclarator> > >; _ForwardIterator = unique_ptr<VarDeclarator>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<VarDeclarator>*, vector<unique_ptr<VarDeclarator> > >; _ForwardIterator = unique_ptr<VarDeclarator>*; _Tp = unique_ptr<VarDeclarator>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<VarDeclarator>; _Alloc = std::allocator<std::unique_ptr<VarDeclarator> >]’
+src/visitor/printer.cpp:81:32:   required from here
+/usr/include/c++/13/bits/stl_construct.h:115:28: error: no matching function for call to ‘construct_at(std::unique_ptr<VarDeclarator>*&, const std::unique_ptr<VarDeclarator>&)’
+  115 |           std::construct_at(__p, std::forward<_Args>(__args)...);
+      |           ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h:94:5: note: candidate: ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...)’
+   94 |     construct_at(_Tp* __location, _Args&&... __args)
+      |     ^~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h:94:5: note:   template argument deduction/substitution failed:
+/usr/include/c++/13/bits/stl_construct.h: In substitution of ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...) [with _Tp = std::unique_ptr<VarDeclarator>; _Args = {const std::unique_ptr<VarDeclarator, std::default_delete<VarDeclarator> >&}]’:
+/usr/include/c++/13/bits/stl_construct.h:115:21:   required from ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<VarDeclarator>; _Args = {const unique_ptr<VarDeclarator, default_delete<VarDeclarator> >&}]’
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<VarDeclarator>*, vector<unique_ptr<VarDeclarator> > >; _ForwardIterator = unique_ptr<VarDeclarator>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<VarDeclarator>*, vector<unique_ptr<VarDeclarator> > >; _ForwardIterator = unique_ptr<VarDeclarator>*; _Tp = unique_ptr<VarDeclarator>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<VarDeclarator>; _Alloc = std::allocator<std::unique_ptr<VarDeclarator> >]’
+src/visitor/printer.cpp:81:32:   required from here
+/usr/include/c++/13/bits/stl_construct.h:96:17: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = VarDeclarator; _Dp = std::default_delete<VarDeclarator>]’
+   96 |     -> decltype(::new((void*)0) _Tp(std::declval<_Args>()...))
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
   522 |       unique_ptr(const unique_ptr&) = delete;
       |       ^~~~~~~~~~
-inc/expression.hpp:20:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
-   20 | class TernaryExpression : public Expression {
-      |       ^~~~~~~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h: In instantiation of ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<VarDeclarator>; _Args = {const unique_ptr<VarDeclarator, default_delete<VarDeclarator> >&}]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<VarDeclarator>*, vector<unique_ptr<VarDeclarator> > >; _ForwardIterator = unique_ptr<VarDeclarator>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<VarDeclarator>*, vector<unique_ptr<VarDeclarator> > >; _ForwardIterator = unique_ptr<VarDeclarator>*; _Tp = unique_ptr<VarDeclarator>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<VarDeclarator>; _Alloc = std::allocator<std::unique_ptr<VarDeclarator> >]’
+src/visitor/printer.cpp:81:32:   required from here
+/usr/include/c++/13/bits/stl_construct.h:119:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = VarDeclarator; _Dp = std::default_delete<VarDeclarator>]’
+  119 |       ::new((void*)__p) _Tp(std::forward<_Args>(__args)...);
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
   522 |       unique_ptr(const unique_ptr&) = delete;
       |       ^~~~~~~~~~
-inc/expression.hpp:20:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
-   20 | class TernaryExpression : public Expression {
-      |       ^~~~~~~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h: In instantiation of ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<Expression>; _Args = {const unique_ptr<Expression, default_delete<Expression> >&}]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Expression>*, vector<unique_ptr<Expression> > >; _ForwardIterator = unique_ptr<Expression>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Expression>*, vector<unique_ptr<Expression> > >; _ForwardIterator = unique_ptr<Expression>*; _Tp = unique_ptr<Expression>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<Expression>; _Alloc = std::allocator<std::unique_ptr<Expression> >]’
+src/visitor/printer.cpp:131:38:   required from here
+/usr/include/c++/13/bits/stl_construct.h:115:28: error: no matching function for call to ‘construct_at(std::unique_ptr<Expression>*&, const std::unique_ptr<Expression>&)’
+  115 |           std::construct_at(__p, std::forward<_Args>(__args)...);
+      |           ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h:94:5: note: candidate: ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...)’
+   94 |     construct_at(_Tp* __location, _Args&&... __args)
+      |     ^~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h:94:5: note:   template argument deduction/substitution failed:
+/usr/include/c++/13/bits/stl_construct.h: In substitution of ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...) [with _Tp = std::unique_ptr<Expression>; _Args = {const std::unique_ptr<Expression, std::default_delete<Expression> >&}]’:
+/usr/include/c++/13/bits/stl_construct.h:115:21:   required from ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<Expression>; _Args = {const unique_ptr<Expression, default_delete<Expression> >&}]’
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Expression>*, vector<unique_ptr<Expression> > >; _ForwardIterator = unique_ptr<Expression>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Expression>*, vector<unique_ptr<Expression> > >; _ForwardIterator = unique_ptr<Expression>*; _Tp = unique_ptr<Expression>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<Expression>; _Alloc = std::allocator<std::unique_ptr<Expression> >]’
+src/visitor/printer.cpp:131:38:   required from here
+/usr/include/c++/13/bits/stl_construct.h:96:17: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
+   96 |     -> decltype(::new((void*)0) _Tp(std::declval<_Args>()...))
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
   522 |       unique_ptr(const unique_ptr&) = delete;
       |       ^~~~~~~~~~
-/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = UnaryExpression; _Args = {UnaryExpression&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<UnaryExpression>]’:
-src/ast/expression.cpp:50:52:   required from here
-/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: use of deleted function ‘UnaryExpression::UnaryExpression(const UnaryExpression&)’
- 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:35:7: note: ‘UnaryExpression::UnaryExpression(const UnaryExpression&)’ is implicitly deleted because the default definition would be ill-formed:
-   35 | class UnaryExpression : public Expression {
-      |       ^~~~~~~~~~~~~~~
-inc/expression.hpp:35:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
+/usr/include/c++/13/bits/stl_construct.h: In instantiation of ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<Expression>; _Args = {const unique_ptr<Expression, default_delete<Expression> >&}]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Expression>*, vector<unique_ptr<Expression> > >; _ForwardIterator = unique_ptr<Expression>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Expression>*, vector<unique_ptr<Expression> > >; _ForwardIterator = unique_ptr<Expression>*; _Tp = unique_ptr<Expression>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<Expression>; _Alloc = std::allocator<std::unique_ptr<Expression> >]’
+src/visitor/printer.cpp:131:38:   required from here
+/usr/include/c++/13/bits/stl_construct.h:119:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
+  119 |       ::new((void*)__p) _Tp(std::forward<_Args>(__args)...);
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
   522 |       unique_ptr(const unique_ptr&) = delete;
       |       ^~~~~~~~~~
-/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = PostfixExpression; _Args = {PostfixExpression&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<PostfixExpression>]’:
-src/ast/expression.cpp:64:54:   required from here
-/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: use of deleted function ‘PostfixExpression::PostfixExpression(const PostfixExpression&)’
- 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:46:7: note: ‘PostfixExpression::PostfixExpression(const PostfixExpression&)’ is implicitly deleted because the default definition would be ill-formed:
-   46 | class PostfixExpression : public Expression {
-      |       ^~~~~~~~~~~~~~~~~
-inc/expression.hpp:46:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
+/usr/include/c++/13/bits/stl_construct.h: In instantiation of ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<Statement>; _Args = {const unique_ptr<Statement, default_delete<Statement> >&}]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Statement>*, vector<unique_ptr<Statement> > >; _ForwardIterator = unique_ptr<Statement>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Statement>*, vector<unique_ptr<Statement> > >; _ForwardIterator = unique_ptr<Statement>*; _Tp = unique_ptr<Statement>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<Statement>; _Alloc = std::allocator<std::unique_ptr<Statement> >]’
+src/visitor/printer.cpp:209:44:   required from here
+/usr/include/c++/13/bits/stl_construct.h:115:28: error: no matching function for call to ‘construct_at(std::unique_ptr<Statement>*&, const std::unique_ptr<Statement>&)’
+  115 |           std::construct_at(__p, std::forward<_Args>(__args)...);
+      |           ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h:94:5: note: candidate: ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...)’
+   94 |     construct_at(_Tp* __location, _Args&&... __args)
+      |     ^~~~~~~~~~~~
+/usr/include/c++/13/bits/stl_construct.h:94:5: note:   template argument deduction/substitution failed:
+/usr/include/c++/13/bits/stl_construct.h: In substitution of ‘template<class _Tp, class ... _Args> constexpr decltype (::new(void*(0)) _Tp) std::construct_at(_Tp*, _Args&& ...) [with _Tp = std::unique_ptr<Statement>; _Args = {const std::unique_ptr<Statement, std::default_delete<Statement> >&}]’:
+/usr/include/c++/13/bits/stl_construct.h:115:21:   required from ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<Statement>; _Args = {const unique_ptr<Statement, default_delete<Statement> >&}]’
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Statement>*, vector<unique_ptr<Statement> > >; _ForwardIterator = unique_ptr<Statement>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Statement>*, vector<unique_ptr<Statement> > >; _ForwardIterator = unique_ptr<Statement>*; _Tp = unique_ptr<Statement>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<Statement>; _Alloc = std::allocator<std::unique_ptr<Statement> >]’
+src/visitor/printer.cpp:209:44:   required from here
+/usr/include/c++/13/bits/stl_construct.h:96:17: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Statement; _Dp = std::default_delete<Statement>]’
+   96 |     -> decltype(::new((void*)0) _Tp(std::declval<_Args>()...))
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
   522 |       unique_ptr(const unique_ptr&) = delete;
       |       ^~~~~~~~~~
-/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = SubscriptExpression; _Args = {SubscriptExpression&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<SubscriptExpression>]’:
-src/ast/expression.cpp:79:56:   required from here
-/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: use of deleted function ‘SubscriptExpression::SubscriptExpression(const SubscriptExpression&)’
- 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:57:7: note: ‘SubscriptExpression::SubscriptExpression(const SubscriptExpression&)’ is implicitly deleted because the default definition would be ill-formed:
-   57 | class SubscriptExpression : public PostfixExpression {
-      |       ^~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:57:7: error: use of deleted function ‘PostfixExpression::PostfixExpression(const PostfixExpression&)’
-/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = CallExpression; _Args = {CallExpression&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<CallExpression>]’:
-src/ast/expression.cpp:91:51:   required from here
-/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: use of deleted function ‘CallExpression::CallExpression(const CallExpression&)’
- 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:67:7: note: ‘CallExpression::CallExpression(const CallExpression&)’ is implicitly deleted because the default definition would be ill-formed:
-   67 | class CallExpression : public PostfixExpression {
-      |       ^~~~~~~~~~~~~~
-inc/expression.hpp:67:7: error: use of deleted function ‘PostfixExpression::PostfixExpression(const PostfixExpression&)’
-/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = AccessExpression; _Args = {AccessExpression&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<AccessExpression>]’:
-src/ast/expression.cpp:104:53:   required from here
-/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: use of deleted function ‘AccessExpression::AccessExpression(const AccessExpression&)’
- 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:77:7: note: ‘AccessExpression::AccessExpression(const AccessExpression&)’ is implicitly deleted because the default definition would be ill-formed:
-   77 | class AccessExpression : public PostfixExpression {
-      |       ^~~~~~~~~~~~~~~~
-inc/expression.hpp:77:7: error: use of deleted function ‘PostfixExpression::PostfixExpression(const PostfixExpression&)’
-inc/expression.hpp:77:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
-/usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
-  522 |       unique_ptr(const unique_ptr&) = delete;
-      |       ^~~~~~~~~~
-/usr/include/c++/13/bits/unique_ptr.h: In instantiation of ‘constexpr std::__detail::__unique_ptr_t<_Tp> std::make_unique(_Args&& ...) [with _Tp = GroupExpression; _Args = {GroupExpression&}; __detail::__unique_ptr_t<_Tp> = __detail::__unique_ptr_t<GroupExpression>]’:
-src/ast/expression.cpp:115:52:   required from here
-/usr/include/c++/13/bits/unique_ptr.h:1070:30: error: use of deleted function ‘GroupExpression::GroupExpression(const GroupExpression&)’
- 1070 |     { return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...)); }
-      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-inc/expression.hpp:105:7: note: ‘GroupExpression::GroupExpression(const GroupExpression&)’ is implicitly deleted because the default definition would be ill-formed:
-  105 | class GroupExpression : public Expression {
-      |       ^~~~~~~~~~~~~~~
-inc/expression.hpp:105:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Expression; _Dp = std::default_delete<Expression>]’
+/usr/include/c++/13/bits/stl_construct.h: In instantiation of ‘constexpr void std::_Construct(_Tp*, _Args&& ...) [with _Tp = unique_ptr<Statement>; _Args = {const unique_ptr<Statement, default_delete<Statement> >&}]’:
+/usr/include/c++/13/bits/stl_uninitialized.h:120:21:   required from ‘constexpr _ForwardIterator std::__do_uninit_copy(_InputIterator, _InputIterator, _ForwardIterator) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Statement>*, vector<unique_ptr<Statement> > >; _ForwardIterator = unique_ptr<Statement>*]’
+/usr/include/c++/13/bits/stl_uninitialized.h:371:30:   required from ‘constexpr _ForwardIterator std::__uninitialized_copy_a(_InputIterator, _InputIterator, _ForwardIterator, allocator<_Tp>&) [with _InputIterator = __gnu_cxx::__normal_iterator<const unique_ptr<Statement>*, vector<unique_ptr<Statement> > >; _ForwardIterator = unique_ptr<Statement>*; _Tp = unique_ptr<Statement>]’
+/usr/include/c++/13/bits/stl_vector.h:606:31:   required from ‘constexpr std::vector<_Tp, _Alloc>::vector(const std::vector<_Tp, _Alloc>&) [with _Tp = std::unique_ptr<Statement>; _Alloc = std::allocator<std::unique_ptr<Statement> >]’
+src/visitor/printer.cpp:209:44:   required from here
+/usr/include/c++/13/bits/stl_construct.h:119:7: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = Statement; _Dp = std::default_delete<Statement>]’
+  119 |       ::new((void*)__p) _Tp(std::forward<_Args>(__args)...);
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /usr/include/c++/13/bits/unique_ptr.h:522:7: note: declared here
   522 |       unique_ptr(const unique_ptr&) = delete;
       |       ^~~~~~~~~~

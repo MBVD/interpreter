@@ -21,12 +21,7 @@ void Printer::visit(const std::unique_ptr<InitDeclarator>& node ) {
     this->visit(expr);
     std::cout << "\n";
 }
-void Printer::visit(const std::unique_ptr<Expression>& node){
-    if (node == nullptr){
-        return;
-    }
-    node->accept(*this);   
-}
+
 void Printer::visit(const std::unique_ptr<IdDeclorator>& node ) {
     std::cout << node->get_id();
     auto type = node->get_declorator_type();
