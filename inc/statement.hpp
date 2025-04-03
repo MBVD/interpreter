@@ -8,6 +8,7 @@ class VarDeclarator;
 class ExpressionStatement : public Statement {
 public:
     ExpressionStatement(std::unique_ptr<Expression>& expression);
+    ExpressionStatement(ExpressionStatement& other);
     void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> expression;
@@ -16,6 +17,7 @@ private:
 class DeclorationStatement : public Statement {
 public:
     DeclorationStatement(std::unique_ptr<VarDeclarator>& declaration);
+    DeclorationStatement(DeclorationStatement& other);
     void accept(Visitor& visitor);
 private:
     std::unique_ptr<VarDeclarator> declaration;
@@ -24,6 +26,7 @@ private:
 class ReturnStatement : public Statement {
 public:
     ReturnStatement(std::unique_ptr<Expression>& expression);
+    ReturnStatement(ReturnStatement& other);
     void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> expression;
@@ -32,18 +35,23 @@ private:
 class BreakStatement : public Statement {
 public:
     ~BreakStatement() = default;
+    BreakStatement() = default;
+    BreakStatement(BreakStatement& other) = default;
     void accept(Visitor& visitor);
 };
 
 class ContinueStatement : public Statement {
 public:
     ~ContinueStatement() = default;
+    ContinueStatement() = default;
+    ContinueStatement(ContinueStatement& other) = default;
     void accept(Visitor& visitor);
 };
 
 class BlockStatement : public Statement {
 public:
     BlockStatement(std::vector<std::unique_ptr<Statement>>& statements);
+    BlockStatement(BlockStatement& other);
     BlockStatement() = default;
     void accept(Visitor& visitor);
 private:
@@ -57,6 +65,7 @@ public:
                          std::unique_ptr<Statement>& false_statement);
     ConditionalStatement(std::unique_ptr<Expression>& conditional,
                          std::unique_ptr<Statement>& true_statement);
+    ConditionalStatement(ConditionalStatement& other);
     void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> conditional;
@@ -74,6 +83,7 @@ class WhileStatement : public LoopStatement {
 public:
     WhileStatement(std::unique_ptr<Expression>& conditional,
                    std::unique_ptr<Statement>& statement);
+    WhileStatement(WhileStatement& other);
     void accept(Visitor& visitor);
 private:
     std::unique_ptr<Expression> conditional;
@@ -84,6 +94,7 @@ class DoWhileStatement : public LoopStatement {
 public:
     DoWhileStatement(std::unique_ptr<Statement>& statement,
                      std::unique_ptr<Expression>& expression);
+    DoWhileStatement(DoWhileStatement& other);
     void accept(Visitor& visitor);
 private:
     std::unique_ptr<Statement> statement;
@@ -98,6 +109,7 @@ public:
     ForStatement(std::unique_ptr<Expression>& init_expr,
                  std::unique_ptr<Expression>& cond_expr,
                  std::unique_ptr<Expression>& iter_expr);
+    ForStatement(ForStatement& other);
     void accept(Visitor& visitor);
 private:
     std::unique_ptr<VarDeclarator> var;
