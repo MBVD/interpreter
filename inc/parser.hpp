@@ -11,7 +11,7 @@ class Parser {
 public:
     Parser(const std::vector<Token>& tokens) : tokens(tokens) {};
     std::unique_ptr<ASTNode> parse();
-    using decl_ptr = std::unique_ptr<Declaration>;
+    using decl_ptr = std::unique_ptr<Declarator>;
     using var_ptr = std::unique_ptr<VarDeclarator>;
     using init_ptr = std::unique_ptr<InitDeclarator>;
     using id_ptr = std::unique_ptr<IdDeclorator>;
@@ -40,7 +40,7 @@ public:
     using return_st_ptr = std::unique_ptr<ReturnStatement>;
     using cont_st_ptr = std::unique_ptr<ContinueStatement>;
     using break_st_ptr = std::unique_ptr<BreakStatement>;
-    using decl_st_ptr = std::unique_ptr<DeclorationStatement>;
+    using decl_st_ptr = std::unique_ptr<DeclarationStatement>;
 
     using block_st_ptr = std::unique_ptr<BlockStatement>;
 private:

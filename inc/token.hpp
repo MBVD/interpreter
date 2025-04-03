@@ -28,7 +28,4 @@ struct Token {
 
 };
 
-std::ostream& operator<< (std::ostream& out, const Token& token) {
-    out<<token.value;
-    return out;
-}
+std::ostream& operator<< (std::ostream& out, const Token& token);

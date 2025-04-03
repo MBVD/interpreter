@@ -23,7 +23,7 @@ Parser::decl_st_ptr Parser::parse_decl_statement() {
     auto decl_st_index = index;
     try {
         auto var_decl = parse_var_declaration();
-        return std::make_unique<DeclorationStatement>(var_decl);
+        return std::make_unique<DeclarationStatement>(var_decl);
     } catch (const parse_var_decl_error&) {
         index = decl_st_index;
         throw parse_decl_st_error("");

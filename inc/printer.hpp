@@ -2,36 +2,36 @@
 
 class Printer : Visitor {
 public:
-    void visit(const std::unique_ptr<Declaration>& ) final;
-    void visit(const std::unique_ptr<VarDeclarator>& ) final;
-    void visit(const std::unique_ptr<InitDeclarator>& ) final;
-    void visit(const std::unique_ptr<IdDeclorator>& ) final;
-    void visit(const std::unique_ptr<FuncDeclarator>& ) final;
-    void visit(const std::unique_ptr<ParamDeclarator>& ) final;
-    void visit(const std::unique_ptr<StructDeclarator>& ) final;
+    void visit(Declarator*) final;
+    void visit(VarDeclarator*) final;
+    void visit(InitDeclarator*) final;
+    void visit(IdDeclorator*) final;
+    void visit(FuncDeclarator*) final;
+    void visit(ParamDeclarator*) final;
+    void visit(StructDeclarator*) final;
 
-    void visit(const std::unique_ptr<Expression>& ) final;
-    void visit(const std::unique_ptr<BinaryExpression>&) final;
-    void visit(const std::unique_ptr<TernaryExpression>&) final;
-    void visit(const std::unique_ptr<UnaryExpression>&) final;
-    void visit(const std::unique_ptr<PostfixExpression>&) final;
-    void visit(const std::unique_ptr<SubscriptExpression>&) final;
-    void visit(const std::unique_ptr<CallExpression>&) final;
-    void visit(const std::unique_ptr<AccessExpression>&) final;
-    void visit(const std::unique_ptr<LiteralExpression>&) final;
-    void visit(const std::unique_ptr<IDexpression>&) final;
-    void visit(const std::unique_ptr<GroupExpression>&) final;
+    void visit(Expression*) final;
+    void visit(BinaryExpression*) final;
+    void visit(TernaryExpression*) final;
+    void visit(UnaryExpression*) final;
+    void visit(PostfixExpression*) final;
+    void visit(SubscriptExpression*) final;
+    void visit(CallExpression*) final;
+    void visit(AccessExpression*) final;
+    void visit(LiteralExpression*) final;
+    void visit(IDexpression*) final;
+    void visit(GroupExpression*) final;
 
-    void visit(const std::unique_ptr<Statement>& ) final;
-    void visit(const std::unique_ptr<ExpressionStatement>&) final;
-    void visit(const std::unique_ptr<DeclorationStatement>&) final;
-    void visit(const std::unique_ptr<ReturnStatement>&) final;
-    void visit(const std::unique_ptr<BreakStatement>&) final;
-    void visit(const std::unique_ptr<ContinueStatement>&) final;
-    void visit(const std::unique_ptr<BlockStatement>&) final;
-    void visit(const std::unique_ptr<ConditionalStatement>&) final;
-    void visit(const std::unique_ptr<LoopStatement>& node) final;
-    void visit(const std::unique_ptr<WhileStatement>&) final;
-    void visit(const std::unique_ptr<DoWhileStatement>&) final;
-    void visit(const std::unique_ptr<ForStatement>&) final;
+    void visit(Statement*) final;
+    void visit(ExpressionStatement*) final;
+    void visit(DeclarationStatement*) final;
+    void visit(ReturnStatement*) final;
+    void visit(BreakStatement*) final;
+    void visit(ContinueStatement*) final;
+    void visit(BlockStatement*) final;
+    void visit(ConditionalStatement*) final;
+    void visit(LoopStatement*) final;
+    void visit(WhileStatement*) final;
+    void visit(DoWhileStatement*) final;
+    void visit(ForStatement*) final;
 };

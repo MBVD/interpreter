@@ -19,9 +19,9 @@ public:
     virtual void accept(Visitor& visitor) = 0;
 };
 
-class Declaration : public ASTNode {
+class Declarator : public ASTNode {
 public:
-    virtual ~Declaration() = default;
+    virtual ~Declarator() = default;
     virtual void accept(Visitor& visitor) = 0;
 };
 

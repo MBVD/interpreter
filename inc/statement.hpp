@@ -15,10 +15,10 @@ private:
     std::unique_ptr<Expression> expression;
 };
 
-class DeclorationStatement : public Statement {
+class DeclarationStatement : public Statement {
 public:
-    DeclorationStatement(std::unique_ptr<VarDeclarator>& declaration);
-    DeclorationStatement(DeclorationStatement& other);
+    DeclarationStatement(std::unique_ptr<VarDeclarator>& declaration);
+    DeclarationStatement(DeclarationStatement& other);
     void accept(Visitor& visitor);
     const std::unique_ptr<VarDeclarator>& get_declaration();
 private:

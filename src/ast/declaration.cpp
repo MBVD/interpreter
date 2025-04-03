@@ -9,7 +9,7 @@ VarDeclarator::VarDeclarator(const Token& token, std::vector<std::unique_ptr<Ini
 VarDeclarator::VarDeclarator(VarDeclarator& other) 
     : type(other.type), init_declarators(std::move(other.init_declarators)) {}
 void VarDeclarator::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<VarDeclarator>(*this));
+    visitor.visit(this);
 }
 
 const Token& VarDeclarator::get_type() {
@@ -32,7 +32,7 @@ InitDeclarator::InitDeclarator(InitDeclarator& other)
     : declarator(std::move(other.declarator)), expression(std::move(other.expression)) {}
 
 void InitDeclarator::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<InitDeclarator>(*this));
+    visitor.visit(this);
 }
 
 const std::unique_ptr<IdDeclorator>& InitDeclarator::get_declarator(){
@@ -57,7 +57,7 @@ IdDeclorator::IdDeclorator(IdDeclorator& other)
     : id(other.id), type(other.type), expression(std::move(other.expression)) {}
 
 void IdDeclorator::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<IdDeclorator>(*this));
+    visitor.visit(this);
 }
 
 const Token& IdDeclorator::get_id() {
@@ -83,7 +83,7 @@ FuncDeclarator::FuncDeclarator(FuncDeclarator& other)
     : returnable_type(other.returnable_type), name(other.name), params(std::move(other.params)), block(std::move(other.block)) {}
 
 void FuncDeclarator::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<FuncDeclarator>(*this));
+    visitor.visit(this);
 }
 
 const Token& FuncDeclarator::get_returnable_type(){
@@ -103,7 +103,7 @@ const std::unique_ptr<BlockStatement>& FuncDeclarator::get_block(){
 }
 
 // ParamDeclarator
-ParamDeclarator::ParamDeclarator(const Token& type, std::unique_ptr<Declaration>& declorator)
+ParamDeclarator::ParamDeclarator(const Token& type, std::unique_ptr<Declarator>& declorator)
     : type(type), declorator(std::move(declorator)) {}
 
 
@@ -111,14 +111,14 @@ ParamDeclarator::ParamDeclarator(ParamDeclarator& other)
     : type(other.type), declorator(std::move(other.declorator)) {}
 
 void ParamDeclarator::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<ParamDeclarator>(*this));
+    visitor.visit(this);
 }
 
 const Token& ParamDeclarator::get_type() {
     return this->type;
 }
 
-const std::unique_ptr<Declaration>& ParamDeclarator::get_declorator() {
+const std::unique_ptr<Declarator>& ParamDeclarator::get_declorator() {
     return this->declorator;
 }
 
@@ -131,7 +131,7 @@ StructDeclarator::StructDeclarator(StructDeclarator& other)
     : id(other.id), vars(std::move(other.vars)) {}
 
 void StructDeclarator::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<StructDeclarator>(*this));
+    visitor.visit(this);
 }
 
 const Token& StructDeclarator::get_id() {

@@ -9,22 +9,22 @@ ExpressionStatement::ExpressionStatement(std::unique_ptr<Expression>& expression
 ExpressionStatement::ExpressionStatement(ExpressionStatement& other)
     : expression(std::move(other.expression)) {}
 
-void ExpressionStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<ExpressionStatement>(*this)); }
+void ExpressionStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& ExpressionStatement::get_expression(){
     return this->expression;
 }
 
-// DeclorationStatement
-DeclorationStatement::DeclorationStatement(std::unique_ptr<VarDeclarator>& declaration)
+// DeclarationStatement
+DeclarationStatement::DeclarationStatement(std::unique_ptr<VarDeclarator>& declaration)
     : declaration(std::move(declaration)) {}
 
-DeclorationStatement::DeclorationStatement(DeclorationStatement& other)
+DeclarationStatement::DeclarationStatement(DeclarationStatement& other)
     : declaration(std::move(other.declaration)) {}
 
-void DeclorationStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<DeclorationStatement>(*this)); }
+void DeclarationStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::unique_ptr<VarDeclarator>& DeclorationStatement::get_declaration() {
+const std::unique_ptr<VarDeclarator>& DeclarationStatement::get_declaration() {
     return this->declaration;
 }
 
@@ -35,7 +35,7 @@ ReturnStatement::ReturnStatement(std::unique_ptr<Expression>& expression)
 ReturnStatement::ReturnStatement(ReturnStatement& other)
     : expression(std::move(other.expression)) {}
 
-void ReturnStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<ReturnStatement>(*this)); }
+void ReturnStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& ReturnStatement::get_expression() {
     return this->expression;
@@ -48,7 +48,7 @@ BlockStatement::BlockStatement(std::vector<std::unique_ptr<Statement>>& statemen
 BlockStatement::BlockStatement(BlockStatement& other)
     : statements(std::move(other.statements)) {}
 
-void BlockStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<BlockStatement>(*this)); }
+void BlockStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::vector<std::unique_ptr<Statement>>& BlockStatement::get_statements(){
     return this->statements;
@@ -72,7 +72,7 @@ ConditionalStatement::ConditionalStatement(ConditionalStatement& other)
       true_statement(std::move(other.true_statement)),
       false_statement(std::move(other.false_statement)) {}
 
-void ConditionalStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<ConditionalStatement>(*this)); }
+void ConditionalStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& ConditionalStatement::get_conditional(){
     return this->conditional;
@@ -94,7 +94,7 @@ WhileStatement::WhileStatement(std::unique_ptr<Expression>& conditional,
 WhileStatement::WhileStatement(WhileStatement& other)
     : conditional(std::move(other.conditional)), statement(std::move(other.statement)) {}
 
-void WhileStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<WhileStatement>(*this)); }
+void WhileStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& WhileStatement::get_conditional(){
     return this->conditional;
@@ -112,7 +112,7 @@ DoWhileStatement::DoWhileStatement(std::unique_ptr<Statement>& statement,
 DoWhileStatement::DoWhileStatement(DoWhileStatement& other)
     : statement(std::move(other.statement)), expression(std::move(other.expression)) {}
 
-void DoWhileStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<DoWhileStatement>(*this)); }
+void DoWhileStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Statement>& DoWhileStatement::get_statement() {
     return this->statement;
@@ -147,7 +147,7 @@ ForStatement::ForStatement(ForStatement& other)
     cond_expr(std::move(other.cond_expr)),
     iter_expr(std::move(other.iter_expr)) {}
 
-void ForStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<ForStatement>(*this)); }
+void ForStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<VarDeclarator>& ForStatement::get_var(){
     return this->var;
@@ -170,6 +170,6 @@ const std::unique_ptr<Statement>& ForStatement::get_statement(){
 }
 
 
-void BreakStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<BreakStatement>(*this)); }
+void BreakStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-void ContinueStatement::accept(Visitor& visitor) { visitor.visit(std::make_unique<ContinueStatement>(*this)); }
+void ContinueStatement::accept(Visitor& visitor) { visitor.visit(this); }

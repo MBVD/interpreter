@@ -9,7 +9,7 @@ class InitDeclarator;
 class IdDeclorator;
 class ParamDeclarator;
 
-class VarDeclarator : public Declaration {
+class VarDeclarator : public Declarator {
 public:
     VarDeclarator(const Token& token, std::vector<std::unique_ptr<InitDeclarator>>& init_declarators);
     VarDeclarator(VarDeclarator& other);
@@ -21,7 +21,7 @@ private:
     std::vector<std::unique_ptr<InitDeclarator>> init_declarators;
 };
 
-class InitDeclarator : public Declaration {
+class InitDeclarator : public Declarator {
 public:
     InitDeclarator(std::unique_ptr<IdDeclorator>& declarator);
     InitDeclarator(std::unique_ptr<IdDeclorator>& declarator, std::unique_ptr<Expression>& expression);
@@ -38,7 +38,7 @@ enum class IDDeclaratorType {
     REF, POINTER, ARRAY
 };
 
-class IdDeclorator : public Declaration {
+class IdDeclorator : public Declarator {
 public:
     IdDeclorator(const Token& id, IDDeclaratorType type, std::unique_ptr<Expression>& expression);
     IdDeclorator(const Token& id, IDDeclaratorType type);
@@ -54,7 +54,7 @@ private:
     std::unique_ptr<Expression> expression;
 };
 
-class FuncDeclarator : public Declaration {
+class FuncDeclarator : public Declarator {
 public:
     FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params);
     FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params, std::unique_ptr<BlockStatement>& block);
@@ -71,19 +71,19 @@ private:
     std::unique_ptr<BlockStatement> block;
 };
 
-class ParamDeclarator : public Declaration {
+class ParamDeclarator : public Declarator {
 public:
-    ParamDeclarator(const Token& type, std::unique_ptr<Declaration>& declorator);
+    ParamDeclarator(const Token& type, std::unique_ptr<Declarator>& declorator);
     ParamDeclarator(ParamDeclarator& other);
     void accept(Visitor& visitor);
     const Token& get_type();
-    const std::unique_ptr<Declaration>& get_declorator();
+    const std::unique_ptr<Declarator>& get_declorator();
 private:
     Token type; // может быть и id
-    std::unique_ptr<Declaration> declorator;
+    std::unique_ptr<Declarator> declorator;
 };
 
-class StructDeclarator : public Declaration {
+class StructDeclarator : public Declarator {
 public:
     StructDeclarator(const Token& id, std::vector<std::unique_ptr<VarDeclarator>>& vars);
     StructDeclarator(StructDeclarator& other);

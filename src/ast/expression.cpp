@@ -10,7 +10,7 @@ BinaryExpression::BinaryExpression(BinaryExpression& other)
     : left(std::move(other.left)), op(other.op), right(std::move(other.right)) {}
 
 void BinaryExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<BinaryExpression>(*this));
+    visitor.visit(this);
 }
 
 const Token& BinaryExpression::get_op(){
@@ -39,7 +39,7 @@ TernaryExpression::TernaryExpression(TernaryExpression& other)
       false_expression(std::move(other.false_expression)) {}
 
 void TernaryExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<TernaryExpression>(*this));
+    visitor.visit(this);
 }
 
 const std::unique_ptr<Expression>& TernaryExpression::get_cond_expression(){
@@ -63,7 +63,7 @@ UnaryExpression::UnaryExpression(UnaryExpression& other)
     : base(std::move(other.base)), op(other.op) {}
 
 void UnaryExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<UnaryExpression>(*this));
+    visitor.visit(this);
 }
 
 const Token& UnaryExpression::get_op(){
@@ -81,7 +81,7 @@ PostfixExpression::PostfixExpression(PostfixExpression& other)
     : expression(std::move(other.expression)), op(other.op) {}
 
 void PostfixExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<PostfixExpression>(*this));
+    visitor.visit(this);
 }
 
 const Token& PostfixExpression::get_op(){
@@ -100,7 +100,7 @@ SubscriptExpression::SubscriptExpression(SubscriptExpression& other)
     : PostfixExpression(other), indexes(std::move(other.indexes)) {}
 
 void SubscriptExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<SubscriptExpression>(*this));
+    visitor.visit(this);
 }
 
 const std::vector<std::unique_ptr<Expression>>& SubscriptExpression::get_indexes(){
@@ -116,7 +116,7 @@ CallExpression::CallExpression(CallExpression& other)
     : PostfixExpression(other), args(std::move(other.args)) {}
 
 void CallExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<CallExpression>(*this));
+    visitor.visit(this);
 }
 
 const std::vector<std::unique_ptr<Expression>>& CallExpression::get_args(){
@@ -132,7 +132,7 @@ AccessExpression::AccessExpression(AccessExpression& other)
     : PostfixExpression(other), expression_to_access(std::move(other.expression_to_access)) {}
 
 void AccessExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<AccessExpression>(*this));
+    visitor.visit(this);
 }
 
 const std::unique_ptr<Expression>& AccessExpression::get_expression_to_access(){
@@ -159,11 +159,11 @@ IDexpression::IDexpression(IDexpression& other)
     : token(other.token) {}
 
 void GroupExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<GroupExpression>(*this));
+    visitor.visit(this);
 }
 
 void LiteralExpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<LiteralExpression>(*this));
+    visitor.visit(this);
 }
 
 const Token& LiteralExpression::get_token(){
@@ -171,7 +171,7 @@ const Token& LiteralExpression::get_token(){
 }
 
 void IDexpression::accept(Visitor& visitor) {
-    visitor.visit(std::make_unique<IDexpression>(*this));
+    visitor.visit(this);
 }
 
 const Token& IDexpression::get_token() {
