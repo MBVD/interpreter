@@ -8,7 +8,6 @@ class VarDeclarator;
 class ExpressionStatement : public Statement {
 public:
     ExpressionStatement(std::unique_ptr<Expression>& expression);
-    ExpressionStatement(ExpressionStatement& other);
     void accept(Visitor& visitor);
     const std::unique_ptr<Expression>& get_expression();
 private:
@@ -18,7 +17,6 @@ private:
 class DeclarationStatement : public Statement {
 public:
     DeclarationStatement(std::unique_ptr<VarDeclarator>& declaration);
-    DeclarationStatement(DeclarationStatement& other);
     void accept(Visitor& visitor);
     const std::unique_ptr<VarDeclarator>& get_declaration();
 private:
@@ -28,7 +26,6 @@ private:
 class ReturnStatement : public Statement {
 public:
     ReturnStatement(std::unique_ptr<Expression>& expression);
-    ReturnStatement(ReturnStatement& other);
     void accept(Visitor& visitor);
     const std::unique_ptr<Expression>& get_expression();
 private:
@@ -39,7 +36,6 @@ class BreakStatement : public Statement {
 public:
     ~BreakStatement() = default;
     BreakStatement() = default;
-    BreakStatement(BreakStatement& other) = default;
     void accept(Visitor& visitor);
 };
 
@@ -47,14 +43,12 @@ class ContinueStatement : public Statement {
 public:
     ~ContinueStatement() = default;
     ContinueStatement() = default;
-    ContinueStatement(ContinueStatement& other) = default;
     void accept(Visitor& visitor);
 };
 
 class BlockStatement : public Statement {
 public:
     BlockStatement(std::vector<std::unique_ptr<Statement>>& statements);
-    BlockStatement(BlockStatement& other);
     BlockStatement() = default;
     void accept(Visitor& visitor);
     const std::vector<std::unique_ptr<Statement>>& get_statements();
@@ -69,7 +63,6 @@ public:
                          std::unique_ptr<Statement>& false_statement);
     ConditionalStatement(std::unique_ptr<Expression>& conditional,
                          std::unique_ptr<Statement>& true_statement);
-    ConditionalStatement(ConditionalStatement& other);
     void accept(Visitor& visitor);
     const std::unique_ptr<Expression>& get_conditional();
     const std::unique_ptr<Statement>& get_true_statement();
@@ -90,7 +83,6 @@ class WhileStatement : public LoopStatement {
 public:
     WhileStatement(std::unique_ptr<Expression>& conditional,
                    std::unique_ptr<Statement>& statement);
-    WhileStatement(WhileStatement& other);
     void accept(Visitor& visitor);
     const std::unique_ptr<Expression>& get_conditional();
     const std::unique_ptr<Statement>& get_statement();
@@ -103,7 +95,6 @@ class DoWhileStatement : public LoopStatement {
 public:
     DoWhileStatement(std::unique_ptr<Statement>& statement,
                      std::unique_ptr<Expression>& expression);
-    DoWhileStatement(DoWhileStatement& other);
     void accept(Visitor& visitor);
     const std::unique_ptr<Statement>& get_statement();
     const std::unique_ptr<Expression>& get_expression();
@@ -122,8 +113,7 @@ public:
                  std::unique_ptr<Expression>& cond_expr,
                  std::unique_ptr<Expression>& iter_expr, 
                  std::unique_ptr<Statement>& statement);
-            
-    ForStatement(ForStatement& other);
+             
 
     void accept(Visitor& visitor);
     const std::unique_ptr<VarDeclarator>& get_var();

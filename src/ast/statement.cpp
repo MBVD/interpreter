@@ -6,9 +6,6 @@
 ExpressionStatement::ExpressionStatement(std::unique_ptr<Expression>& expression)
     : expression(std::move(expression)) {}
 
-ExpressionStatement::ExpressionStatement(ExpressionStatement& other)
-    : expression(std::move(other.expression)) {}
-
 void ExpressionStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& ExpressionStatement::get_expression(){
@@ -18,9 +15,6 @@ const std::unique_ptr<Expression>& ExpressionStatement::get_expression(){
 // DeclarationStatement
 DeclarationStatement::DeclarationStatement(std::unique_ptr<VarDeclarator>& declaration)
     : declaration(std::move(declaration)) {}
-
-DeclarationStatement::DeclarationStatement(DeclarationStatement& other)
-    : declaration(std::move(other.declaration)) {}
 
 void DeclarationStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
@@ -32,9 +26,6 @@ const std::unique_ptr<VarDeclarator>& DeclarationStatement::get_declaration() {
 ReturnStatement::ReturnStatement(std::unique_ptr<Expression>& expression)
     : expression(std::move(expression)) {}
 
-ReturnStatement::ReturnStatement(ReturnStatement& other)
-    : expression(std::move(other.expression)) {}
-
 void ReturnStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& ReturnStatement::get_expression() {
@@ -44,9 +35,6 @@ const std::unique_ptr<Expression>& ReturnStatement::get_expression() {
 // BlockStatement
 BlockStatement::BlockStatement(std::vector<std::unique_ptr<Statement>>& statements)
     : statements(std::move(statements)) {}
-
-BlockStatement::BlockStatement(BlockStatement& other)
-    : statements(std::move(other.statements)) {}
 
 void BlockStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
@@ -67,11 +55,6 @@ ConditionalStatement::ConditionalStatement(std::unique_ptr<Expression>& conditio
     : conditional(std::move(conditional)),
       true_statement(std::move(true_statement)) {}
 
-ConditionalStatement::ConditionalStatement(ConditionalStatement& other)
-    : conditional(std::move(other.conditional)),
-      true_statement(std::move(other.true_statement)),
-      false_statement(std::move(other.false_statement)) {}
-
 void ConditionalStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& ConditionalStatement::get_conditional(){
@@ -91,9 +74,6 @@ WhileStatement::WhileStatement(std::unique_ptr<Expression>& conditional,
                                std::unique_ptr<Statement>& statement)
     : conditional(std::move(conditional)), statement(std::move(statement)) {}
 
-WhileStatement::WhileStatement(WhileStatement& other)
-    : conditional(std::move(other.conditional)), statement(std::move(other.statement)) {}
-
 void WhileStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& WhileStatement::get_conditional(){
@@ -108,9 +88,6 @@ const std::unique_ptr<Statement>& WhileStatement::get_statement(){
 DoWhileStatement::DoWhileStatement(std::unique_ptr<Statement>& statement,
                                    std::unique_ptr<Expression>& expression)
     : statement(std::move(statement)), expression(std::move(expression)) {}
-
-DoWhileStatement::DoWhileStatement(DoWhileStatement& other)
-    : statement(std::move(other.statement)), expression(std::move(other.expression)) {}
 
 void DoWhileStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
@@ -140,12 +117,6 @@ ForStatement::ForStatement(std::unique_ptr<Expression>& init_expr,
       cond_expr(std::move(cond_expr)),
       iter_expr(std::move(iter_expr)),
       statement(std::move(statement)){}
-
-ForStatement::ForStatement(ForStatement& other)
-    : var(std::move(other.var)),
-    init_expr(std::move(other.init_expr)),
-    cond_expr(std::move(other.cond_expr)),
-    iter_expr(std::move(other.iter_expr)) {}
 
 void ForStatement::accept(Visitor& visitor) { visitor.visit(this); }
 

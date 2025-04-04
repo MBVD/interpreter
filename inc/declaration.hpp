@@ -12,7 +12,6 @@ class ParamDeclarator;
 class VarDeclarator : public Declarator {
 public:
     VarDeclarator(const Token& token, std::vector<std::unique_ptr<InitDeclarator>>& init_declarators);
-    VarDeclarator(VarDeclarator& other);
     void accept(Visitor& visitor);
     const Token& get_type();
     const std::vector<std::unique_ptr<InitDeclarator>>& get_init_declarators();
@@ -25,7 +24,6 @@ class InitDeclarator : public Declarator {
 public:
     InitDeclarator(std::unique_ptr<IdDeclorator>& declarator);
     InitDeclarator(std::unique_ptr<IdDeclorator>& declarator, std::unique_ptr<Expression>& expression);
-    InitDeclarator(InitDeclarator& other);
     void accept(Visitor& visitor);
     const std::unique_ptr<IdDeclorator>& get_declarator();
     const std::unique_ptr<Expression>& get_expression();
@@ -43,7 +41,6 @@ public:
     IdDeclorator(const Token& id, IDDeclaratorType type, std::unique_ptr<Expression>& expression);
     IdDeclorator(const Token& id, IDDeclaratorType type);
     IdDeclorator(const Token& id);
-    IdDeclorator(IdDeclorator& other);
     void accept(Visitor& visitor);
     const Token& get_id();
     const IDDeclaratorType get_declorator_type();
@@ -58,7 +55,6 @@ class FuncDeclarator : public Declarator {
 public:
     FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params);
     FuncDeclarator(const Token& returnable_type, const Token& name, std::vector<std::unique_ptr<ParamDeclarator>>& params, std::unique_ptr<BlockStatement>& block);
-    FuncDeclarator(FuncDeclarator& other);
     void accept(Visitor& visitor);
     const Token& get_returnable_type();
     const Token& get_name();
@@ -74,7 +70,6 @@ private:
 class ParamDeclarator : public Declarator {
 public:
     ParamDeclarator(const Token& type, std::unique_ptr<Declarator>& declorator);
-    ParamDeclarator(ParamDeclarator& other);
     void accept(Visitor& visitor);
     const Token& get_type();
     const std::unique_ptr<Declarator>& get_declorator();
@@ -86,7 +81,6 @@ private:
 class StructDeclarator : public Declarator {
 public:
     StructDeclarator(const Token& id, std::vector<std::unique_ptr<VarDeclarator>>& vars);
-    StructDeclarator(StructDeclarator& other);
     void accept(Visitor& visitor);
     const Token& get_id();
     const std::vector<std::unique_ptr<VarDeclarator>>& get_vars();
@@ -94,4 +88,3 @@ private:
     Token id;
     std::vector<std::unique_ptr<VarDeclarator>> vars;
 };
-
