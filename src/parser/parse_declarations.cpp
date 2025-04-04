@@ -2,49 +2,49 @@
 #include "exceptions.hpp"
 #include <iostream>
 
-
 Parser::decl_ptr Parser::parse_func_declaration() {
     auto func_index = this->index;
     auto returnable_type = this->tokens[index];
-    if (returnable_type != TokenType::ID || returnable_type != TokenType::TYPE){
-        throw parse_func_decl_error(""); // TODO потом придумать кокой то умный message
+    if (returnable_type != TokenType::ID && returnable_type != TokenType::TYPE) {
+        throw parse_func_decl_error(""); // TODO: придумать умный message
     }
     index++;
     auto name = this->tokens[index];
-    if (name!= TokenType::ID) {
+    if (name != TokenType::ID) {
         throw parse_func_decl_error("");
     }
     index++;
 
-    if (auto i = this->tokens[index]; i!=TokenType::PARENTHESIS_LEFT) {
+    if (auto i = this->tokens[index]; i != TokenType::PARENTHESIS_LEFT) {
         throw parse_func_decl_error("");
     }
+    index++;
+
     std::vector<Parser::param_ptr> params;
     while (this->tokens[index] != TokenType::PARENTHESIS_RIGHT && this->tokens[index] != TokenType::END) {
-        if (this->tokens[index] == TokenType::COMMA){
+        if (this->tokens[index] == TokenType::COMMA) {
             index++;
         }
         try {
-            auto tmp_param = parse_param_declaration();
+            params.push_back(parse_param_declaration());
         } catch (const parse_param_decl_error&) {
-            index =  func_index;
+            index = func_index;
             throw parse_func_decl_error("");
         }
-    } 
-    if (this->tokens[index] == TokenType::SEMICOLON) {
-        return std::make_unique<FuncDeclarator>(returnable_type, name, params);
+    }
+
+    if (this->tokens[index++] == TokenType::SEMICOLON) {
+        return std::make_unique<FuncDeclarator>(returnable_type, name, std::move(params));
     } else {
         try {
             Parser::block_st_ptr block = parse_block_statement();
-            return std::make_unique<FuncDeclarator>(returnable_type, name, params, block);
+            return std::make_unique<FuncDeclarator>(returnable_type, name, std::move(params), std::move(block));
         } catch (const parse_block_st_error&) {
             index = func_index;
             throw parse_func_decl_error("");
         }
     }
-    throw parse_func_decl_error("");
 }
-
 
 Parser::param_ptr Parser::parse_param_declaration() {
     auto param_index = index;
@@ -55,7 +55,7 @@ Parser::param_ptr Parser::parse_param_declaration() {
     index++;
     try {
         Parser::decl_ptr decl = parse_declaration();
-        return std::make_unique<ParamDeclarator>(type, decl);
+        return std::make_unique<ParamDeclarator>(type, std::move(decl));
     } catch (const declaration_parsing_error&) {
         index = param_index;
         throw parse_param_decl_error("");
@@ -67,56 +67,58 @@ Parser::struct_ptr Parser::parse_struct_declaration() {
     if (this->tokens[index].value != "struct") {
         throw parse_struct_decl_error("");
     }
+    index++;
     auto id = this->tokens[index++];
-    if (id != TokenType::ID){
+    if (id != TokenType::ID) {
         index = struct_index;
         throw parse_struct_decl_error("");
     }
-    if (this->tokens[index] != TokenType::BRACE_LEFT){
+    if (this->tokens[index] != TokenType::BRACE_LEFT) {
         throw parse_struct_decl_error("");
     }
+    index++;
+
     std::vector<Parser::var_ptr> vars;
-    while (this->tokens[index] != TokenType::BRACE_RIGHT && this->tokens[index] != TokenType::END){
-        Parser::var_ptr var;
+    while (this->tokens[index] != TokenType::BRACE_RIGHT && this->tokens[index] != TokenType::END) {
         try {
-            var =  parse_var_declaration();
+            vars.push_back(parse_var_declaration());
         } catch (const parse_var_decl_error&) {
             index = struct_index;
             throw parse_struct_decl_error("");
         }
-        vars.push_back(std::move(var));
     }
-    if (this->tokens[index] != TokenType::BRACE_RIGHT){
+    if (this->tokens[index++] != TokenType::BRACE_RIGHT) {
         throw parse_struct_decl_error("");
     }
-    return std::make_unique<StructDeclarator>(id, vars);
+    return std::make_unique<StructDeclarator>(id, std::move(vars));
 }
 
 Parser::var_ptr Parser::parse_var_declaration() {
     auto var_index = this->index;
-    if (this->tokens[index] != TokenType::TYPE && this->tokens[index] != TokenType::ID){
+    if (this->tokens[index] != TokenType::TYPE && this->tokens[index] != TokenType::ID) {
         throw parse_var_decl_error("no var decl");
     }
     auto type = this->tokens[index++];
     std::unique_ptr<InitDeclarator> first_declared;
     try {
         first_declared = parse_init_declaration();
-    } catch (const parse_init_decl_error& ) {
+    } catch (const parse_init_decl_error&) {
         this->index = var_index;
         throw parse_var_decl_error("no var decl");
     }
-    
+
     std::vector<std::unique_ptr<InitDeclarator>> declared;
     declared.push_back(std::move(first_declared));
-    while(this->tokens[index] == TokenType::COMMA){
-        declared.push_back(std::move(parse_init_declaration()));
-    }
-    // TODO кинуть exception проверка на ; 
-    if (this->tokens[index++] != TokenType::SEMICOLON){
-
+    while (this->tokens[index] == TokenType::COMMA) {
+        index++;
+        declared.push_back(parse_init_declaration());
     }
 
-    return std::make_unique<VarDeclarator>(type, declared);
+    if (this->tokens[index++] != TokenType::SEMICOLON) {
+        throw parse_var_decl_error("expected semicolon");
+    }
+
+    return std::make_unique<VarDeclarator>(type, std::move(declared));
 }
 
 Parser::init_ptr Parser::parse_init_declaration() {
@@ -133,28 +135,28 @@ Parser::init_ptr Parser::parse_init_declaration() {
         this->index++;
         std::unique_ptr<Expression> expr;
         try {
-            auto expr = parse_expression();
+            expr = parse_expression();
         } catch (const expression_parsing_error&) {
             index = init_index;
             throw parse_init_decl_error("");
         }
-        
-        return std::make_unique<InitDeclarator>(declorator, expr);
+        return std::make_unique<InitDeclarator>(std::move(declorator), std::move(expr));
     }
-    return std::make_unique<InitDeclarator>(declorator);
+    return std::make_unique<InitDeclarator>(std::move(declorator));
 }
 
 Parser::id_ptr Parser::parse_id_declaration() {
     auto id = this->tokens[index];
-    if (id != TokenType::ID){
+    if (id != TokenType::ID) {
         throw parse_id_decl_error("");
     }
     index++;
-    if (id_modifiers.contains(id.type)){
+    if (id_modifiers.contains(id.type)) {
         auto id_type = id_modifiers[id.type];
-        if (id == TokenType::INDEX_LEFT){
+        if (this->tokens[index] == TokenType::INDEX_LEFT) {
+            index++;
             auto expr = parse_expression();
-            return std::make_unique<IdDeclorator>(id, id_type, expr);
+            return std::make_unique<IdDeclorator>(id, id_type, std::move(expr));
         }
         return std::make_unique<IdDeclorator>(id, id_type);
     }

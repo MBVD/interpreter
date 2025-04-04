@@ -69,9 +69,9 @@ private:
     expr_ptr parse_unary_expression();
     expr_ptr parse_base();
     expr_ptr parse_post_expression();
-    access_expr_ptr parse_access_expression(expr_ptr& base);
-    subscript_expr_ptr parse_subscript_expression(expr_ptr& base);
-    call_expr_ptr parse_call_expression(expr_ptr& base);
+    access_expr_ptr parse_access_expression(expr_ptr base);
+    subscript_expr_ptr parse_subscript_expression(expr_ptr base);
+    call_expr_ptr parse_call_expression(expr_ptr base);
 
 
     

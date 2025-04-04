@@ -34,5 +34,6 @@ int main(){
 
     std::cout<<"\n Start parsing ... \n";
     Parser parser = Parser(tokens);
+    test_binary_expression_printer();
     parser.parse();
 }
