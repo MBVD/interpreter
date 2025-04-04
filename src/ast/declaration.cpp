@@ -45,7 +45,7 @@ IdDeclorator::IdDeclorator(const Token& id, IDDeclaratorType type)
     : id(id), type(type), expression(nullptr) {}
 
 IdDeclorator::IdDeclorator(const Token& id) 
-    : id(id), type(IDDeclaratorType::REF), expression(nullptr) {}
+    : id(id), type(IDDeclaratorType::NONE), expression(nullptr) {}
 
 void IdDeclorator::accept(Visitor& visitor) {
     visitor.visit(this);

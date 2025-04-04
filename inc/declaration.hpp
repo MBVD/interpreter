@@ -33,7 +33,7 @@ private:
 };
 
 enum class IDDeclaratorType {
-    REF, POINTER, ARRAY
+    NONE, REF, POINTER, ARRAY
 };
 
 class IdDeclorator : public Declarator {

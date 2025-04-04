@@ -13,7 +13,7 @@ void Printer::visit(Declarator* node){
 }
 
 void Printer::visit(VarDeclarator* node) {
-    std::cout << node->get_type();
+    std::cout << node->get_type() << " ";
     const auto& declorators = node->get_init_declarators();
     int sz = declorators.size(), cnt = 0;
     for (auto& i : declorators) {
@@ -30,6 +30,9 @@ void Printer::visit(InitDeclarator* node) {
     auto* decl = node->get_declarator().get();
     auto* expr = node->get_expression().get();
     this->visit(decl);
+    if (expr != nullptr){
+        std::cout<<" = ";
+    }
     this->visit(expr);
     std::cout << "\n";
 }
@@ -39,6 +42,9 @@ void Printer::visit(IdDeclorator* node) {
     auto type = node->get_declorator_type();
     auto* expr = node->get_expression().get();
     switch (type) {
+        case IDDeclaratorType::NONE: {
+            break;
+        }
         case IDDeclaratorType::REF: {
             std::cout << "&";
             break;
@@ -56,7 +62,6 @@ void Printer::visit(IdDeclorator* node) {
     if (type == IDDeclaratorType::ARRAY) {
         std::cout << "]";
     }
-    std::cout << "\n";
 }
 
 void Printer::visit(FuncDeclarator* node) {

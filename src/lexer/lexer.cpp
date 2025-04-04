@@ -69,7 +69,7 @@ std::unordered_map<std::string, TokenType> Lexer::keywords = {
     {"true", TokenType::TRUE},
     {"return", TokenType::RETURN}
 };
-std::string Lexer::spec_symbols = "()-=+*&-><%^[]?";
+std::string Lexer::spec_symbols = "()-=+*&-><%^[]?;";
 
 std::vector<Token> Lexer::operator() (){
     std::vector<Token> tokens;
@@ -205,11 +205,11 @@ Token Lexer::extract_operator(){
 
 Token Lexer::extract_id(){
     int tmp = index;
-    while (spec_symbols.find(input[tmp]) != std::string::npos && !std::isspace(input[tmp])){++tmp;}
-    int size = tmp - index + 1;
+    while (spec_symbols.find(input[tmp]) == std::string::npos && !std::isspace(input[tmp])){++tmp;}
+    int size = tmp - index;
     int prev = index;
-    index += size;
     if (tmp == index) {throw erroneous_extract_exception("id");}
+    index += size;
     return {TokenType::ID, {input, prev, size}};
 }
 

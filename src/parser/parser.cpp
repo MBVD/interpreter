@@ -11,40 +11,82 @@ std::unordered_map<TokenType, IDDeclaratorType> Parser::id_modifiers = {
 std::unique_ptr<ASTNode> Parser::parse() {
     try {
         return parse_declaration();
-        return parse_statement();
-        return parse_expression();
     } catch (declaration_parsing_error&) {
         std::cout<<"no decl\n";
         throw;
     }
-    throw parsing_errors(""); // TODO make message
 }
 
 Parser::decl_ptr Parser::parse_declaration() {
+    auto decl_index = index;
     try {
         return parse_var_declaration();
-        return parse_func_declaration();
-        return parse_struct_declaration();
     } catch (const declaration_parsing_error&) {
+        index = decl_index;
         std::cout<<"failed to parse var_decl \n";
-        throw;
+    }
+    try {
+        return parse_func_declaration();
+    } catch (parse_func_decl_error&){
+        index = decl_index;
+        std::cout<<"failed to parse func_decl \n";
+    }
+
+    try {
+        return parse_struct_declaration();
+    } catch (parse_struct_decl_error&){
+        index = decl_index;
+        std::cout<<"failed to parse struct_decl \n";
     }
     throw declaration_parsing_error("no decalarations");
 }
 
 Parser::statement_ptr Parser::parse_statement() {
+    auto statement_index = index;
     try {
-        return parse_expression_stetement();
+        return parse_expression_stetement();  
+    } catch (const parse_expression_st_error&) {
+        index = statement_index;
+    }
+    try {
         return parse_decl_statement();
+    } catch (parse_decl_st_error&) {
+        index = statement_index;
+    }
+    try {
         return parse_conditional_statement();
+    } catch (parse_conditional_st_error&) {
+        index = statement_index;
+    }
+    try {
         return parse_loop_statement();
+    } catch (parse_loop_st_error&) {
+        index = statement_index;
+    }
+    try {
         return parse_return_statement();
+    } catch (parse_return_st_error&){
+        index = statement_index;
+    }
+    try {
         return parse_break_statement();
+    } catch (parse_break_st_error&) {
+        index = statement_index;
+    }
+    try {
         return parse_continue_statement();
+    } catch (parse_conditional_st_error& ){
+        index = statement_index;
+    }
+    try {
         return parse_decl_statement();
+    } catch (parse_decl_st_error&){
+        index = statement_index;
+    }
+    try {
         return parse_block_statement();
-    } catch (const statement_parsing_error&) {
-        throw; 
+    } catch (parse_block_st_error&){
+        index = statement_index;
     }
     throw statement_parsing_error(""); //TODO mesasage
 }

@@ -131,7 +131,7 @@ Parser::init_ptr Parser::parse_init_declaration() {
         throw parse_init_decl_error("");
     }
 
-    if (this->tokens[index] == TokenType::EQUAL) {
+    if (this->tokens[index] == TokenType::ASSIGN) {
         this->index++;
         std::unique_ptr<Expression> expr;
         try {
