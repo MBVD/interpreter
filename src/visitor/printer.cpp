@@ -1,6 +1,10 @@
 #include <iostream>
 #include "printer.hpp"
 
+void Printer::print(ASTNode* node){
+    node->accept(*this);
+}
+
 void Printer::visit(Declarator* node){
     if (node == nullptr){
         return;
