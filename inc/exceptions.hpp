@@ -92,12 +92,20 @@ public:
     virtual const char* what() const noexcept override;
 };
 
+class parse_comparison_expr_error : public expression_parsing_error {
+public:
+    explicit parse_comparison_expr_error(const char* message) : expression_parsing_error(message) {};
+    explicit parse_comparison_expr_error(std::string message) : expression_parsing_error(message) {};
+    virtual const char* what() const noexcept override;
+};
+
 class parse_binary_expr_error : public expression_parsing_error {
 public:
     explicit parse_binary_expr_error(const char* message) : expression_parsing_error(message) {};
     explicit parse_binary_expr_error(std::string message) : expression_parsing_error(message) {};
     virtual const char* what() const noexcept override;
 };
+
 
 class parse_ternary_expr_error : public expression_parsing_error {
 public:

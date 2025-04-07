@@ -8,6 +8,14 @@ std::unordered_map<TokenType, IDDeclaratorType> Parser::id_modifiers = {
     {TokenType::INDEX_LEFT, IDDeclaratorType::ARRAY}
 };
 
+std::unordered_set<TokenType> Parser::comp_ops = {
+    TokenType::EQUAL, TokenType::NOT_EQUAL, TokenType::GREATER, TokenType::LESS, TokenType::GREATER_EQUAL, TokenType::LESS_EQUAL
+};
+
+std::unordered_set<TokenType> Parser::unary_ops = {
+    TokenType::INCREMENT, TokenType::DECREMENT, TokenType::PLUS, TokenType::MINUS, TokenType::TYPE
+};
+
 std::unique_ptr<ASTNode> Parser::parse() {
     try {
         return parse_declaration();
@@ -23,20 +31,20 @@ Parser::decl_ptr Parser::parse_declaration() {
         return parse_var_declaration();
     } catch (const declaration_parsing_error&) {
         index = decl_index;
-        std::cout<<"failed to parse var_decl \n";
+        // std::cout<<"failed to parse var_decl \n";
     }
     try {
         return parse_func_declaration();
     } catch (parse_func_decl_error&){
         index = decl_index;
-        std::cout<<"failed to parse func_decl \n";
+        // std::cout<<"failed to parse func_decl \n";
     }
 
     try {
         return parse_struct_declaration();
     } catch (parse_struct_decl_error&){
         index = decl_index;
-        std::cout<<"failed to parse struct_decl \n";
+        // std::cout<<"failed to parse struct_decl \n";
     }
     throw declaration_parsing_error("no decalarations");
 }
@@ -92,13 +100,13 @@ Parser::statement_ptr Parser::parse_statement() {
 }
 
 Parser::expr_ptr Parser::parse_expression(){
+    auto expr_index = index;
     try {
-        return parse_binary_expression();
-        return parse_ternary_expression();
-    } catch (const expression_parsing_error&){
+        return parse_comparison_expression();
+    } catch (expression_parsing_error&) {
+        index = expr_index;
         throw;
     }
-    throw expression_parsing_error(""); //TODO mesasage
 }
 
 

@@ -21,6 +21,26 @@ const std::unique_ptr<Expression>& BinaryExpression::get_right() {
     return this->right;
 }
 
+//ComparisonExpression
+ComparisonExpression::ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
+    : left(std::move(left)), op(op), right(std::move(right)) {}
+
+void ComparisonExpression::accept(Visitor& visitor) {
+    visitor.visit(this);
+}
+
+const Token& ComparisonExpression::get_op(){
+    return this->op;
+}
+
+const std::unique_ptr<Expression>& ComparisonExpression::get_left() {
+    return this->left;
+}
+
+const std::unique_ptr<Expression>& ComparisonExpression::get_right() {
+    return this->right;
+}
+
 // TernaryExpression
 TernaryExpression::TernaryExpression(std::unique_ptr<Expression> cond_expression,
                                      std::unique_ptr<Expression> true_expression,

@@ -106,7 +106,7 @@ Token Lexer::extract(){
     } catch (const erroneous_extract_exception&) {}
 
     try {
-        extract_keyword();
+        return extract_keyword();
     } catch (const erroneous_extract_exception&) {}
 
     try {

@@ -3,44 +3,30 @@
 #include "parser.hpp"
 #include <iostream>
 
-Parser::ternary_expr_ptr Parser::parse_ternary_expression() {
+Parser::expr_ptr Parser::parse_ternary_expression() {
     auto ternary_expr_index = index;
-    Parser::expr_ptr conditional_expression;
-    try {
-        conditional_expression = parse_expression();
-    } catch (const expression_parsing_error&) {
-        index = ternary_expr_index;
-        throw parse_ternary_expr_error("");
+    auto conditional_expression = parse_binary_expression();
+    while (this->tokens[index] == TokenType::QUESTION){
+        index++;
+        auto true_expr = parse_binary_expression();
+        if (this->tokens[index++] != TokenType::COLON) {
+            throw parse_ternary_expr_error("");
+        }
+        auto false_expr = parse_binary_expression();
+        conditional_expression = std::make_unique<TernaryExpression>(std::move(conditional_expression), std::move(true_expr), std::move(false_expr));
     }
-    auto q_token = this->tokens[index++];
-    if (q_token != TokenType::QUESTION) {
-        index = ternary_expr_index;
-        throw parse_ternary_expr_error("no ?");
+    return conditional_expression;
+}
+
+Parser::expr_ptr Parser::parse_comparison_expression() {
+    auto comp_index = index;
+    auto left = parse_ternary_expression();
+    while (comp_ops.contains(this->tokens[index].type)){
+        auto op = this->tokens[index++];
+        auto right = parse_ternary_expression();
+        left = std::make_unique<ComparisonExpression>(std::move(left), op, std::move(right));
     }
-    Parser::expr_ptr true_expr;
-    try {
-        true_expr = parse_expression();
-    } catch (const expression_parsing_error&) {
-        index = ternary_expr_index;
-        throw parse_ternary_expr_error("");
-    }
-    auto colon_token = this->tokens[index++];
-    if (colon_token != TokenType::COLON) {
-        index = ternary_expr_index;
-        throw parse_ternary_expr_error("expected :");
-    }
-    Parser::expr_ptr false_expr;
-    try {
-        false_expr = parse_expression();
-        return std::make_unique<TernaryExpression>(
-            std::move(conditional_expression),
-            std::move(true_expr),
-            std::move(false_expr)
-        );
-    } catch (const expression_parsing_error&) {
-        index = ternary_expr_index;
-        throw parse_ternary_expr_error("expected expression");
-    }
+    return left; 
 }
 
 Parser::expr_ptr Parser::parse_binary_expression() {
@@ -76,11 +62,7 @@ Parser::expr_ptr Parser::parse_pow_expression() {
         left = std::make_unique<BinaryExpression>(std::move(left), op, std::move(right));
     }
     return left;
-}
-
-std::unordered_set<TokenType> Parser::unary_ops = {
-    TokenType::INCREMENT, TokenType::DECREMENT, TokenType::PLUS, TokenType::MINUS, TokenType::ID, TokenType::TYPE
-}; // ++ -- + -  
+}  
 
 Parser::expr_ptr Parser::parse_unary_expression() {
     auto unary_index = index;

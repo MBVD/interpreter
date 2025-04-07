@@ -44,6 +44,10 @@ const char* expression_parsing_error::what() const noexcept {
     return ("syntax_error_exception::error with " + _msg).c_str();
 }
 
+const char* parse_comparison_expr_error::what() const noexcept {
+    return ("parse_comparison_expr_error" + _msg).c_str();
+}
+
 const char* parse_binary_expr_error::what() const noexcept {
     return ("syntax_error_exception::error with " + _msg).c_str();
 }

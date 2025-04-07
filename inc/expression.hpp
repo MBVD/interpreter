@@ -32,6 +32,19 @@ private:
     std::unique_ptr<Expression> false_expression;
 };
 
+class ComparisonExpression : public Expression {
+public:
+    ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
+    void accept(Visitor& visitor);
+    const Token& get_op();
+    const std::unique_ptr<Expression>& get_left();
+    const std::unique_ptr<Expression>& get_right();
+private:
+    Token op;
+    std::unique_ptr<Expression> left;
+    std::unique_ptr<Expression> right;
+};
+
 class UnaryExpression : public Expression {
 public:
     UnaryExpression(std::unique_ptr<Expression> base, const Token& op);

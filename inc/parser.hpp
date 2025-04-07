@@ -20,6 +20,7 @@ public:
     
     using expr_ptr = std::unique_ptr<Expression>;
     using ternary_expr_ptr = std::unique_ptr<TernaryExpression>;
+    using comp_expr_ptr = std::unique_ptr<ComparisonExpression>;
     using binary_expr_ptr = std::unique_ptr<BinaryExpression>;
     using unary_expr_ptr = std::unique_ptr<UnaryExpression>;
     using post_expr_ptr = std::unique_ptr<PostfixExpression>;
@@ -43,9 +44,11 @@ public:
     using decl_st_ptr = std::unique_ptr<DeclarationStatement>;
 
     using block_st_ptr = std::unique_ptr<BlockStatement>;
+    expr_ptr parse_expression();
 private:
     static std::unordered_map<TokenType, IDDeclaratorType> id_modifiers;
     static std::unordered_set<TokenType> unary_ops;
+    static std::unordered_set<TokenType> comp_ops;
 
     
     std::vector<Token> tokens;
@@ -60,8 +63,8 @@ private:
     struct_ptr parse_struct_declaration();
     
     
-    expr_ptr parse_expression();
-    ternary_expr_ptr parse_ternary_expression();
+    expr_ptr parse_comparison_expression();
+    expr_ptr parse_ternary_expression();
     expr_ptr parse_binary_expression();
     expr_ptr parse_sum_expression();
     expr_ptr parse_mul_expression();

@@ -16,18 +16,35 @@ void test_binary_expression_printer() {
     printer.print(binary_expression.get());
 }
 
+
+void test_binary_parser() {
+    std::string s = "- x";
+    Lexer lexer = Lexer(s);
+    std::vector<Token>tokens = lexer();
+    for (auto i : tokens){
+        std::cout<<"["<<i<<"] ";
+    }
+    std::cout<<"\n";
+    Parser parser = Parser(tokens);
+    auto root = parser.parse_expression();
+    Printer printer;
+    printer.print(root.get());
+}
+
 int main(){
     // test_binary_expression_printer();
-    // std::cout<<"\n";
+    std::cout<<"\n";
+    test_binary_parser();
     // std::string source_code((std::istreambuf_iterator<char>(std::cin)),
     //                         std::istreambuf_iterator<char>());
-    std::string source_code = "int x = 1;";
+    std::string source_code = "int main() {int x = 1;for (int i = 0; i<x; i+1){int a = 1;}}";
     std::cout<<source_code<<"\n";
     Lexer lexer = Lexer(source_code);
     std::vector<Token>tokens = lexer();
     for (auto i : tokens){
         std::cout<<"["<<i<<"] ";
     }
+    std::cout<<"\n";
     Parser parser = Parser(tokens);
     auto root = parser.parse();
     Printer printer;

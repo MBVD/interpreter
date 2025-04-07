@@ -195,10 +195,6 @@ Parser::for_st_prt Parser::parse_for_statement() {
         }
     }
 
-    if (this->tokens[index++] != TokenType::SEMICOLON) {
-        throw parse_for_statement_error("Expected ';' after initialization");
-    }
-
     Parser::expr_ptr condition;
     try {
         condition = parse_expression();
@@ -225,7 +221,7 @@ Parser::for_st_prt Parser::parse_for_statement() {
 
     Parser::statement_ptr body;
     try {
-        body = parse_statement();
+        body = parse_block_statement();
     } catch (const statement_parsing_error&) {
         index = for_index;
         throw parse_for_statement_error("Error parsing body");

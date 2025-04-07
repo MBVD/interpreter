@@ -106,7 +106,7 @@ void Printer::visit(Expression* node) {
     node->accept(*this);
 }
 
-void Printer::visit(BinaryExpression* node) {
+void Printer::visit(ComparisonExpression* node) {
     auto* left = node->get_left().get();
     auto* right = node->get_right().get();
     auto op = node->get_op();
@@ -124,6 +124,15 @@ void Printer::visit(TernaryExpression* node) {
     this->visit(true_expr);
     std::cout << " : ";
     this->visit(false_expr);
+}
+
+void Printer::visit(BinaryExpression* node) {
+    auto* left = node->get_left().get();
+    auto* right = node->get_right().get();
+    auto op = node->get_op();
+    this->visit(left);
+    std::cout << " " << op << " ";
+    this->visit(right);
 }
 
 void Printer::visit(UnaryExpression* node) {

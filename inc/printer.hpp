@@ -12,8 +12,9 @@ public:
     void visit(StructDeclarator*) final;
 
     void visit(Expression*) final;
-    void visit(BinaryExpression*) final;
+    void visit(ComparisonExpression*) final;
     void visit(TernaryExpression*) final;
+    void visit(BinaryExpression*) final;
     void visit(UnaryExpression*) final;
     void visit(PostfixExpression*) final;
     void visit(SubscriptExpression*) final;

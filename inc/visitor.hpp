@@ -15,8 +15,9 @@ public:
     virtual void visit(StructDeclarator*) = 0;
 
     virtual void visit(Expression*) = 0;
-    virtual void visit(BinaryExpression*) = 0;
+    virtual void visit(ComparisonExpression*) = 0;
     virtual void visit(TernaryExpression*) = 0;
+    virtual void visit(BinaryExpression*) = 0;
     virtual void visit(UnaryExpression*) = 0;
     virtual void visit(PostfixExpression*) = 0;
     virtual void visit(SubscriptExpression*) = 0;
