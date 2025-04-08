@@ -146,6 +146,7 @@ void Printer::visit(PostfixExpression* node){
     auto* base = node->get_expression().get();
     auto op = node->get_op();
     this->visit(base);
+    std::cout<<"HERE \n";
     std::cout<<op;
 }
 
@@ -178,10 +179,10 @@ void Printer::visit(CallExpression* node) {
 
 void Printer::visit(AccessExpression* node) {
     auto* expr = node->get_expression().get();
-    auto* expression_to_access = node->get_expression_to_access().get();
+    auto member = node->get_member();
     this->visit(expr);
     std::cout<<"->";
-    this->visit(expression_to_access);
+    std::cout<<member;
 }
 
 void Printer::visit(LiteralExpression* node) {

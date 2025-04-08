@@ -18,7 +18,7 @@ void test_binary_expression_printer() {
 
 
 void test_binary_parser() {
-    std::string s = "- x";
+    std::string s = "a [1 + 2] + x + 3";
     Lexer lexer = Lexer(s);
     std::vector<Token>tokens = lexer();
     for (auto i : tokens){
@@ -29,6 +29,7 @@ void test_binary_parser() {
     auto root = parser.parse_expression();
     Printer printer;
     printer.print(root.get());
+    std::cout<<"\n";
 }
 
 int main(){

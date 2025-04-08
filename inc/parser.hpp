@@ -44,6 +44,7 @@ public:
     using decl_st_ptr = std::unique_ptr<DeclarationStatement>;
 
     using block_st_ptr = std::unique_ptr<BlockStatement>;
+
     expr_ptr parse_expression();
 private:
     static std::unordered_map<TokenType, IDDeclaratorType> id_modifiers;
@@ -62,22 +63,23 @@ private:
     param_ptr parse_param_declaration();
     struct_ptr parse_struct_declaration();
     
-    
     expr_ptr parse_comparison_expression();
     expr_ptr parse_ternary_expression();
     expr_ptr parse_binary_expression();
+    expr_ptr parse_assignment_expression();
     expr_ptr parse_sum_expression();
     expr_ptr parse_mul_expression();
     expr_ptr parse_pow_expression();
+    expr_ptr parse_post_expression();
+    expr_ptr parse_post_helper(Token op, expr_ptr);
+    expr_ptr parse_access_expression(expr_ptr);
+    expr_ptr parse_subscript_expression(expr_ptr);
+    expr_ptr parse_call_expression(expr_ptr);
     expr_ptr parse_unary_expression();
     expr_ptr parse_base();
-    expr_ptr parse_post_expression();
-    access_expr_ptr parse_access_expression(expr_ptr base);
-    subscript_expr_ptr parse_subscript_expression(expr_ptr base);
-    call_expr_ptr parse_call_expression(expr_ptr base);
 
 
-    
+
     statement_ptr parse_statement();
     expr_st_ptr parse_expression_stetement();
     cond_st_ptr parse_conditional_statement();

@@ -23,22 +23,10 @@ const std::unique_ptr<Expression>& BinaryExpression::get_right() {
 
 //ComparisonExpression
 ComparisonExpression::ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
-    : left(std::move(left)), op(op), right(std::move(right)) {}
+    : BinaryExpression(std::move(left), op, std::move(right)) {}
 
 void ComparisonExpression::accept(Visitor& visitor) {
     visitor.visit(this);
-}
-
-const Token& ComparisonExpression::get_op(){
-    return this->op;
-}
-
-const std::unique_ptr<Expression>& ComparisonExpression::get_left() {
-    return this->left;
-}
-
-const std::unique_ptr<Expression>& ComparisonExpression::get_right() {
-    return this->right;
 }
 
 // TernaryExpression
@@ -63,6 +51,14 @@ const std::unique_ptr<Expression>& TernaryExpression::get_true_expression(){
 
 const std::unique_ptr<Expression>& TernaryExpression::get_false_expression(){
     return this->false_expression;
+}
+
+//AssignmentExpression
+AssignmentExpression::AssignmentExpression(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right) 
+    : BinaryExpression(std::move(left), {TokenType::ASSIGN, "="}, std::move(right)){};
+
+void AssignmentExpression::accept(Visitor& visitor){
+    visitor.visit(this);
 }
 
 // UnaryExpression
@@ -98,7 +94,7 @@ const std::unique_ptr<Expression>& PostfixExpression::get_expression(){
 // SubscriptExpression
 SubscriptExpression::SubscriptExpression(std::unique_ptr<Expression> expression,
                                          std::vector<std::unique_ptr<Expression>> indexes)
-    : PostfixExpression(std::move(expression), {TokenType::INDEX_LEFT}), indexes(std::move(indexes)) {}
+    : PostfixExpression(std::move(expression), {TokenType::INDEX_LEFT, "["}), indexes(std::move(indexes)) {}
 
 void SubscriptExpression::accept(Visitor& visitor) {
     visitor.visit(this);
@@ -123,15 +119,15 @@ const std::vector<std::unique_ptr<Expression>>& CallExpression::get_args(){
 
 // AccessExpression
 AccessExpression::AccessExpression(std::unique_ptr<Expression> expression,
-                                   std::unique_ptr<Expression> expression_to_access)
-    : PostfixExpression(std::move(expression), {TokenType::ARROW}), expression_to_access(std::move(expression_to_access)) {}
+                                   Token member)
+    : PostfixExpression(std::move(expression), {TokenType::ARROW}), member(member) {}
 
 void AccessExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const std::unique_ptr<Expression>& AccessExpression::get_expression_to_access(){
-    return this->expression_to_access;
+const Token& AccessExpression::get_member(){
+    return this->member;
 }
 
 // GroupExpression

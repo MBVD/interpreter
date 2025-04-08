@@ -3,19 +3,19 @@
 #include "parser.hpp"
 #include <iostream>
 
-Parser::expr_ptr Parser::parse_ternary_expression() {
-    auto ternary_expr_index = index;
-    auto conditional_expression = parse_binary_expression();
-    while (this->tokens[index] == TokenType::QUESTION){
-        index++;
-        auto true_expr = parse_binary_expression();
-        if (this->tokens[index++] != TokenType::COLON) {
-            throw parse_ternary_expr_error("");
-        }
-        auto false_expr = parse_binary_expression();
-        conditional_expression = std::make_unique<TernaryExpression>(std::move(conditional_expression), std::move(true_expr), std::move(false_expr));
+Parser::expr_ptr Parser::parse_binary_expression() {
+    auto expression = parse_assignment_expression();
+    return expression;
+}
+
+Parser::expr_ptr Parser::parse_assignment_expression() {// 1 ? x : y = ...
+    auto left = parse_comparison_expression(); // ++ X ++ = ... (int) x = ...
+    if (this->tokens[index] == TokenType::ASSIGN){ //TODO make set and contains
+        auto op = tokens[index++];
+        auto right = parse_assignment_expression();
+        left = std::make_unique<AssignmentExpression>(std::move(left), std::move(right));
     }
-    return conditional_expression;
+    return left;
 }
 
 Parser::expr_ptr Parser::parse_comparison_expression() {
@@ -29,9 +29,19 @@ Parser::expr_ptr Parser::parse_comparison_expression() {
     return left; 
 }
 
-Parser::expr_ptr Parser::parse_binary_expression() {
-    auto expression = Parser::parse_sum_expression();
-    return expression;
+Parser::expr_ptr Parser::parse_ternary_expression() { // 1 + 2 ... || 1 < 2 ? x : y ? y : x =
+    auto ternary_expr_index = index;
+    auto conditional_expression = parse_sum_expression();
+    while (this->tokens[index] == TokenType::QUESTION){
+        index++;
+        auto true_expr = parse_comparison_expression();
+        if (this->tokens[index++] != TokenType::COLON) {
+            throw parse_ternary_expr_error("");
+        }
+        auto false_expr = parse_binary_expression();
+        conditional_expression = std::make_unique<TernaryExpression>(std::move(conditional_expression), std::move(true_expr), std::move(false_expr));
+    }
+    return conditional_expression;
 }
 
 Parser::expr_ptr Parser::parse_sum_expression() {
@@ -62,18 +72,86 @@ Parser::expr_ptr Parser::parse_pow_expression() {
         left = std::make_unique<BinaryExpression>(std::move(left), op, std::move(right));
     }
     return left;
-}  
+}
 
 Parser::expr_ptr Parser::parse_unary_expression() {
     auto unary_index = index;
     auto unary_op = this->tokens[index++];
     if (unary_ops.contains(unary_op.type)) {
-        auto base = parse_base();
+        auto base = parse_post_expression();
         return std::make_unique<UnaryExpression>(std::move(base), unary_op);
     } else {
         index = unary_index;
-        return parse_base();
+        return parse_post_expression();
     }
+}
+
+Parser::expr_ptr Parser::parse_post_expression() {
+    auto post_index = index;
+    Parser::expr_ptr left;
+    left = parse_base();
+    while (tokens[index] == TokenType::INCREMENT || tokens[index] == TokenType::INDEX_LEFT) { // TODO make set
+        auto op = tokens[index++];
+        left = parse_post_helper(op, std::move(left));
+    }
+    return left;
+}
+
+Parser::expr_ptr Parser::parse_post_helper(Token op, expr_ptr base){
+    auto helper_index = index;
+    if (op == TokenType::ARROW){
+        return parse_access_expression(std::move(base));
+    } else if (op == TokenType::INDEX_LEFT){
+         return parse_subscript_expression(std::move(base));
+    } else if (op == TokenType::PARENTHESIS_LEFT){
+        return parse_call_expression(std::move(base));
+    }
+    throw expression_parsing_error("");
+}
+
+Parser::expr_ptr Parser::parse_access_expression(Parser::expr_ptr base) {// ->
+    if (index >= this->tokens.size() || this->tokens[index] != TokenType::ID) {
+        throw expression_parsing_error("Expected identifier after '->'");
+    }
+
+    auto member = this->tokens[index++];
+    return std::make_unique<AccessExpression>(std::move(base), member);
+}
+
+Parser::expr_ptr Parser::parse_subscript_expression(expr_ptr base) { // []
+    std::vector<Parser::expr_ptr> indexes;
+
+    while (index < this->tokens.size() && this->tokens[index] != TokenType::INDEX_RIGHT) {
+        if (this->tokens[index] == TokenType::COMMA) {
+            index++;
+            continue;
+        }
+        indexes.push_back(parse_expression());
+    }
+
+    if (index >= this->tokens.size() || this->tokens[index++] != TokenType::INDEX_RIGHT) {
+        throw expression_parsing_error("Expected ']' to close subscript expression");
+    }
+
+    return std::make_unique<SubscriptExpression>(std::move(base), std::move(indexes));
+}
+
+Parser::expr_ptr Parser::parse_call_expression(expr_ptr base) { // ()
+    std::vector<Parser::expr_ptr> args;
+
+    while (index < this->tokens.size() && this->tokens[index] != TokenType::PARENTHESIS_RIGHT) {
+        if (this->tokens[index++] == TokenType::COMMA) {
+            continue;
+        }
+
+        args.push_back(parse_expression());
+    }
+
+    if (index >= this->tokens.size() || this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
+        throw expression_parsing_error("Expected ')' to close function call");
+    }
+
+    return std::make_unique<CallExpression>(std::move(base), std::move(args));
 }
 
 Parser::expr_ptr Parser::parse_base() {
@@ -95,60 +173,4 @@ Parser::expr_ptr Parser::parse_base() {
     }
     index = base_index;
     throw parse_base_expr_error("no base expression");
-}
-
-Parser::expr_ptr Parser::parse_post_expression() {
-    auto post_index = index;
-    Parser::expr_ptr left;
-    try {
-        left = parse_base();
-    } catch (const parse_base_expr_error&) {
-        index = post_index;
-        throw;
-    }
-    while (1) {
-        auto token = this->tokens[index++];
-        if (token == TokenType::INDEX_LEFT) { // subscript
-            left = parse_subscript_expression(std::move(left));
-            continue;
-        } else if (token == TokenType::PARENTHESIS_LEFT) { // call
-            left = parse_call_expression(std::move(left));
-            continue;
-        } else if (token == TokenType::INCREMENT || token == TokenType::DECREMENT) {
-            left = std::make_unique<PostfixExpression>(std::move(left), token);
-            continue;
-        } else if (token == TokenType::ARROW) {
-            left = parse_access_expression(std::move(left));
-        } else {
-            break;
-        }
-    }
-    return left;
-}
-
-Parser::access_expr_ptr Parser::parse_access_expression(Parser::expr_ptr base) {
-    auto right = parse_post_expression();
-    return std::make_unique<AccessExpression>(std::move(base), std::move(right));
-}
-
-Parser::subscript_expr_ptr Parser::parse_subscript_expression(Parser::expr_ptr base) {
-    std::vector<Parser::expr_ptr> indexes;
-    while (this->tokens[index++] != TokenType::INDEX_RIGHT) {
-        if (this->tokens[index] == TokenType::COMMA) {
-            continue;
-        }
-        indexes.push_back(parse_expression());
-    }
-    return std::make_unique<SubscriptExpression>(std::move(base), std::move(indexes));
-}
-
-Parser::call_expr_ptr Parser::parse_call_expression(Parser::expr_ptr base) {
-    std::vector<Parser::expr_ptr> args;
-    while (this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
-        if (this->tokens[index] == TokenType::COMMA) {
-            continue;
-        }
-        args.push_back(parse_expression());
-    }
-    return std::make_unique<CallExpression>(std::move(base), std::move(args));
 }

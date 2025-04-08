@@ -17,6 +17,13 @@ private:
     std::unique_ptr<Expression> right;
 };
 
+class ComparisonExpression : public BinaryExpression{
+public:
+    ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
+    void accept(Visitor& visitor);
+private:
+};
+
 class TernaryExpression : public Expression {
 public:
     TernaryExpression(std::unique_ptr<Expression> cond_expression,
@@ -32,17 +39,10 @@ private:
     std::unique_ptr<Expression> false_expression;
 };
 
-class ComparisonExpression : public Expression {
+class AssignmentExpression : public BinaryExpression{
 public:
-    ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
+    AssignmentExpression(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right);
     void accept(Visitor& visitor);
-    const Token& get_op();
-    const std::unique_ptr<Expression>& get_left();
-    const std::unique_ptr<Expression>& get_right();
-private:
-    Token op;
-    std::unique_ptr<Expression> left;
-    std::unique_ptr<Expression> right;
 };
 
 class UnaryExpression : public Expression {
@@ -90,11 +90,11 @@ private:
 class AccessExpression : public PostfixExpression {
 public:
     AccessExpression(std::unique_ptr<Expression> expression,
-                     std::unique_ptr<Expression> expression_to_access);
+                     Token member);
     void accept(Visitor& visitor);
-    const std::unique_ptr<Expression>& get_expression_to_access();    
+    const Token& get_member();    
 private:
-    std::unique_ptr<Expression> expression_to_access;
+    Token member;
 };
 
 class LiteralExpression : public Expression {
