@@ -18,7 +18,7 @@ void test_binary_expression_printer() {
 
 
 void test_binary_parser() {
-    std::string s = "a [1 + 2] + x + 3";
+    std::string s = "a++, 1";
     Lexer lexer = Lexer(s);
     std::vector<Token>tokens = lexer();
     for (auto i : tokens){
@@ -35,10 +35,10 @@ void test_binary_parser() {
 int main(){
     // test_binary_expression_printer();
     std::cout<<"\n";
-    test_binary_parser();
-    // std::string source_code((std::istreambuf_iterator<char>(std::cin)),
-    //                         std::istreambuf_iterator<char>());
-    std::string source_code = "int main() {int x = 1;for (int i = 0; i<x; i+1){int a = 1;}}";
+    // test_binary_parser();
+    std::string source_code((std::istreambuf_iterator<char>(std::cin)),
+                            std::istreambuf_iterator<char>());
+    // std::string source_code = "int main() {int x = 1;if (x == 1){return 1;}for (int i = 0; i<x; i=i+1){int a = 1;}}";
     std::cout<<source_code<<"\n";
     Lexer lexer = Lexer(source_code);
     std::vector<Token>tokens = lexer();

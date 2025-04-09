@@ -75,6 +75,7 @@ private:
     expr_ptr parse_access_expression(expr_ptr);
     expr_ptr parse_subscript_expression(expr_ptr);
     expr_ptr parse_call_expression(expr_ptr);
+    expr_ptr parse_increment_expression(expr_ptr, Token);
     expr_ptr parse_unary_expression();
     expr_ptr parse_base();
 

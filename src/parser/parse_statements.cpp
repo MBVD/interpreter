@@ -54,7 +54,7 @@ Parser::cond_st_ptr Parser::parse_conditional_statement() {
 
     Parser::statement_ptr true_statement;
     try {
-        true_statement = parse_statement();
+        true_statement = parse_block_statement();
     } catch (const statement_parsing_error&) {
         index = cond_index;
         throw parse_conditional_st_error("Error parsing true statement");
@@ -64,7 +64,7 @@ Parser::cond_st_ptr Parser::parse_conditional_statement() {
         index++;
         Parser::statement_ptr else_statement;
         try {
-            else_statement = parse_statement();
+            else_statement = parse_block_statement();
             return std::make_unique<ConditionalStatement>(std::move(condition), std::move(true_statement), std::move(else_statement));
         } catch (const statement_parsing_error&) {
             index = cond_index;
@@ -119,7 +119,7 @@ Parser::while_st_ptr Parser::parse_while_statement() {
 
     Parser::statement_ptr statement;
     try {
-        statement = parse_statement();
+        statement = parse_block_statement();
     } catch (const statement_parsing_error&) {
         index = while_index;
         throw parse_while_statement_error("Error parsing statement");

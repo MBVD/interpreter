@@ -76,8 +76,9 @@ Parser::expr_ptr Parser::parse_pow_expression() {
 
 Parser::expr_ptr Parser::parse_unary_expression() {
     auto unary_index = index;
-    auto unary_op = this->tokens[index++];
+    auto unary_op = this->tokens[index];
     if (unary_ops.contains(unary_op.type)) {
+        index++;
         auto base = parse_post_expression();
         return std::make_unique<UnaryExpression>(std::move(base), unary_op);
     } else {
@@ -90,7 +91,7 @@ Parser::expr_ptr Parser::parse_post_expression() {
     auto post_index = index;
     Parser::expr_ptr left;
     left = parse_base();
-    while (tokens[index] == TokenType::INCREMENT || tokens[index] == TokenType::INDEX_LEFT) { // TODO make set
+    while ((tokens[index] == TokenType::INCREMENT || tokens[index] == TokenType::INDEX_LEFT) && tokens[index] != TokenType::END) { // TODO make set
         auto op = tokens[index++];
         left = parse_post_helper(op, std::move(left));
     }
@@ -105,6 +106,8 @@ Parser::expr_ptr Parser::parse_post_helper(Token op, expr_ptr base){
          return parse_subscript_expression(std::move(base));
     } else if (op == TokenType::PARENTHESIS_LEFT){
         return parse_call_expression(std::move(base));
+    } else if (op == TokenType::INCREMENT || op == TokenType::DECREMENT){
+        return parse_increment_expression(std::move(base), op);
     }
     throw expression_parsing_error("");
 }
@@ -152,6 +155,10 @@ Parser::expr_ptr Parser::parse_call_expression(expr_ptr base) { // ()
     }
 
     return std::make_unique<CallExpression>(std::move(base), std::move(args));
+}
+
+Parser::expr_ptr Parser::parse_increment_expression(Parser::expr_ptr base, Token op) {// ++ --
+    return std::make_unique<PostfixExpression>(std::move(base), op);
 }
 
 Parser::expr_ptr Parser::parse_base() {

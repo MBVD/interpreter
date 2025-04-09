@@ -146,7 +146,6 @@ void Printer::visit(PostfixExpression* node){
     auto* base = node->get_expression().get();
     auto op = node->get_op();
     this->visit(base);
-    std::cout<<"HERE \n";
     std::cout<<op;
 }
 

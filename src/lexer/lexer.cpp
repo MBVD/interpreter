@@ -4,7 +4,7 @@
 #include<iostream>
 
 std::set<std::string> Lexer::types = {"int", "float", "double", "char", "bool", "size_t"};
-std::unordered_map<std::string, TokenType> Lexer::operators = {
+std::map<std::string, TokenType> Lexer::operators = {
     {"+", TokenType::PLUS},
     {"-", TokenType::MINUS},
     {"*", TokenType::MULTIPLY},
@@ -193,7 +193,8 @@ Token Lexer::extract_keyword() {
 }
 
 Token Lexer::extract_operator(){
-    for (auto opearator_data : operators){
+    for (auto i = operators.rbegin(); i != operators.rend(); ++i) {
+        auto opearator_data = *i;
         if (input.find(opearator_data.first, index) == index){
             int prev = index;
             index += opearator_data.first.size();
