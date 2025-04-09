@@ -101,12 +101,8 @@ Parser::statement_ptr Parser::parse_statement() {
 
 Parser::expr_ptr Parser::parse_expression(){
     auto expr_index = index;
-    try {
-        return parse_assignment_expression();
-    } catch (expression_parsing_error&) {
-        index = expr_index;
-        throw;
-    }
+    return parse_assignment_expression();
+
 }
 
 
