@@ -27,7 +27,7 @@ Parser::decl_ptr Parser::parse_func_declaration() {
         }
         try {
             params.push_back(parse_param_declaration());
-        } catch (const parse_param_decl_error&) {
+        } catch (parse_param_decl_error&) {
             index = func_index;
             throw parse_func_decl_error("");
         }
@@ -39,7 +39,7 @@ Parser::decl_ptr Parser::parse_func_declaration() {
         try {
             Parser::block_st_ptr block = parse_block_statement();
             return std::make_unique<FuncDeclarator>(returnable_type, name, std::move(params), std::move(block));
-        } catch (const parse_block_st_error&) {
+        } catch (parse_block_st_error&) {
             index = func_index;
             throw parse_func_decl_error("");
         }
@@ -56,7 +56,7 @@ Parser::param_ptr Parser::parse_param_declaration() {
     try {
         Parser::decl_ptr decl = parse_declaration();
         return std::make_unique<ParamDeclarator>(type, std::move(decl));
-    } catch (const declaration_parsing_error&) {
+    } catch (declaration_parsing_error&) {
         index = param_index;
         throw parse_param_decl_error("");
     }
@@ -82,7 +82,7 @@ Parser::struct_ptr Parser::parse_struct_declaration() {
     while (this->tokens[index] != TokenType::BRACE_RIGHT && this->tokens[index] != TokenType::END) {
         try {
             vars.push_back(parse_var_declaration());
-        } catch (const parse_var_decl_error&) {
+        } catch (parse_var_decl_error&) {
             index = struct_index;
             throw parse_struct_decl_error("");
         }
@@ -102,7 +102,7 @@ Parser::var_ptr Parser::parse_var_declaration() {
     std::unique_ptr<InitDeclarator> first_declared;
     try {
         first_declared = parse_init_declaration();
-    } catch (const parse_init_decl_error&) {
+    } catch (parse_init_decl_error&) {
         this->index = var_index;
         throw parse_var_decl_error("no var decl");
     }
@@ -126,7 +126,7 @@ Parser::init_ptr Parser::parse_init_declaration() {
     std::unique_ptr<IdDeclorator> declorator;
     try {
         declorator = parse_id_declaration();
-    } catch (const parse_id_decl_error&) {
+    } catch (parse_id_decl_error&) {
         this->index = init_index;
         throw parse_init_decl_error("");
     }
@@ -136,7 +136,7 @@ Parser::init_ptr Parser::parse_init_declaration() {
         std::unique_ptr<Expression> expr;
         try {
             expr = parse_expression();
-        } catch (const expression_parsing_error&) {
+        } catch (expression_parsing_error&) {
             index = init_index;
             throw parse_init_decl_error("");
         }

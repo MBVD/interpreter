@@ -29,7 +29,7 @@ Parser::decl_ptr Parser::parse_declaration() {
     auto decl_index = index;
     try {
         return parse_var_declaration();
-    } catch (const declaration_parsing_error&) {
+    } catch (declaration_parsing_error&) {
         index = decl_index;
         // std::cout<<"failed to parse var_decl \n";
     }
@@ -53,7 +53,7 @@ Parser::statement_ptr Parser::parse_statement() {
     auto statement_index = index;
     try {
         return parse_expression_stetement();  
-    } catch (const parse_expression_st_error&) {
+    } catch (parse_expression_st_error&) {
         index = statement_index;
     }
     try {

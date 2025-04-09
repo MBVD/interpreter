@@ -12,7 +12,7 @@ Parser::expr_st_ptr Parser::parse_expression_stetement() {
         }
         index++;
         return std::make_unique<ExpressionStatement>(std::move(expr));
-    } catch (const expression_parsing_error&) {
+    } catch (expression_parsing_error&) {
         index = expr_st_index;
         throw parse_expression_st_error("");
     }
@@ -24,7 +24,7 @@ Parser::decl_st_ptr Parser::parse_decl_statement() {
     try {
         auto var_decl = parse_var_declaration();
         return std::make_unique<DeclarationStatement>(std::move(var_decl));
-    } catch (const parse_var_decl_error&) {
+    } catch (parse_var_decl_error&) {
         index = decl_st_index;
         throw parse_decl_st_error("");
     }
@@ -43,7 +43,7 @@ Parser::cond_st_ptr Parser::parse_conditional_statement() {
     Parser::expr_ptr condition;
     try {
         condition = parse_expression();
-    } catch (const expression_parsing_error&) {
+    } catch (expression_parsing_error&) {
         index = cond_index;
         throw parse_conditional_st_error("Error parsing condition");
     }
@@ -55,7 +55,7 @@ Parser::cond_st_ptr Parser::parse_conditional_statement() {
     Parser::statement_ptr true_statement;
     try {
         true_statement = parse_block_statement();
-    } catch (const statement_parsing_error&) {
+    } catch (statement_parsing_error&) {
         index = cond_index;
         throw parse_conditional_st_error("Error parsing true statement");
     }
@@ -66,7 +66,7 @@ Parser::cond_st_ptr Parser::parse_conditional_statement() {
         try {
             else_statement = parse_block_statement();
             return std::make_unique<ConditionalStatement>(std::move(condition), std::move(true_statement), std::move(else_statement));
-        } catch (const statement_parsing_error&) {
+        } catch (statement_parsing_error&) {
             index = cond_index;
             throw parse_conditional_st_error("Error parsing else statement");
         }
@@ -80,18 +80,15 @@ Parser::loop_st_ptr Parser::parse_loop_statement() {
     auto loop_index = index;
     try {
         return parse_while_statement();
-    } catch (const parse_loop_st_error&) {
-        try {
-            return parse_do_while_statement();
-        } catch (const parse_loop_st_error&) {
-            try {
-                return parse_for_statement();
-            } catch (const parse_loop_st_error&) {
-                index = loop_index;
-                throw parse_loop_st_error("Error parsing loop statement");
-            }
-        }
-    }
+    } catch (parse_loop_st_error&) {}
+    try {
+        return parse_do_while_statement();
+    } catch (parse_loop_st_error&) {}
+    try {
+        return parse_for_statement();
+    } catch (parse_loop_st_error&) {}
+    index = loop_index;
+    throw parse_loop_st_error("Error parsing loop statement");
 }
 
 // WhileStatement
@@ -108,7 +105,7 @@ Parser::while_st_ptr Parser::parse_while_statement() {
     Parser::expr_ptr condition;
     try {
         condition = parse_expression();
-    } catch (const expression_parsing_error&) {
+    } catch (expression_parsing_error&) {
         index = while_index;
         throw parse_while_statement_error("Error parsing condition");
     }
@@ -120,7 +117,7 @@ Parser::while_st_ptr Parser::parse_while_statement() {
     Parser::statement_ptr statement;
     try {
         statement = parse_block_statement();
-    } catch (const statement_parsing_error&) {
+    } catch (statement_parsing_error&) {
         index = while_index;
         throw parse_while_statement_error("Error parsing statement");
     }
@@ -139,7 +136,7 @@ Parser::do_while_st_ptr Parser::parse_do_while_statement() {
     Parser::statement_ptr statement;
     try {
         statement = parse_statement();
-    } catch (const statement_parsing_error&) {
+    } catch (statement_parsing_error&) {
         index = do_while_index;
         throw parse_do_while_statement_error("Error parsing statement");
     }
@@ -154,7 +151,7 @@ Parser::do_while_st_ptr Parser::parse_do_while_statement() {
     Parser::expr_ptr condition;
     try {
         condition = parse_expression();
-    } catch (const expression_parsing_error&) {
+    } catch (expression_parsing_error&) {
         index = do_while_index;
         throw parse_do_while_statement_error("Error parsing condition");
     }
@@ -185,11 +182,11 @@ Parser::for_st_prt Parser::parse_for_statement() {
     Parser::expr_ptr init_expression;
     try {
         var = parse_var_declaration();
-    } catch (const parse_var_decl_error&) {
+    } catch (parse_var_decl_error&) {
         is_var = false;
         try {
             init_expression = parse_expression();
-        } catch (const expression_parsing_error&) {
+        } catch (expression_parsing_error&) {
             index = for_index;
             throw parse_for_statement_error("Error parsing initialization");
         }
@@ -198,7 +195,7 @@ Parser::for_st_prt Parser::parse_for_statement() {
     Parser::expr_ptr condition;
     try {
         condition = parse_expression();
-    } catch (const expression_parsing_error&) {
+    } catch (expression_parsing_error&) {
         index = for_index;
         throw parse_for_statement_error("Error parsing condition");
     }
@@ -210,7 +207,7 @@ Parser::for_st_prt Parser::parse_for_statement() {
     Parser::expr_ptr iteration;
     try {
         iteration = parse_expression();
-    } catch (const expression_parsing_error&) {
+    } catch (expression_parsing_error&) {
         index = for_index;
         throw parse_for_statement_error("Error parsing iteration");
     }
@@ -222,7 +219,7 @@ Parser::for_st_prt Parser::parse_for_statement() {
     Parser::statement_ptr body;
     try {
         body = parse_block_statement();
-    } catch (const statement_parsing_error&) {
+    } catch (statement_parsing_error&) {
         index = for_index;
         throw parse_for_statement_error("Error parsing body");
     }
@@ -242,7 +239,7 @@ Parser::return_st_ptr Parser::parse_return_statement() {
     Parser::expr_ptr expression;
     try {
         expression = parse_expression();
-    } catch (const expression_parsing_error&) {
+    } catch (expression_parsing_error&) {
         index = return_index;
         index++;
     }
@@ -296,7 +293,7 @@ Parser::block_st_ptr Parser::parse_block_statement() {
     while (this->tokens[index] != TokenType::BRACE_RIGHT && this->tokens[index] != TokenType::END) {
         try {
             statements.push_back(parse_statement());
-        } catch (const statement_parsing_error&) {
+        } catch (statement_parsing_error&) {
             index = block_st_index;
             throw parse_block_st_error("Error parsing statements inside block");
         }

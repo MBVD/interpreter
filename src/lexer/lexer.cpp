@@ -91,27 +91,27 @@ Token Lexer::extract(){
 
     try {
         return extract_literal();
-    } catch (const erroneous_extract_exception&) {}
+    } catch (erroneous_extract_exception&) {}
 
     try {
         return extract_type();
-    } catch (const erroneous_extract_exception&) {}
+    } catch (erroneous_extract_exception&) {}
 
     try {
         return extract_operator();
-    } catch (const erroneous_extract_exception&) {}
+    } catch (erroneous_extract_exception&) {}
 
     try {
         return extract_puctuator();
-    } catch (const erroneous_extract_exception&) {}
+    } catch (erroneous_extract_exception&) {}
 
     try {
         return extract_keyword();
-    } catch (const erroneous_extract_exception&) {}
+    } catch (erroneous_extract_exception&) {}
 
     try {
         return extract_id();
-    } catch (const erroneous_extract_exception&) {}
+    } catch (erroneous_extract_exception&) {}
     
     return {TokenType::END, ""};
 };
