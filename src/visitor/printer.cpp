@@ -222,7 +222,8 @@ void Printer::visit(DeclarationStatement* node) {
 void Printer::visit(ReturnStatement* node) {
     auto* expr = node->get_expression().get();
     std::cout<<"return ";
-    this->visit(expr);
+    if (expr != nullptr)
+        this->visit(expr);
 }
 
 void Printer::visit(BreakStatement*) {

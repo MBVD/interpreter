@@ -26,6 +26,7 @@ private:
 class ReturnStatement : public Statement {
 public:
     ReturnStatement(std::unique_ptr<Expression> expression);
+    ReturnStatement();
     void accept(Visitor& visitor);
     const std::unique_ptr<Expression>& get_expression();
 private:

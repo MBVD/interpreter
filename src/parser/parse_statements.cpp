@@ -244,7 +244,7 @@ Parser::return_st_ptr Parser::parse_return_statement() {
         expression = parse_expression();
     } catch (const expression_parsing_error&) {
         index = return_index;
-        throw parse_return_st_error("Error parsing return expression");
+        index++;
     }
 
     if (this->tokens[index++] != TokenType::SEMICOLON) {

@@ -26,6 +26,8 @@ const std::unique_ptr<VarDeclarator>& DeclarationStatement::get_declaration() {
 ReturnStatement::ReturnStatement(std::unique_ptr<Expression> expression)
     : expression(std::move(expression)) {}
 
+ReturnStatement::ReturnStatement() : expression(nullptr){}
+
 void ReturnStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 const std::unique_ptr<Expression>& ReturnStatement::get_expression() {
