@@ -30,22 +30,17 @@ Parser::decl_ptr Parser::parse_declaration() {
     try {
         return parse_var_declaration();
     } catch (declaration_parsing_error&) {
-        index = decl_index;
         // std::cout<<"failed to parse var_decl \n";
     }
     try {
         return parse_func_declaration();
     } catch (parse_func_decl_error&){
-        index = decl_index;
         // std::cout<<"failed to parse func_decl \n";
     }
 
     try {
         return parse_struct_declaration();
-    } catch (parse_struct_decl_error&){
-        index = decl_index;
-        // std::cout<<"failed to parse struct_decl \n";
-    }
+    } catch (parse_struct_decl_error&){}
     throw declaration_parsing_error("no decalarations");
 }
 
@@ -53,54 +48,35 @@ Parser::statement_ptr Parser::parse_statement() {
     auto statement_index = index;
     try {
         return parse_expression_stetement();  
-    } catch (parse_expression_st_error&) {
-        index = statement_index;
-    }
+    } catch (parse_expression_st_error&) {}
     try {
         return parse_decl_statement();
-    } catch (parse_decl_st_error&) {
-        index = statement_index;
-    }
+    } catch (parse_decl_st_error&) {}
     try {
         return parse_conditional_statement();
-    } catch (parse_conditional_st_error&) {
-        index = statement_index;
-    }
+    } catch (parse_conditional_st_error&) {}
     try {
         return parse_loop_statement();
-    } catch (parse_loop_st_error&) {
-        index = statement_index;
-    }
+    } catch (parse_loop_st_error&) {}
     try {
         return parse_return_statement();
-    } catch (parse_return_st_error&){
-        index = statement_index;
-    }
+    } catch (parse_return_st_error&){}
     try {
         return parse_break_statement();
-    } catch (parse_break_st_error&) {
-        index = statement_index;
-    }
+    } catch (parse_break_st_error&) {}
     try {
         return parse_continue_statement();
-    } catch (parse_conditional_st_error& ){
-        index = statement_index;
-    }
+    } catch (parse_conditional_st_error& ) {}
     try {
         return parse_decl_statement();
-    } catch (parse_decl_st_error&){
-        index = statement_index;
-    }
+    } catch (parse_decl_st_error&) {}
     try {
         return parse_block_statement();
-    } catch (parse_block_st_error&){
-        index = statement_index;
-    }
+    } catch (parse_block_st_error&){}
     throw statement_parsing_error(""); //TODO mesasage
 }
 
 Parser::expr_ptr Parser::parse_expression(){
-    auto expr_index = index;
     return parse_assignment_expression();
 
 }

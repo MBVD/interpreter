@@ -6,16 +6,19 @@ Parser::decl_ptr Parser::parse_func_declaration() {
     auto func_index = this->index;
     auto returnable_type = this->tokens[index];
     if (returnable_type != TokenType::ID && returnable_type != TokenType::TYPE) {
+        index = func_index;
         throw parse_func_decl_error(""); // TODO: придумать умный message
     }
     index++;
     auto name = this->tokens[index];
     if (name != TokenType::ID) {
+        index = func_index;
         throw parse_func_decl_error("");
     }
     index++;
 
     if (auto i = this->tokens[index]; i != TokenType::PARENTHESIS_LEFT) {
+        index = func_index;
         throw parse_func_decl_error("");
     }
     index++;
@@ -28,7 +31,6 @@ Parser::decl_ptr Parser::parse_func_declaration() {
         try {
             params.push_back(parse_param_declaration());
         } catch (parse_param_decl_error&) {
-            index = func_index;
             throw parse_func_decl_error("");
         }
     }
@@ -40,7 +42,6 @@ Parser::decl_ptr Parser::parse_func_declaration() {
             Parser::block_st_ptr block = parse_block_statement();
             return std::make_unique<FuncDeclarator>(returnable_type, name, std::move(params), std::move(block));
         } catch (parse_block_st_error&) {
-            index = func_index;
             throw parse_func_decl_error("");
         }
     }
@@ -50,6 +51,7 @@ Parser::param_ptr Parser::parse_param_declaration() {
     auto param_index = index;
     auto type = this->tokens[index];
     if (type != TokenType::ID && type != TokenType::TYPE) {
+        index = param_index;
         throw parse_param_decl_error("");
     }
     index++;
@@ -57,7 +59,6 @@ Parser::param_ptr Parser::parse_param_declaration() {
         Parser::decl_ptr decl = parse_declaration();
         return std::make_unique<ParamDeclarator>(type, std::move(decl));
     } catch (declaration_parsing_error&) {
-        index = param_index;
         throw parse_param_decl_error("");
     }
 }
@@ -65,6 +66,7 @@ Parser::param_ptr Parser::parse_param_declaration() {
 Parser::struct_ptr Parser::parse_struct_declaration() {
     auto struct_index = index;
     if (this->tokens[index].value != "struct") {
+        index = struct_index;
         throw parse_struct_decl_error("");
     }
     index++;
@@ -74,6 +76,7 @@ Parser::struct_ptr Parser::parse_struct_declaration() {
         throw parse_struct_decl_error("");
     }
     if (this->tokens[index] != TokenType::BRACE_LEFT) {
+        index = struct_index;
         throw parse_struct_decl_error("");
     }
     index++;
@@ -88,14 +91,16 @@ Parser::struct_ptr Parser::parse_struct_declaration() {
         }
     }
     if (this->tokens[index++] != TokenType::BRACE_RIGHT) {
+        index = struct_index;
         throw parse_struct_decl_error("");
     }
     return std::make_unique<StructDeclarator>(id, std::move(vars));
 }
 
 Parser::var_ptr Parser::parse_var_declaration() {
-    auto var_index = this->index;
+    auto var_index = index;
     if (this->tokens[index] != TokenType::TYPE && this->tokens[index] != TokenType::ID) {
+        index = var_index;
         throw parse_var_decl_error("no var decl");
     }
     auto type = this->tokens[index++];
@@ -103,7 +108,7 @@ Parser::var_ptr Parser::parse_var_declaration() {
     try {
         first_declared = parse_init_declaration();
     } catch (parse_init_decl_error&) {
-        this->index = var_index;
+        index = var_index;
         throw parse_var_decl_error("no var decl");
     }
 
@@ -111,10 +116,15 @@ Parser::var_ptr Parser::parse_var_declaration() {
     declared.push_back(std::move(first_declared));
     while (this->tokens[index] == TokenType::COMMA) {
         index++;
-        declared.push_back(parse_init_declaration());
+        try {
+            declared.push_back(parse_init_declaration());
+        } catch (parse_init_decl_error&){
+            throw parse_var_decl_error("no var decl");
+        } 
     }
 
     if (this->tokens[index++] != TokenType::SEMICOLON) {
+        index = var_index;
         throw parse_var_decl_error("expected semicolon");
     }
 
@@ -122,22 +132,21 @@ Parser::var_ptr Parser::parse_var_declaration() {
 }
 
 Parser::init_ptr Parser::parse_init_declaration() {
-    auto init_index = this->index;
+    auto init_index = index;
     std::unique_ptr<IdDeclorator> declorator;
     try {
         declorator = parse_id_declaration();
     } catch (parse_id_decl_error&) {
-        this->index = init_index;
+        index = init_index;
         throw parse_init_decl_error("");
     }
 
     if (this->tokens[index] == TokenType::ASSIGN) {
-        this->index++;
+        index++;
         std::unique_ptr<Expression> expr;
         try {
             expr = parse_expression();
         } catch (expression_parsing_error&) {
-            index = init_index;
             throw parse_init_decl_error("");
         }
         return std::make_unique<InitDeclarator>(std::move(declorator), std::move(expr));

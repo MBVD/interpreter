@@ -34,9 +34,11 @@ Parser::decl_st_ptr Parser::parse_decl_statement() {
 Parser::cond_st_ptr Parser::parse_conditional_statement() {
     auto cond_index = index;
     if (this->tokens[index++] != TokenType::IF) {
+        index = cond_index;
         throw parse_conditional_st_error("");
     }
     if (this->tokens[index++] != TokenType::PARENTHESIS_LEFT) {
+        index = cond_index;
         throw parse_conditional_st_error("Expected '(' after 'if'");
     }
 
@@ -49,6 +51,7 @@ Parser::cond_st_ptr Parser::parse_conditional_statement() {
     }
 
     if (this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
+        index = cond_index;
         throw parse_conditional_st_error("Expected ')' after condition");
     }
 
@@ -106,7 +109,6 @@ Parser::while_st_ptr Parser::parse_while_statement() {
     try {
         condition = parse_expression();
     } catch (expression_parsing_error&) {
-        index = while_index;
         throw parse_while_statement_error("Error parsing condition");
     }
 
@@ -118,7 +120,6 @@ Parser::while_st_ptr Parser::parse_while_statement() {
     try {
         statement = parse_block_statement();
     } catch (statement_parsing_error&) {
-        index = while_index;
         throw parse_while_statement_error("Error parsing statement");
     }
 
@@ -137,14 +138,15 @@ Parser::do_while_st_ptr Parser::parse_do_while_statement() {
     try {
         statement = parse_statement();
     } catch (statement_parsing_error&) {
-        index = do_while_index;
         throw parse_do_while_statement_error("Error parsing statement");
     }
 
     if (this->tokens[index++] != TokenType::WHILE) {
+        index = do_while_index;
         throw parse_do_while_statement_error("Expected 'while' after statement");
     }
     if (this->tokens[index++] != TokenType::PARENTHESIS_LEFT) {
+        index = do_while_index;
         throw parse_do_while_statement_error("Expected '(' after 'while'");
     }
 
@@ -152,14 +154,15 @@ Parser::do_while_st_ptr Parser::parse_do_while_statement() {
     try {
         condition = parse_expression();
     } catch (expression_parsing_error&) {
-        index = do_while_index;
         throw parse_do_while_statement_error("Error parsing condition");
     }
 
     if (this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
+        index = do_while_index;
         throw parse_do_while_statement_error("Expected ')' after condition");
     }
     if (this->tokens[index++] != TokenType::SEMICOLON) {
+        index = do_while_index;
         throw parse_do_while_statement_error("Expected ';' after do-while statement");
     }
 
@@ -174,6 +177,7 @@ Parser::for_st_prt Parser::parse_for_statement() {
         throw parse_for_statement_error("");
     }
     if (this->tokens[index++] != TokenType::PARENTHESIS_LEFT) {
+        index = for_index;
         throw parse_for_statement_error("Expected '(' after 'for'");
     }
 
@@ -187,7 +191,6 @@ Parser::for_st_prt Parser::parse_for_statement() {
         try {
             init_expression = parse_expression();
         } catch (expression_parsing_error&) {
-            index = for_index;
             throw parse_for_statement_error("Error parsing initialization");
         }
     }
@@ -196,7 +199,6 @@ Parser::for_st_prt Parser::parse_for_statement() {
     try {
         condition = parse_expression();
     } catch (expression_parsing_error&) {
-        index = for_index;
         throw parse_for_statement_error("Error parsing condition");
     }
 
@@ -208,11 +210,11 @@ Parser::for_st_prt Parser::parse_for_statement() {
     try {
         iteration = parse_expression();
     } catch (expression_parsing_error&) {
-        index = for_index;
         throw parse_for_statement_error("Error parsing iteration");
     }
 
     if (this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
+        index = for_index;
         throw parse_for_statement_error("Expected ')' after iteration");
     }
 
@@ -220,7 +222,6 @@ Parser::for_st_prt Parser::parse_for_statement() {
     try {
         body = parse_block_statement();
     } catch (statement_parsing_error&) {
-        index = for_index;
         throw parse_for_statement_error("Error parsing body");
     }
 
@@ -239,12 +240,10 @@ Parser::return_st_ptr Parser::parse_return_statement() {
     Parser::expr_ptr expression;
     try {
         expression = parse_expression();
-    } catch (expression_parsing_error&) {
-        index = return_index;
-        index++;
-    }
+    } catch (expression_parsing_error&) {}
 
     if (this->tokens[index++] != TokenType::SEMICOLON) {
+        index = return_index;
         throw parse_return_st_error("Expected ';' after return statement");
     }
 
@@ -259,6 +258,7 @@ Parser::cont_st_ptr Parser::parse_continue_statement() {
         throw parse_continue_st_error("");
     }
     if (this->tokens[index++] != TokenType::SEMICOLON) {
+        index = cont_index;
         throw parse_continue_st_error("Expected ';' after continue statement");
     }
     return std::make_unique<ContinueStatement>();
@@ -272,6 +272,7 @@ Parser::break_st_ptr Parser::parse_break_statement() {
         throw parse_break_st_error("");
     }
     if (this->tokens[index++] != TokenType::SEMICOLON) {
+        index = break_index;
         throw parse_break_st_error("Expected ';' after break statement");
     }
     return std::make_unique<BreakStatement>();
@@ -281,6 +282,7 @@ Parser::break_st_ptr Parser::parse_break_statement() {
 Parser::block_st_ptr Parser::parse_block_statement() {
     auto block_st_index = index;
     if (this->tokens[index++] != TokenType::BRACE_LEFT) {
+        index = block_st_index;
         throw parse_block_st_error("");
     }
 
@@ -294,12 +296,12 @@ Parser::block_st_ptr Parser::parse_block_statement() {
         try {
             statements.push_back(parse_statement());
         } catch (statement_parsing_error&) {
-            index = block_st_index;
             throw parse_block_st_error("Error parsing statements inside block");
         }
     }
 
     if (this->tokens[index++] != TokenType::BRACE_RIGHT) {
+        index = block_st_index;
         throw parse_block_st_error("Expected '}' at the end of block");
     }
 
