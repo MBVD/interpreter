@@ -16,6 +16,15 @@ std::unordered_set<TokenType> Parser::unary_ops = {
     TokenType::INCREMENT, TokenType::DECREMENT, TokenType::PLUS, TokenType::MINUS, TokenType::TYPE
 };
 
+std::unordered_set<TokenType> Parser::asssign_ops = {
+    TokenType::ASSIGN, TokenType::PLUS_ASSIGN, TokenType::MINUS_ASSIGN, TokenType::MULTIPLY_ASSIGN, TokenType::DIVIDE_ASSIGN, TokenType::MODULO_ASSIGN, 
+    TokenType::RIGHT_SHIFT_ASSIGN, TokenType::LEFT_SHIFT_ASSIGN, TokenType::AND_ASSIGN, TokenType::XOR_ASSIGN, TokenType::OR_ASSIGN
+};
+
+std::unordered_set<TokenType> Parser::post_ops = {
+    TokenType::INCREMENT, TokenType::DECREMENT, TokenType::ARROW, TokenType::INDEX_LEFT, TokenType::PARENTHESIS_LEFT
+};
+
 std::unique_ptr<ASTNode> Parser::parse() {
     try {
         return parse_declaration();
@@ -73,7 +82,7 @@ Parser::statement_ptr Parser::parse_statement() {
     try {
         return parse_block_statement();
     } catch (parse_block_st_error&){}
-    throw statement_parsing_error(""); //TODO mesasage
+    throw statement_parsing_error("");
 }
 
 Parser::expr_ptr Parser::parse_expression(){

@@ -50,6 +50,8 @@ private:
     static std::unordered_map<TokenType, IDDeclaratorType> id_modifiers;
     static std::unordered_set<TokenType> unary_ops;
     static std::unordered_set<TokenType> comp_ops;
+    static std::unordered_set<TokenType> asssign_ops;
+    static std::unordered_set<TokenType> post_ops;
 
     
     std::vector<Token> tokens;

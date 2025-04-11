@@ -10,10 +10,10 @@ Parser::expr_ptr Parser::parse_binary_expression() {
 
 Parser::expr_ptr Parser::parse_assignment_expression() {// 1 ? x : y = ...
     auto left = parse_comparison_expression(); // ++ X ++ = ... (int) x = ...
-    if (this->tokens[index] == TokenType::ASSIGN){ //TODO make set and contains
+    if (asssign_ops.contains(this->tokens[index].type)){ // TODO make set
         auto op = tokens[index++];
         auto right = parse_assignment_expression();
-        left = std::make_unique<AssignmentExpression>(std::move(left), std::move(right));
+        left = std::make_unique<AssignmentExpression>(std::move(left), op, std::move(right));
     }
     return left;
 }
@@ -91,7 +91,7 @@ Parser::expr_ptr Parser::parse_post_expression() {
     auto post_index = index;
     Parser::expr_ptr left;
     left = parse_base();
-    while ((tokens[index] == TokenType::INCREMENT || tokens[index] == TokenType::INDEX_LEFT) && tokens[index] != TokenType::END) { // TODO make set
+    while (post_ops.contains(this->tokens[index].type)) { // TODO make set
         auto op = tokens[index++];
         left = parse_post_helper(op, std::move(left));
     }

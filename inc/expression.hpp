@@ -41,7 +41,7 @@ private:
 
 class AssignmentExpression : public BinaryExpression{
 public:
-    AssignmentExpression(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right);
+    AssignmentExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
     void accept(Visitor& visitor);
 };
 

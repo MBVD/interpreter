@@ -7,7 +7,7 @@ Parser::decl_ptr Parser::parse_func_declaration() {
     auto returnable_type = this->tokens[index];
     if (returnable_type != TokenType::ID && returnable_type != TokenType::TYPE) {
         index = func_index;
-        throw parse_func_decl_error(""); // TODO: придумать умный message
+        throw parse_func_decl_error("");
     }
     index++;
     auto name = this->tokens[index];

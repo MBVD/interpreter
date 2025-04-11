@@ -54,8 +54,8 @@ const std::unique_ptr<Expression>& TernaryExpression::get_false_expression(){
 }
 
 //AssignmentExpression
-AssignmentExpression::AssignmentExpression(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right) 
-    : BinaryExpression(std::move(left), {TokenType::ASSIGN, "="}, std::move(right)){};
+AssignmentExpression::AssignmentExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) 
+    : BinaryExpression(std::move(left), op, std::move(right)){};
 
 void AssignmentExpression::accept(Visitor& visitor){
     visitor.visit(this);
