@@ -4,17 +4,17 @@
 #include "parser.hpp"
 #include "printer.hpp"
 
-void test_binary_expression_printer() {
-    Token left_token(TokenType::LITERAL_NUM, "5");
-    Token op_token(TokenType::PLUS, "+");
-    Token right_token(TokenType::LITERAL_NUM, "3");
+// void test_binary_expression_printer() {
+//     Token left_token(TokenType::LITERAL_NUM, "5");
+//     Token op_token(TokenType::PLUS, "+");
+//     Token right_token(TokenType::LITERAL_NUM, "3");
 
-    auto binary_expression = std::make_unique<BinaryExpression>(
-        std::make_unique<LiteralExpression>(left_token), op_token, std::make_unique<LiteralExpression>(right_token));
+//     auto binary_expression = std::make_unique<BinaryExpression>(
+//         std::make_unique<LiteralExpression>(left_token), op_token, std::make_unique<LiteralExpression>(right_token));
     
-        Printer printer;
-    printer.print(binary_expression.get());
-}
+//         Printer printer;
+//     printer.print(binary_expression.get());
+// }
 
 
 void test_binary_parser() {
@@ -28,7 +28,7 @@ void test_binary_parser() {
     Parser parser = Parser(tokens);
     auto root = parser.parse_expression();
     Printer printer;
-    printer.print(root.get());
+    printer.visit(root.get());
     std::cout<<"\n";
 }
 
@@ -47,7 +47,7 @@ int main(){
     }
     std::cout<<"\n";
     Parser parser = Parser(tokens);
-    auto root = parser.parse();
+    auto unit = parser.parse();
     Printer printer;
-    printer.print(root.get());
+    printer.print(unit);
 }

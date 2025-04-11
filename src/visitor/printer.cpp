@@ -1,7 +1,14 @@
 #include <iostream>
 #include "printer.hpp"
 
-void Printer::print(ASTNode* node){
+void Printer::print(TranslationUnit& unit){
+    for (auto& i : unit.get_nodes()){
+        this->visit(i.get());
+    }
+    std::cout<<"\n";
+}
+
+void Printer::visit(ASTNode* node){
     node->accept(*this);
 }
 
@@ -34,7 +41,6 @@ void Printer::visit(InitDeclarator* node) {
         std::cout<<" = ";
     }
     this->visit(expr);
-    std::cout << "\n";
 }
 
 void Printer::visit(IdDeclorator* node) {
@@ -224,6 +230,7 @@ void Printer::visit(ReturnStatement* node) {
     std::cout<<"return ";
     if (expr != nullptr)
         this->visit(expr);
+    std::cout<<";";
 }
 
 void Printer::visit(BreakStatement*) {
@@ -295,7 +302,6 @@ void Printer::visit(ForStatement* node) {
     } else {
         this->visit(expr);
     }
-    std::cout << ";";
     this->visit(cond_expr);
     std::cout << ";";
     this->visit(iter_expr);

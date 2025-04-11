@@ -6,6 +6,7 @@
 
 class Visitor {
 public:
+    virtual void visit(ASTNode* ) = 0;
     virtual void visit(Declarator*) = 0;
     virtual void visit(VarDeclarator*) = 0;
     virtual void visit(InitDeclarator*) = 0;

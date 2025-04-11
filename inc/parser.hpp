@@ -10,7 +10,9 @@
 class Parser {
 public:
     Parser(const std::vector<Token>& tokens) : tokens(tokens) {};
-    std::unique_ptr<ASTNode> parse();
+    TranslationUnit parse();
+
+    
     using decl_ptr = std::unique_ptr<Declarator>;
     using var_ptr = std::unique_ptr<VarDeclarator>;
     using init_ptr = std::unique_ptr<InitDeclarator>;
@@ -56,6 +58,8 @@ private:
     
     std::vector<Token> tokens;
     size_t index = 0;
+
+
     decl_ptr parse_declaration();
     var_ptr parse_var_declaration();
     init_ptr parse_init_declaration();

@@ -25,13 +25,12 @@ std::unordered_set<TokenType> Parser::post_ops = {
     TokenType::INCREMENT, TokenType::DECREMENT, TokenType::ARROW, TokenType::INDEX_LEFT, TokenType::PARENTHESIS_LEFT
 };
 
-std::unique_ptr<ASTNode> Parser::parse() {
-    try {
-        return parse_declaration();
-    } catch (declaration_parsing_error&) {
-        std::cout<<"no decl\n";
-        throw;
+TranslationUnit Parser::parse() {
+    std::vector<std::unique_ptr<ASTNode>>nodes;
+    while (this->tokens[index] != TokenType::END){
+        nodes.push_back(parse_declaration());
     }
+    return TranslationUnit(std::move(nodes));
 }
 
 Parser::decl_ptr Parser::parse_declaration() {

@@ -24,6 +24,7 @@ Parser::decl_ptr Parser::parse_func_declaration() {
     index++;
 
     std::vector<Parser::param_ptr> params;
+
     while (this->tokens[index] != TokenType::PARENTHESIS_RIGHT && this->tokens[index] != TokenType::END) {
         if (this->tokens[index] == TokenType::COMMA) {
             index++;
@@ -34,8 +35,7 @@ Parser::decl_ptr Parser::parse_func_declaration() {
             throw parse_func_decl_error("");
         }
     }
-
-    if (this->tokens[index++] == TokenType::SEMICOLON) {
+    if (this->tokens[++index] == TokenType::SEMICOLON) {
         return std::make_unique<FuncDeclarator>(returnable_type, name, std::move(params));
     } else {
         try {
@@ -56,7 +56,7 @@ Parser::param_ptr Parser::parse_param_declaration() {
     }
     index++;
     try {
-        Parser::decl_ptr decl = parse_declaration();
+        Parser::decl_ptr decl = parse_init_declaration();
         return std::make_unique<ParamDeclarator>(type, std::move(decl));
     } catch (declaration_parsing_error&) {
         throw parse_param_decl_error("");

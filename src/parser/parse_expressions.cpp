@@ -143,13 +143,13 @@ Parser::expr_ptr Parser::parse_call_expression(expr_ptr base) { // ()
     std::vector<Parser::expr_ptr> args;
 
     while (index < this->tokens.size() && this->tokens[index] != TokenType::PARENTHESIS_RIGHT) {
-        if (this->tokens[index++] == TokenType::COMMA) {
+        if (this->tokens[index] == TokenType::COMMA) {
+            index++;
             continue;
         }
-
-        args.push_back(parse_expression());
+        args.push_back(parse_comparison_expression());
     }
-
+    std::cout<<"HERE2 \n";
     if (index >= this->tokens.size() || this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
         throw expression_parsing_error("Expected ')' to close function call");
     }

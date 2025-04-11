@@ -2,7 +2,8 @@
 
 class Printer : Visitor {
 public:
-    void print(ASTNode*);
+    void print(TranslationUnit& );
+    void visit(ASTNode* ) final;
     void visit(Declarator*) final;
     void visit(VarDeclarator*) final;
     void visit(InitDeclarator*) final;
