@@ -29,7 +29,7 @@ Parser::expr_ptr Parser::parse_ternary_expression() { // 1 + 2 ... || 1 < 2 ? x 
     return conditional_expression;
 }
 
-Parser::expr_ptr Parser::parse_comparison_expression() {
+Parser::expr_ptr Parser::parse_comparison_expression() { // разделить по приоритетам
     auto comp_index = index;
     auto left = parse_sum_expression();
     if (comp_ops.contains(this->tokens[index].type)){
@@ -96,14 +96,22 @@ Parser::expr_ptr Parser::parse_post_expression() {
 
 Parser::expr_ptr Parser::parse_post_helper(Token op, expr_ptr base){
     auto helper_index = index;
-    if (op == TokenType::ARROW){
-        return parse_access_expression(std::move(base));
-    } else if (op == TokenType::INDEX_LEFT){
-         return parse_subscript_expression(std::move(base));
-    } else if (op == TokenType::PARENTHESIS_LEFT){
-        return parse_call_expression(std::move(base));
-    } else if (op == TokenType::INCREMENT || op == TokenType::DECREMENT){
-        return parse_increment_expression(std::move(base), op);
+    switch (op.type) {
+        case TokenType::ARROW :
+            return parse_access_expression(std::move(base));
+            break; 
+        case TokenType::INDEX_LEFT :
+            return parse_subscript_expression(std::move(base));
+            break;
+        case TokenType::PARENTHESIS_LEFT : 
+            return parse_call_expression(std::move(base));
+            break;
+        case TokenType::INCREMENT :
+            return parse_increment_expression(std::move(base), op);
+            break;
+        case TokenType::DECREMENT :
+            return parse_increment_expression(std::move(base), op);
+            break;
     }
     throw expression_parsing_error("");
 }
