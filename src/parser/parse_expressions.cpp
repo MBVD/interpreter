@@ -3,13 +3,9 @@
 #include "parser.hpp"
 #include <iostream>
 
-Parser::expr_ptr Parser::parse_binary_expression() {
-    auto expression = parse_assignment_expression();
-    return expression;
-}
 
 Parser::expr_ptr Parser::parse_assignment_expression() {// 1 ? x : y = ...
-    auto left = parse_comparison_expression(); // ++ X ++ = ... (int) x = ...
+    auto left = parse_ternary_expression(); // ++ X ++ = ... (int) x = ...
     if (asssign_ops.contains(this->tokens[index].type)){ // TODO make set
         auto op = tokens[index++];
         auto right = parse_assignment_expression();
@@ -18,30 +14,30 @@ Parser::expr_ptr Parser::parse_assignment_expression() {// 1 ? x : y = ...
     return left;
 }
 
-Parser::expr_ptr Parser::parse_comparison_expression() {
-    auto comp_index = index;
-    auto left = parse_ternary_expression();
-    while (comp_ops.contains(this->tokens[index].type)){
-        auto op = this->tokens[index++];
-        auto right = parse_ternary_expression();
-        left = std::make_unique<ComparisonExpression>(std::move(left), op, std::move(right));
-    }
-    return left; 
-}
-
 Parser::expr_ptr Parser::parse_ternary_expression() { // 1 + 2 ... || 1 < 2 ? x : y ? y : x =
     auto ternary_expr_index = index;
-    auto conditional_expression = parse_sum_expression();
+    auto conditional_expression = parse_comparison_expression();
     while (this->tokens[index] == TokenType::QUESTION){
         index++;
-        auto true_expr = parse_comparison_expression();
+        auto true_expr = parse_expression();
         if (this->tokens[index++] != TokenType::COLON) {
             throw parse_ternary_expr_error("");
         }
-        auto false_expr = parse_binary_expression();
+        auto false_expr = parse_assignment_expression();
         conditional_expression = std::make_unique<TernaryExpression>(std::move(conditional_expression), std::move(true_expr), std::move(false_expr));
     }
     return conditional_expression;
+}
+
+Parser::expr_ptr Parser::parse_comparison_expression() {
+    auto comp_index = index;
+    auto left = parse_sum_expression();
+    if (comp_ops.contains(this->tokens[index].type)){
+        auto op = this->tokens[index++];
+        auto right = parse_comparison_expression();
+        left = std::make_unique<ComparisonExpression>(std::move(left), op, std::move(right));
+    }
+    return left; 
 }
 
 Parser::expr_ptr Parser::parse_sum_expression() {
@@ -171,7 +167,7 @@ Parser::expr_ptr Parser::parse_base() {
         return std::make_unique<IDexpression>(token);
     }
     if (token == TokenType::PARENTHESIS_LEFT) {
-        auto base = parse_binary_expression();
+        auto base = parse_expression();
         if (this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
             index = base_index;
             throw parse_base_expr_error("unclosed )");

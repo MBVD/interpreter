@@ -12,7 +12,7 @@ public:
     Parser(const std::vector<Token>& tokens) : tokens(tokens) {};
     TranslationUnit parse();
 
-    
+
     using decl_ptr = std::unique_ptr<Declarator>;
     using var_ptr = std::unique_ptr<VarDeclarator>;
     using init_ptr = std::unique_ptr<InitDeclarator>;
@@ -71,7 +71,6 @@ private:
     
     expr_ptr parse_comparison_expression();
     expr_ptr parse_ternary_expression();
-    expr_ptr parse_binary_expression();
     expr_ptr parse_assignment_expression();
     expr_ptr parse_sum_expression();
     expr_ptr parse_mul_expression();
