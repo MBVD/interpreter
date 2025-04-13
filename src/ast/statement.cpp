@@ -148,3 +148,5 @@ void BreakStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
 // ContinueStatement
 void ContinueStatement::accept(Visitor& visitor) { visitor.visit(this); }
+
+void EmptyStatement::accept(Visitor& visitor) { visitor.visit(this); }

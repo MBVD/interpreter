@@ -40,4 +40,5 @@ public:
     void visit(WhileStatement*) final;
     void visit(DoWhileStatement*) final;
     void visit(ForStatement*) final;
+    void visit(EmptyStatement*) final;
 };

@@ -39,7 +39,7 @@ run: $(TARGET)
  
 debug: $(TARGET)
 	@echo "Debugging $<..."
-	@gdb $(TARGET)
+	@gdb --args $(TARGET)
 
 clean:
 	@echo "cleaning..."

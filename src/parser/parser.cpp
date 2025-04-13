@@ -74,13 +74,16 @@ Parser::statement_ptr Parser::parse_statement() {
     } catch (parse_break_st_error&) {}
     try {
         return parse_continue_statement();
-    } catch (parse_conditional_st_error& ) {}
+    } catch (parse_continue_st_error& ) {}
     try {
         return parse_decl_statement();
     } catch (parse_decl_st_error&) {}
     try {
         return parse_block_statement();
-    } catch (parse_block_st_error&){}
+    } catch (parse_block_st_error&) {}
+    try {
+        return parse_empty_statement();
+    } catch (statement_parsing_error&){std::cout<<"HEREEE";}
     throw statement_parsing_error("");
 }
 

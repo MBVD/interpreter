@@ -47,6 +47,7 @@ public:
     using cont_st_ptr = std::unique_ptr<ContinueStatement>;
     using break_st_ptr = std::unique_ptr<BreakStatement>;
     using decl_st_ptr = std::unique_ptr<DeclarationStatement>;
+    using empty_st_ptr = std::unique_ptr<EmptyStatement>;
 
     using block_st_ptr = std::unique_ptr<BlockStatement>;
 
@@ -102,4 +103,5 @@ private:
     break_st_ptr parse_break_statement();
     decl_st_ptr parse_decl_statement();
     block_st_ptr parse_block_statement();
+    empty_st_ptr parse_empty_statement();
 };

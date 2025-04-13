@@ -323,3 +323,8 @@ void Printer::visit(ForStatement* node) {
     std::cout << ")";
     this->visit(statement);
 }
+
+void Printer::visit(EmptyStatement* node){
+    std::cout<<";";
+    return;
+}

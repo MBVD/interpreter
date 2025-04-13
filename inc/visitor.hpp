@@ -43,4 +43,5 @@ public:
     virtual void visit(WhileStatement*) = 0;
     virtual void visit(DoWhileStatement*) = 0;
     virtual void visit(ForStatement*) = 0;
+    virtual void visit(EmptyStatement*) = 0;
 };

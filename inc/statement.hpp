@@ -129,3 +129,10 @@ private:
     std::unique_ptr<Expression> iter_expr;
     std::unique_ptr<Statement> statement;
 };
+
+class EmptyStatement : public Statement {
+public:     
+    ~EmptyStatement() = default;
+    EmptyStatement() = default;
+    void accept(Visitor& visitor);
+};

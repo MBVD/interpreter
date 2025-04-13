@@ -307,3 +307,12 @@ Parser::block_st_ptr Parser::parse_block_statement() {
 
     return std::make_unique<BlockStatement>(std::move(statements));
 }
+
+Parser::empty_st_ptr Parser::parse_empty_statement(){
+    if (this->tokens[index] != TokenType::SEMICOLON){
+        throw statement_parsing_error("");
+    } else {
+        index ++;
+        return std::make_unique<EmptyStatement>();
+    }
+}

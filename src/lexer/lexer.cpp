@@ -69,7 +69,7 @@ std::unordered_map<std::string, TokenType> Lexer::keywords = {
     {"true", TokenType::TRUE},
     {"return", TokenType::RETURN}
 };
-std::string Lexer::spec_symbols = "()-=+*&-><%^[]?;";
+std::string Lexer::spec_symbols = "()-=+*&-><%^[]?;,.";
 
 std::vector<Token> Lexer::operator() (){
     std::vector<Token> tokens;
