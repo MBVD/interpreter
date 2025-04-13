@@ -1,1 +1,37 @@
+# Исключить файлы сборки
+/build/
+/bin/
+/obj/
+/*.o
+/*.a
+/*.so
+/*.exe
+
+# Исключить файлы отладки
+*.log
+*.txt
+*.out
+*.gdb
+
+# Исключить временные файлы IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# Исключить временные файлы системы
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Исключить файлы CMake (если используется)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Исключить пользовательские файлы
+file.gpp
 logger.txt
