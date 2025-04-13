@@ -163,7 +163,6 @@ Parser::expr_ptr Parser::parse_call_expression(expr_ptr base) { // ()
         }
         args.push_back(parse_comparison_expression());
     }
-    std::cout<<"HERE2 \n";
     if (index >= this->tokens.size() || this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
         throw expression_parsing_error("Expected ')' to close function call");
     }

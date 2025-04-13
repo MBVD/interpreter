@@ -108,7 +108,7 @@ class LiteralNumExpression : public Expression {
 public:
     LiteralNumExpression(const Token& token);
     void accept(Visitor&);
-    const int8_t get_value();
+    const int get_value();
 private:
     int8_t value;
 };

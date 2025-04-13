@@ -159,7 +159,7 @@ void LiteralNumExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const int8_t LiteralNumExpression::get_value(){
+const int LiteralNumExpression::get_value(){
     return this->value;
 }
 

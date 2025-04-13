@@ -45,7 +45,7 @@ int main(){
     for (auto i : tokens){
         std::cout<<"["<<i<<"] ";
     }
-    std::cout<<"\n";
+    std::cout<<"\n\n";
     Parser parser = Parser(tokens);
     auto unit = parser.parse();
     Printer printer;
