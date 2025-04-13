@@ -24,7 +24,10 @@ public:
     virtual void visit(SubscriptExpression*) = 0;
     virtual void visit(CallExpression*) = 0;
     virtual void visit(AccessExpression*) = 0;
-    virtual void visit(LiteralExpression*) = 0;
+    virtual void visit(LiteralNumExpression*) = 0;
+    virtual void visit(LiteralFloatExpression*) = 0;
+    virtual void visit(LiteralCharExpression*) = 0;
+    virtual void visit(LiteralStringExpression*) = 0;
     virtual void visit(IDexpression*) = 0;
     virtual void visit(GroupExpression*) = 0;
  

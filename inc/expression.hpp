@@ -17,18 +17,23 @@ private:
     std::unique_ptr<Expression> right;
 };
 
-class ComparisonExpression : public BinaryExpression{
+class CommaExpression : public BinaryExpression{
 public:
-    ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
+    CommaExpression(std::unique_ptr<Expression>, Token, std::unique_ptr<Expression>);
     void accept(Visitor& visitor);
-private:
+};
+
+class AssignmentExpression : public BinaryExpression{
+public:
+    AssignmentExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
+    void accept(Visitor& visitor);
 };
 
 class TernaryExpression : public Expression {
 public:
     TernaryExpression(std::unique_ptr<Expression> cond_expression,
-                      std::unique_ptr<Expression> true_expression,
-                      std::unique_ptr<Expression> false_expression);
+                        std::unique_ptr<Expression> true_expression,
+                        std::unique_ptr<Expression> false_expression);
     void accept(Visitor& visitor);
     const std::unique_ptr<Expression>& get_cond_expression();
     const std::unique_ptr<Expression>& get_true_expression();
@@ -38,11 +43,13 @@ private:
     std::unique_ptr<Expression> true_expression;
     std::unique_ptr<Expression> false_expression;
 };
+    
 
-class AssignmentExpression : public BinaryExpression{
+class ComparisonExpression : public BinaryExpression{
 public:
-    AssignmentExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
+    ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
     void accept(Visitor& visitor);
+private:
 };
 
 class UnaryExpression : public Expression {
@@ -97,13 +104,40 @@ private:
     Token member;
 };
 
-class LiteralExpression : public Expression {
+class LiteralNumExpression : public Expression {
 public:
-    LiteralExpression(const Token& token);
+    LiteralNumExpression(const Token& token);
     void accept(Visitor&);
-    const Token& get_token();
+    const int8_t get_value();
 private:
-    Token token;
+    int8_t value;
+};
+
+class LiteralFloatExpression : public Expression {
+public:
+    LiteralFloatExpression(const Token& token);
+    void accept(Visitor&);
+    const double get_value();
+private:
+    double value;
+};
+
+class LiteralCharExpression : public Expression {
+public:
+    LiteralCharExpression(const Token& token);
+    void accept(Visitor&);
+    char get_value();
+private:
+    char16_t value;
+};
+
+class LiteralStringExpression : public Expression {
+public:
+    LiteralStringExpression(const Token& token);
+    void accept(Visitor&);
+    std::string get_value();
+private:
+    std::string value;
 };
 
 class IDexpression : public Expression {

@@ -29,7 +29,10 @@ public:
     using access_expr_ptr = std::unique_ptr<AccessExpression>;
     using subscript_expr_ptr = std::unique_ptr<SubscriptExpression>;
     using call_expr_ptr = std::unique_ptr<CallExpression>;
-    using literal_expr_ptr = std::unique_ptr<LiteralExpression>;
+    using literal_num_expr_ptr = std::unique_ptr<LiteralNumExpression>;
+    using literal_float_expr_ptr = std::unique_ptr<LiteralFloatExpression>;
+    using literal_char_expr_ptr = std::unique_ptr<LiteralCharExpression>;
+    using literal_string_expr_ptr = std::unique_ptr<LiteralStringExpression>;
     using id_expr_ptr = std::unique_ptr<IDexpression>;
     using group_expr_ptr = std::unique_ptr<GroupExpression>;
 
@@ -69,9 +72,10 @@ private:
     param_ptr parse_param_declaration();
     struct_ptr parse_struct_declaration();
     
-    expr_ptr parse_comparison_expression();
-    expr_ptr parse_ternary_expression();
+    expr_ptr parse_comma_expression();
     expr_ptr parse_assignment_expression();
+    expr_ptr parse_ternary_expression();
+    expr_ptr parse_comparison_expression();
     expr_ptr parse_sum_expression();
     expr_ptr parse_mul_expression();
     expr_ptr parse_pow_expression();

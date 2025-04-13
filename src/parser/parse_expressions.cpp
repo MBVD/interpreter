@@ -4,6 +4,16 @@
 #include <iostream>
 
 
+Parser::expr_ptr Parser::parse_comma_expression() {
+    auto left = parse_assignment_expression();
+    while (this->tokens[index] == TokenType::COMMA){
+        auto op = this->tokens[index++];
+        auto right = parse_comma_expression();
+        left = std::make_unique<CommaExpression>(std::move(left), op, std::move(right));
+    }
+    return left;
+}
+
 Parser::expr_ptr Parser::parse_assignment_expression() {// 1 ? x : y = ...
     auto left = parse_ternary_expression(); // ++ X ++ = ... (int) x = ...
     if (asssign_ops.contains(this->tokens[index].type)){ // TODO make set
@@ -52,7 +62,7 @@ Parser::expr_ptr Parser::parse_sum_expression() {
 
 Parser::expr_ptr Parser::parse_mul_expression() {
     auto left = parse_pow_expression();
-    while (this->tokens[index] == TokenType::MULTIPLY || this->tokens[index] == TokenType::DIVIDE) {
+    while (this->tokens[index] == TokenType::MULTIPLY || this->tokens[index] == TokenType::DIVIDE || this->tokens[index] == TokenType::MODULO) {
         auto op = this->tokens[index++];
         auto right = parse_pow_expression();
         left = std::make_unique<BinaryExpression>(std::move(left), op, std::move(right));
@@ -168,20 +178,34 @@ Parser::expr_ptr Parser::parse_increment_expression(Parser::expr_ptr base, Token
 Parser::expr_ptr Parser::parse_base() {
     auto base_index = index;
     auto token = this->tokens[index++];
-    if (token == TokenType::LITERAL_NUM) {
-        return std::make_unique<LiteralExpression>(token);
-    }
-    if (token == TokenType::ID) {
-        return std::make_unique<IDexpression>(token);
-    }
-    if (token == TokenType::PARENTHESIS_LEFT) {
-        auto base = parse_expression();
-        if (this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
+    switch (token.type) {
+        case TokenType::LITERAL_NUM : {
+            if (token.value.find('.') == std::string::npos){
+                return std::make_unique<LiteralNumExpression>(token);
+            } else {
+                return std::make_unique<LiteralFloatExpression>(token);
+            }
+        } break; 
+        case TokenType::LITERAL_CHAR : {
+            return std::make_unique<LiteralCharExpression>(token);
+        } break; 
+        case TokenType::LITERAL_STRING : {
+            return std::make_unique<LiteralStringExpression>(token);
+        } break; 
+        case TokenType::ID : {
+            return std::make_unique<IDexpression>(token);
+        } break; 
+        case TokenType::PARENTHESIS_LEFT : {
+            auto base = parse_expression();
+            if (this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
+                index = base_index;
+                throw parse_base_expr_error("unclosed )");
+            }
+            return std::make_unique<GroupExpression>(std::move(base));
+        } break; 
+        default : {
             index = base_index;
-            throw parse_base_expr_error("unclosed )");
+            throw parse_base_expr_error("no base expression");
         }
-        return std::make_unique<GroupExpression>(std::move(base));
     }
-    index = base_index;
-    throw parse_base_expr_error("no base expression");
 }

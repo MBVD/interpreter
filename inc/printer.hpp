@@ -21,7 +21,10 @@ public:
     void visit(SubscriptExpression*) final;
     void visit(CallExpression*) final;
     void visit(AccessExpression*) final;
-    void visit(LiteralExpression*) final;
+    void visit(LiteralNumExpression*) final;
+    void visit(LiteralFloatExpression*) final;
+    void visit(LiteralCharExpression*) final;
+    void visit(LiteralStringExpression*) final;
     void visit(IDexpression*) final;
     void visit(GroupExpression*) final;
 

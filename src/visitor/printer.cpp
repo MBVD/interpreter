@@ -190,9 +190,24 @@ void Printer::visit(AccessExpression* node) {
     std::cout<<member;
 }
 
-void Printer::visit(LiteralExpression* node) {
-    auto token = node->get_token();
-    std::cout<<token;
+void Printer::visit(LiteralNumExpression* node) {
+    auto value = node->get_value();
+    std::cout<<value;
+}
+
+void Printer::visit(LiteralFloatExpression* node){
+    auto value = node->get_value();
+    std::cout<<value;
+}
+
+void Printer::visit(LiteralCharExpression* node){
+    auto value = node->get_value();
+    std::cout<<value;
+}
+
+void Printer::visit(LiteralStringExpression* node){
+    auto value = node->get_value();
+    std::cout<<value;
 }
 
 void Printer::visit(IDexpression* node){

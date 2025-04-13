@@ -21,11 +21,19 @@ const std::unique_ptr<Expression>& BinaryExpression::get_right() {
     return this->right;
 }
 
-//ComparisonExpression
-ComparisonExpression::ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
-    : BinaryExpression(std::move(left), op, std::move(right)) {}
+//CommaExpression
+CommaExpression::CommaExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
+    : BinaryExpression(std::move(left), op, std::move(right)){}
 
-void ComparisonExpression::accept(Visitor& visitor) {
+void CommaExpression::accept(Visitor& visitor){
+    visitor.visit(this);
+}
+
+//AssignmentExpression
+AssignmentExpression::AssignmentExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) 
+    : BinaryExpression(std::move(left), op, std::move(right)){};
+
+void AssignmentExpression::accept(Visitor& visitor){
     visitor.visit(this);
 }
 
@@ -53,11 +61,11 @@ const std::unique_ptr<Expression>& TernaryExpression::get_false_expression(){
     return this->false_expression;
 }
 
-//AssignmentExpression
-AssignmentExpression::AssignmentExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) 
-    : BinaryExpression(std::move(left), op, std::move(right)){};
+//ComparisonExpression
+ComparisonExpression::ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
+    : BinaryExpression(std::move(left), op, std::move(right)) {}
 
-void AssignmentExpression::accept(Visitor& visitor){
+void ComparisonExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
@@ -142,15 +150,59 @@ const std::unique_ptr<Expression>& GroupExpression::get_base(){
     return this->base;
 }
 
-// LiteralExpression
-LiteralExpression::LiteralExpression(const Token& token) : token(token) {}
+// LiteralNumExpression
+LiteralNumExpression::LiteralNumExpression(const Token& token) {
+    value = std::stoi(token.value);
+}
 
-void LiteralExpression::accept(Visitor& visitor) {
+void LiteralNumExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const Token& LiteralExpression::get_token(){
-    return this->token;
+const int8_t LiteralNumExpression::get_value(){
+    return this->value;
+}
+
+//LiteralFloatExpression
+
+LiteralFloatExpression::LiteralFloatExpression(const Token& token){
+    value = std::stod(token.value);
+}
+
+const double LiteralFloatExpression::get_value(){
+    return this->value;
+}
+
+void LiteralFloatExpression::accept(Visitor& visitor) {
+    visitor.visit(this);
+}
+
+//LiteralCharExpression
+
+LiteralCharExpression::LiteralCharExpression(const Token& token){
+    value = token.value[0];
+}
+
+char LiteralCharExpression::get_value(){
+    return this->value;
+}
+
+void LiteralCharExpression::accept(Visitor& visitor) {
+    visitor.visit(this);
+}
+
+//LiteralStringExpression
+
+LiteralStringExpression::LiteralStringExpression(const Token& token){
+    value = token.value;
+}
+
+std::string LiteralStringExpression::get_value(){
+    return this->value;
+}
+
+void LiteralStringExpression::accept(Visitor& visitor) {
+    visitor.visit(this);
 }
 
 // IDexpression

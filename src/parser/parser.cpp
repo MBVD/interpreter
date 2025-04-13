@@ -85,7 +85,7 @@ Parser::statement_ptr Parser::parse_statement() {
 }
 
 Parser::expr_ptr Parser::parse_expression(){
-    auto expression = parse_assignment_expression();
+    auto expression = parse_comma_expression();
     return expression;
 }
 
