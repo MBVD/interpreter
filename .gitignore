@@ -35,3 +35,4 @@ Makefile
 # Исключить пользовательские файлы
 file.gpp
 logger.txt
+test.cpp
