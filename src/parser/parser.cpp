@@ -13,7 +13,7 @@ std::unordered_set<TokenType> Parser::comp_ops = {
 };
 
 std::unordered_set<TokenType> Parser::unary_ops = {
-    TokenType::INCREMENT, TokenType::DECREMENT, TokenType::PLUS, TokenType::MINUS, TokenType::TYPE
+    TokenType::INCREMENT, TokenType::DECREMENT, TokenType::PLUS, TokenType::MINUS, TokenType::TYPE, TokenType::BIT_NOT
 };
 
 std::unordered_set<TokenType> Parser::asssign_ops = {
