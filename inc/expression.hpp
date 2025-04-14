@@ -43,12 +43,48 @@ private:
     std::unique_ptr<Expression> true_expression;
     std::unique_ptr<Expression> false_expression;
 };
-    
+
+class LogicalOrExpression : public BinaryExpression {
+public:
+    LogicalOrExpression(std::unique_ptr<Expression>, Token op, std::unique_ptr<Expression>);
+    void accept(Visitor&);
+};
+
+class LogicalAndExpression : public BinaryExpression {
+public:
+    LogicalAndExpression(std::unique_ptr<Expression>, Token op, std::unique_ptr<Expression>);
+    void accept(Visitor&);
+};
+  
+class BiteIncOrExpression : public BinaryExpression {
+public:
+    BiteIncOrExpression(std::unique_ptr<Expression>, Token op, std::unique_ptr<Expression>);
+    void accept(Visitor&);
+};
+
+class BiteExcOrExpression : public BinaryExpression {
+public:
+    BiteExcOrExpression(std::unique_ptr<Expression>, Token op, std::unique_ptr<Expression>);
+    void accept(Visitor&);
+};
+
+class BiteAndExpression : public BinaryExpression {
+public:
+    BiteAndExpression(std::unique_ptr<Expression>, Token op, std::unique_ptr<Expression>);
+    void accept(Visitor&);
+};
 
 class ComparisonExpression : public BinaryExpression{
 public:
     ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
     void accept(Visitor& visitor);
+private:
+};
+
+class ShiftExpression : public BinaryExpression {
+public:
+    ShiftExpression(std::unique_ptr<Expression>left, Token op, std::unique_ptr<Expression> right);
+    void accept(Visitor&);
 private:
 };
 

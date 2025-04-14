@@ -76,7 +76,14 @@ private:
     expr_ptr parse_comma_expression();
     expr_ptr parse_assignment_expression();
     expr_ptr parse_ternary_expression();
-    expr_ptr parse_comparison_expression();
+    expr_ptr parse_logical_or_expression();
+    expr_ptr parse_logical_and_expression();
+    expr_ptr parse_bite_inc_or_expression();
+    expr_ptr parse_bite_exc_or_expression();
+    expr_ptr parse_bite_and_expression();
+    expr_ptr parse_equality_expression();
+    expr_ptr parse_relational_expression();
+    expr_ptr parse_bite_shift_expression();
     expr_ptr parse_sum_expression();
     expr_ptr parse_mul_expression();
     expr_ptr parse_pow_expression();

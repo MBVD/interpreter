@@ -26,7 +26,7 @@ Parser::expr_ptr Parser::parse_assignment_expression() {// 1 ? x : y = ...
 
 Parser::expr_ptr Parser::parse_ternary_expression() { // 1 + 2 ... || 1 < 2 ? x : y ? y : x =
     auto ternary_expr_index = index;
-    auto conditional_expression = parse_comparison_expression();
+    auto conditional_expression = parse_logical_or_expression();
     while (this->tokens[index] == TokenType::QUESTION){
         index++;
         auto true_expr = parse_expression();
@@ -39,15 +39,87 @@ Parser::expr_ptr Parser::parse_ternary_expression() { // 1 + 2 ... || 1 < 2 ? x 
     return conditional_expression;
 }
 
-Parser::expr_ptr Parser::parse_comparison_expression() { // разделить по приоритетам
+Parser::expr_ptr Parser::parse_logical_or_expression() {
+    auto left = parse_logical_and_expression();
+    if (tokens[index] == TokenType::OR){
+        auto op = tokens[index++];
+        auto right = parse_logical_or_expression();
+        left = std::make_unique<LogicalOrExpression>(std::move(left), op, std::move(right));
+    }
+    return left;
+}
+
+Parser::expr_ptr Parser::parse_logical_and_expression(){
+    auto left = parse_bite_inc_or_expression();
+    if (tokens[index] == TokenType::AND){
+        auto op = tokens[index++];
+        auto right = parse_logical_and_expression();
+        left = std::make_unique<LogicalAndExpression>(std::move(left), op, std::move(right));
+    }
+    return left;
+}
+
+Parser::expr_ptr Parser::parse_bite_inc_or_expression(){
+    auto left = parse_bite_exc_or_expression();
+    if (tokens[index] == TokenType::BIT_OR){
+        auto op = tokens[index++];
+        auto right = parse_bite_inc_or_expression();
+        left = std::make_unique<BiteIncOrExpression>(std::move(left), op, std::move(right));
+    }
+    return left;
+}
+
+Parser::expr_ptr Parser::parse_bite_exc_or_expression(){
+    auto left = parse_bite_and_expression();
+    if (tokens[index] == TokenType::BIT_XOR){
+        auto op = tokens[index++];
+        auto right = parse_bite_exc_or_expression();
+        left = std::make_unique<BiteExcOrExpression>(std::move(left), op, std::move(right));
+    }
+    return left;
+}
+
+Parser::expr_ptr Parser::parse_bite_and_expression() {
+    auto left = parse_equality_expression();
+    if (tokens[index] == TokenType::BIT_AND){
+        auto op = tokens[index++];
+        auto right = parse_bite_and_expression();
+        left = std::make_unique<BiteAndExpression>(std::move(left), op, std::move(right));
+    }
+    return left;    
+}
+
+Parser::expr_ptr Parser::parse_equality_expression() { // разделить по приоритетам
     auto comp_index = index;
-    auto left = parse_sum_expression();
-    if (comp_ops.contains(this->tokens[index].type)){
+    auto left = parse_relational_expression();
+    while (this->tokens[index] == TokenType::EQUAL || this->tokens[index] == TokenType::NOT_EQUAL){
         auto op = this->tokens[index++];
-        auto right = parse_comparison_expression();
+        auto right = parse_equality_expression();
         left = std::make_unique<ComparisonExpression>(std::move(left), op, std::move(right));
     }
     return left; 
+}
+
+Parser::expr_ptr Parser::parse_relational_expression() {
+    auto comp_index = index;
+    auto left = parse_bite_shift_expression();
+    while (comp_ops.contains(tokens[index].type)){
+        auto op = this->tokens[index++];
+        auto right = parse_relational_expression();
+        left = std::make_unique<ComparisonExpression>(std::move(left), op, std::move(right));
+    }
+    return left; 
+}
+
+Parser::expr_ptr Parser::parse_bite_shift_expression() {
+    auto shift_index = index;
+    auto left = parse_sum_expression();
+    while (this->tokens[index] == TokenType::LEFT_SHIFT || this->tokens[index] == TokenType::RIGHT_SHIFT){
+        auto op = tokens[index++];
+        auto right = parse_bite_shift_expression();
+        left = std::make_unique<ShiftExpression>(std::move(left), op, std::move(right));
+    }
+    return left;
 }
 
 Parser::expr_ptr Parser::parse_sum_expression() {
@@ -161,7 +233,7 @@ Parser::expr_ptr Parser::parse_call_expression(expr_ptr base) { // ()
             index++;
             continue;
         }
-        args.push_back(parse_comparison_expression());
+        args.push_back(parse_ternary_expression());
     }
     if (index >= this->tokens.size() || this->tokens[index++] != TokenType::PARENTHESIS_RIGHT) {
         throw expression_parsing_error("Expected ')' to close function call");

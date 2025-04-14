@@ -61,11 +61,37 @@ const std::unique_ptr<Expression>& TernaryExpression::get_false_expression(){
     return this->false_expression;
 }
 
+LogicalOrExpression::LogicalOrExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) : BinaryExpression(std::move(left), op, std::move(right)){}
+
+void LogicalOrExpression::accept(Visitor& visitor) {visitor.visit(this);}
+
+LogicalAndExpression::LogicalAndExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) : BinaryExpression(std::move(left), op, std::move(right)){}
+
+void LogicalAndExpression::accept(Visitor& visitor) {visitor.visit(this);}
+
+BiteIncOrExpression::BiteIncOrExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) : BinaryExpression(std::move(left), op, std::move(right)){} 
+
+void BiteIncOrExpression::accept(Visitor& visitor) {visitor.visit(this);}
+
+BiteExcOrExpression::BiteExcOrExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) : BinaryExpression(std::move(left), op, std::move(right)){}
+
+void BiteExcOrExpression::accept(Visitor& visitor) {visitor.visit(this);}
+
+BiteAndExpression::BiteAndExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) : BinaryExpression(std::move(left), op, std::move(right)){}
+
+void BiteAndExpression::accept(Visitor& visitor) {visitor.visit(this);}
+
 //ComparisonExpression
 ComparisonExpression::ComparisonExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right)
     : BinaryExpression(std::move(left), op, std::move(right)) {}
 
 void ComparisonExpression::accept(Visitor& visitor) {
+    visitor.visit(this);
+}
+//shift
+ShiftExpression::ShiftExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) : BinaryExpression(std::move(left), op, std::move(right)){}
+
+void ShiftExpression::accept(Visitor& visitor){
     visitor.visit(this);
 }
 

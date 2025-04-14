@@ -9,7 +9,7 @@ std::unordered_map<TokenType, IDDeclaratorType> Parser::id_modifiers = {
 };
 
 std::unordered_set<TokenType> Parser::comp_ops = {
-    TokenType::EQUAL, TokenType::NOT_EQUAL, TokenType::GREATER, TokenType::LESS, TokenType::GREATER_EQUAL, TokenType::LESS_EQUAL
+    TokenType::GREATER, TokenType::LESS, TokenType::GREATER_EQUAL, TokenType::LESS_EQUAL
 };
 
 std::unordered_set<TokenType> Parser::unary_ops = {
