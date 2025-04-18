@@ -1,7 +1,7 @@
 #pragma once
 #include "ast.hpp"
 #include "visitor.hpp"
-#include "symbolTable.hpp"
+#include "scope.hpp"
 
 class Analyzer : public Visitor {
 public:
