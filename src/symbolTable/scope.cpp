@@ -1,26 +1,26 @@
 #include <unordered_map>
 #include <set>
-#include "symbolTable.hpp"
+#include "scope.hpp"
 
-std::unique_ptr<SymbolTable> SymbolTable::get_prev_table() {
+std::unique_ptr<Scope> Scope::get_prev_table() {
     return std::move(this->prev_table);
 }
 
-Type SymbolTable::match_variable(std::string name) {
+Type Scope::match_variable(std::string name) {
     if (variables.find(name) != variables.end()){
         return variables.at(name);
     }
     return this->prev_table->match_variable(name); // возвращаем из старшей области видимости
 }
 
-StructType SymbolTable::match_struct(std::string name){
+StructType Scope::match_struct(std::string name){
     if (structs.find(name) != structs.end()){
         return structs.at(name);
     }
     return prev_table->match_struct(name);
 }
 
-FuncType SymbolTable::match_function(std::string name, std::vector<Type> args){
+FuncType Scope::match_function(std::string name, std::vector<Type> args){
     auto range = functions.equal_range(name);
     std::map<FuncType, int> functions; 
     for (auto i = range.first; i != range.second; ++i){
@@ -51,14 +51,14 @@ FuncType SymbolTable::match_function(std::string name, std::vector<Type> args){
     return prev_table->match_function(name, args);
 }
 
-void SymbolTable::push_variable(std::string name, Type var) {
+void Scope::push_variable(std::string name, Type var) {
     variables.insert({name, var});
 }
 
-void SymbolTable::push_struct(std::string name, StructType structure){
+void Scope::push_struct(std::string name, StructType structure){
     structs.insert({name, structure});
 }
 
-void SymbolTable::push_func(std::string name, FuncType func) {
+void Scope::push_func(std::string name, FuncType func) {
     functions.insert({name, func});
 }

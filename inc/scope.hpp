@@ -7,12 +7,12 @@
 #include "type.hpp"
 #include "ast.hpp"
 
-class SymbolTable {
+class Scope {
 public:
-    ~SymbolTable() = default;
-    SymbolTable(std::unique_ptr<SymbolTable>, std::unique_ptr<ASTNode>); 
+    ~Scope() = default;
+    Scope(std::unique_ptr<Scope>, std::unique_ptr<ASTNode>); 
 
-    std::unique_ptr<SymbolTable> get_prev_table();
+    std::unique_ptr<Scope> get_prev_table();
 
     Type match_variable(std::string);
     StructType match_struct(std::string);
@@ -22,7 +22,7 @@ public:
     void push_struct(std::string, StructType);
     void push_func(std::string, FuncType);
 private:
-    std::unique_ptr<SymbolTable>prev_table;
+    std::unique_ptr<Scope>prev_table;
     std::unique_ptr<ASTNode> node; // чему принадлежит эта облась видимости
     std::unordered_map<std::string, Type> variables;
     std::unordered_map<std::string, StructType> structs;
