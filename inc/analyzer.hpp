@@ -1,10 +1,11 @@
 #pragma once
 #include "ast.hpp"
 #include "visitor.hpp"
+#include "symbolTable.hpp"
 
 class Analyzer : public Visitor {
 public:
-    Analyzer(TranslationUnit& unit);
+    void analyze(TranslationUnit &);
     void visit(ASTNode* ) final;
     void visit(Declarator*) final;
     void visit(VarDeclarator*) final;
@@ -43,6 +44,4 @@ public:
     void visit(DoWhileStatement*) final;
     void visit(ForStatement*) final;
     void visit(EmptyStatement*) final;
-private:
-
 };

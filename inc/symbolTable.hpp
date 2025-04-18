@@ -1,20 +1,30 @@
 #pragma once
 #include <unordered_map>
+#include <map>
 #include <string>
 #include <any>
 #include <vector>
 #include "type.hpp"
+#include "ast.hpp"
 
 class SymbolTable {
 public:
-    SymbolTable& get_next_table();
-    SymbolTable& get_prev_table();
-    bool match_function();
-    bool match_variable();
+    ~SymbolTable() = default;
+    SymbolTable(std::unique_ptr<SymbolTable>, std::unique_ptr<ASTNode>); 
 
+    std::unique_ptr<SymbolTable> get_prev_table();
+
+    Type match_variable(std::string);
+    StructType match_struct(std::string);
+    FuncType match_function(std::string, std::vector<Type>);
+    
+    void push_variable(std::string, Type);
+    void push_struct(std::string, StructType);
+    void push_func(std::string, FuncType);
 private:
-    SymbolTable& next_table;
-    SymbolTable& prev_table;
+    std::unique_ptr<SymbolTable>prev_table;
+    std::unique_ptr<ASTNode> node; // чему принадлежит эта облась видимости
     std::unordered_map<std::string, Type> variables;
-    std::unordered_map<std::string, FuncType> functions;
+    std::unordered_map<std::string, StructType> structs;
+    std::multimap<std::string, FuncType> functions;
 };

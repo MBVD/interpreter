@@ -83,7 +83,7 @@ Parser::statement_ptr Parser::parse_statement() {
     } catch (parse_block_st_error&) {}
     try {
         return parse_empty_statement();
-    } catch (statement_parsing_error&){std::cout<<"HEREEE";}
+    } catch (statement_parsing_error&){}
     throw statement_parsing_error("");
 }
 

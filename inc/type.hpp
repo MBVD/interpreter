@@ -8,7 +8,7 @@
 // Базовый класс для всех типов
 class Type {
 public:
-    virtual ~Type() = default; // Виртуальный деструктор для корректного удаления
+    virtual ~Type() = default;
 };
 
 // Фундаментальные типы
@@ -22,47 +22,46 @@ class NullPtrType : public Fundamental {
 };
 
 class Arithmetic : public Fundamental {
+public:
+    Arithmetic(std::any = 0);
+    std::any get_any_value();
+private:
+    std::any value;
 };
 
 class Integral : public Arithmetic {
+public:
+    Integral(std::any);
 };
 
 // Все целочисленные типы
 class BoolType : public Integral {
 public:
-    explicit BoolType(std::any value);
-    BoolType();
-    std::any& get_value();
+    explicit BoolType(std::any value = 0);
 private:
-    std::any value;
+    bool value;
 };
 
 class CharType : public Integral {
 public:
-    explicit CharType(std::any value);
-    CharType();
-    std::any& get_value();
+    explicit CharType(std::any value = 0);
 private:
-    std::any value;
+    char16_t value;
 };
 
 class IntegerType : public Integral {
 public:
-    explicit IntegerType(std::any value);
-    IntegerType();
-    std::any& get_value();
+    explicit IntegerType(std::any value = 0);
 private:
-    std::any value;
+    int8_t value;
 };
 
 // Все типы с плавающей точкой
 class FloatType : public Arithmetic {
 public:
-    explicit FloatType(std::any value);
-    FloatType();
-    std::any& get_value();
+    explicit FloatType(std::any value = 0);
 private:
-    std::any value;
+    double value;
 };
 
 // Составные типы
@@ -72,11 +71,11 @@ class Composite : public Type {
 // Тип функции
 class FuncType : public Composite {
 public:
-    FuncType(const Type& returnableType, const std::vector<Type>& args);
-    const Type& get_returnable_type() const;
-    const std::vector<Type>& get_args() const;
+    FuncType(Type, std::vector<Type>);
+    Type get_returnable_type() const;
+    std::vector<Type> get_args() const;
 private:
-    const Type& returnableType;
+    Type returnable_type;
     std::vector<Type> args;
 };
 
@@ -87,8 +86,8 @@ class Record : public Composite {
 // Все типы записей
 class StructType : public Record {
 public:
-    explicit StructType(const std::unordered_map<std::string, Type>& members);
-    const std::unordered_map<std::string, Type>& get_members() const;
+    explicit StructType(const std::unordered_map<std::string, Type>);
+    std::unordered_map<std::string, Type> get_members() const;
 private:
     std::unordered_map<std::string, Type> members;
 };
@@ -106,11 +105,11 @@ class EnumType : public Composite {
 // Указатели
 class PointerType : public Composite {
 public:
-    explicit PointerType(const Type& base);
+    explicit PointerType(const Type* base = nullptr); // int* a;
     PointerType(); // nullptr
     const Type& get_base() const;
 private:
-    const Type* base; // Используем указатель для избежания копирования
+    Type& base;
 };
 
 // Ссылки
