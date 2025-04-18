@@ -8,7 +8,7 @@ Parser::expr_ptr Parser::parse_comma_expression() {
     auto left = parse_assignment_expression();
     while (this->tokens[index] == TokenType::COMMA){
         auto op = this->tokens[index++];
-        auto right = parse_comma_expression();
+        auto right = parse_assignment_expression();
         left = std::make_unique<CommaExpression>(std::move(left), op, std::move(right));
     }
     return left;
@@ -94,7 +94,7 @@ Parser::expr_ptr Parser::parse_equality_expression() { // разделить п�
     auto left = parse_relational_expression();
     while (this->tokens[index] == TokenType::EQUAL || this->tokens[index] == TokenType::NOT_EQUAL){
         auto op = this->tokens[index++];
-        auto right = parse_equality_expression();
+        auto right = parse_relational_expression();
         left = std::make_unique<ComparisonExpression>(std::move(left), op, std::move(right));
     }
     return left; 
@@ -105,7 +105,7 @@ Parser::expr_ptr Parser::parse_relational_expression() {
     auto left = parse_bite_shift_expression();
     while (comp_ops.contains(tokens[index].type)){
         auto op = this->tokens[index++];
-        auto right = parse_relational_expression();
+        auto right = parse_bite_shift_expression();
         left = std::make_unique<ComparisonExpression>(std::move(left), op, std::move(right));
     }
     return left; 
@@ -116,7 +116,7 @@ Parser::expr_ptr Parser::parse_bite_shift_expression() {
     auto left = parse_sum_expression();
     while (this->tokens[index] == TokenType::LEFT_SHIFT || this->tokens[index] == TokenType::RIGHT_SHIFT){
         auto op = tokens[index++];
-        auto right = parse_bite_shift_expression();
+        auto right = parse_sum_expression();
         left = std::make_unique<ShiftExpression>(std::move(left), op, std::move(right));
     }
     return left;
