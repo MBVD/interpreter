@@ -23,7 +23,7 @@ class NullPtrType : public Fundamental {
 
 class Arithmetic : public Fundamental {
 public:
-    Arithmetic(std::any = 0);
+    Arithmetic(std::any);
     std::any get_any_value();
 private:
     std::any value;

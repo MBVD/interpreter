@@ -2,6 +2,9 @@
 #include <set>
 #include "scope.hpp"
 
+Scope::Scope(std::unique_ptr<Scope>scope, std::unique_ptr<ASTNode> node) : 
+    prev_table(std::move(scope)), node(std::move(node)) {}
+
 std::unique_ptr<Scope> Scope::get_prev_table() {
     return std::move(this->prev_table);
 }
@@ -16,6 +19,9 @@ Type Scope::match_variable(std::string name) {
 StructType Scope::match_struct(std::string name){
     if (structs.find(name) != structs.end()){
         return structs.at(name);
+    }
+    if (prev_table == nullptr){
+        throw; //some expression not found struct
     }
     return prev_table->match_struct(name);
 }
@@ -44,7 +50,7 @@ FuncType Scope::match_function(std::string name, std::vector<Type> args){
             return function.first; // Возвращаем первую подходящую функцию
         }
     }
-    if (prev_table.get() == this){
+    if (prev_table.get() == nullptr){
         throw; //throw exceptions no exist function;
     }
     

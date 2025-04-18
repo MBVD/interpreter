@@ -5,7 +5,9 @@
 
 class Analyzer : public Visitor {
 public:
+    Analyzer();
     void analyze(TranslationUnit &);
+private:
     void visit(ASTNode* ) final;
     void visit(Declarator*) final;
     void visit(VarDeclarator*) final;
@@ -44,4 +46,5 @@ public:
     void visit(DoWhileStatement*) final;
     void visit(ForStatement*) final;
     void visit(EmptyStatement*) final;
+    Scope scope;
 };
