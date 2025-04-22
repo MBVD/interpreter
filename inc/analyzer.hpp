@@ -2,12 +2,14 @@
 #include "ast.hpp"
 #include "visitor.hpp"
 #include "scope.hpp"
+#include "type.hpp"
 
 class Analyzer : public Visitor {
 public:
     Analyzer();
     void analyze(TranslationUnit &);
 private:
+    static std::unordered_map<std::string, Type> default_types;
     void visit(ASTNode* ) final;
     void visit(Declarator*) final;
     void visit(VarDeclarator*) final;
@@ -47,4 +49,5 @@ private:
     void visit(ForStatement*) final;
     void visit(EmptyStatement*) final;
     Scope scope;
+    Type current_type;
 };

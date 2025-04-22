@@ -1,6 +1,13 @@
 #include "analyzer.hpp"
 #include "token.hpp"
 
+std::unordered_map<std::string, Type> Analyzer::default_types = {
+    {"int", IntegerType()},
+    {"double", FloatType()},
+    {"float", FloatType()},
+    {"char", CharType()}
+};
+
 Analyzer::Analyzer() : scope(nullptr, nullptr) {}
 
 void Analyzer::analyze(TranslationUnit & unit){
@@ -27,24 +34,38 @@ void Analyzer::visit(VarDeclarator* node){
     }
     if (type.type == TokenType::TYPE){
         // дефолтный типы по типу int char и тд
-        if (type.value == "int"){
-            for (auto& i : declarations){
-                auto name = i->get_declarator()->get_id();
-                scope.push_variable(name.value, IntegerType());
-            }
+        auto current_type = default_types[type.value];
+        for (auto& i : declarations){
+            auto name = i->get_declarator()->get_id();
+            scope.push_variable(name.value, current_type);
         }
-        if (type.value == "char"){
-            for (auto& i : declarations){
-                auto name = i->get_declarator()->get_id();
-                scope.push_variable(name.value, IntegerType());
-            }
+    }
+}
+
+void Analyzer::visit(FuncDeclarator* node){
+    auto returnable_type = node->get_returnable_type();
+    auto name = node->get_name().value;
+    if (returnable_type.type == TokenType::ID){
+        auto struct_type = scope.match_struct(returnable_type.value); // вернет либо обьект либо экспешн что такой структуры нет
+        auto args = node->get_params();
+        std::vector<Type> type_args;
+        for (auto& i : args){
+            this->visit(i.get()); // поверяем являются ли они в зоне видимости
+            type_args.push_back(current_type);
         }
-        if (type.value == "double" || type.value == "float"){
-            for (auto& i : declarations){
-                auto name = i->get_declarator()->get_id();
-                scope.push_variable(name.value, IntegerType());
-            }
+        auto type_returnable = scope.match_struct(returnable_type.value);
+        auto func = FuncType(type_returnable, type_args);
+        this->visit(node->get_block().get());
+    } else {
+        auto default_type = default_types[returnable_type.value];
+        auto args = node->get_params();
+        std::vector<Type> type_args;
+        for (auto& i : args){
+            this->visit(i.get()); // поверяем являются ли они в зоне видимости
+            type_args.push_back(current_type);
         }
+        auto func = FuncType(default_type, type_args);
+        this->visit(node->get_block().get());
     }
 }
 
