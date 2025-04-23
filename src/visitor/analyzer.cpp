@@ -27,18 +27,29 @@ void Analyzer::visit(VarDeclarator* node){
     if (type.type == TokenType::ID){
         // значит может быть какой то сложной фигней
         // значит если нет его в нашей таблице видимости значит ошиька семанитики. нет такого типа данных
-        auto struct_type = scope->match_struct(type.value); // вернет либо обьект либо экспешн что такой структуры нет
-        for (auto& i : declarations){
-            auto name = i->get_declarator()->get_id();
-            scope->push_variable(name.value, struct_type);
+        for (auto& init_declorator : declarations){
+            current_type = scope->match_struct(type.value); // вернет либо обьект либо экспешн что такой структуры нет
+            auto id_declorator = init_declorator->get_declarator();
+            auto name = id_declorator->get_id().value;
+            auto expression = init_declorator->get_expression();
+            if (expression != nullptr){
+                this->visit(expression.get()); // проходимся по expression и проверяем является ли он типом который может конвертироваться в нашу структуру
+                // TODO нужно сделать метод который ищет какой scope для нашей структуры и там находить func - конструктор с таким параметром
+                // if (typeid(current_type) == typeid(struct_type)) // пока так, потом будем проверять есть ли конструктор
+            } // здесь просто проверка
+            // надо дополнительно пройтись в id declorator и проверить явлется ли он массивом
+            this->visit(id_declorator.get()); // будет либо тот же тип либо маасив, указатель или ссылка в current_type
+            scope->push_variable(name, current_type);
         }
     }
     if (type.type == TokenType::TYPE){
         // дефолтный типы по типу int char и тд
-        auto current_type = default_types.at(type.value);
-        for (auto& i : declarations){
-            auto name = i->get_declarator()->get_id();
-            scope->push_variable(name.value, current_type);
+        for (auto& init_declorator : declarations){
+            auto current_type = default_types.at(type.value);
+            auto id_declorator = init_declorator->get_declarator();
+            auto name = id_declorator->get_id().value;
+            this->visit(id_declorator.get()); // после того как мы пройдем сюда мы поменяем current_type на маасив и тд если они такими являются
+            scope->push_variable(name, current_type);
         }
     }
 }
@@ -74,5 +85,9 @@ void Analyzer::visit(FuncDeclarator* node){
         scope = current_scope;
         this->visit(block.get()); // заходим в наш блок
     }
+}
+
+void Analyzer::visit(InitDeclarator* node) {
+
 }
 
