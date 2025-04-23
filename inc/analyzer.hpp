@@ -48,6 +48,6 @@ private:
     void visit(DoWhileStatement*) final;
     void visit(ForStatement*) final;
     void visit(EmptyStatement*) final;
-    Scope scope;
+    std::shared_ptr<Scope> scope;
     Type current_type;
 };

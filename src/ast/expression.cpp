@@ -9,16 +9,16 @@ void BinaryExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const Token& BinaryExpression::get_op(){
+Token BinaryExpression::get_op(){
     return this->op;
 }
 
-const std::unique_ptr<Expression>& BinaryExpression::get_left() {
-    return this->left;
+std::unique_ptr<Expression> BinaryExpression::get_left() {
+    return std::move(this->left);
 }
 
-const std::unique_ptr<Expression>& BinaryExpression::get_right() {
-    return this->right;
+std::unique_ptr<Expression> BinaryExpression::get_right() {
+    return std::move(this->right);
 }
 
 //CommaExpression
@@ -49,16 +49,16 @@ void TernaryExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const std::unique_ptr<Expression>& TernaryExpression::get_cond_expression(){
-    return this->cond_expression;
+std::unique_ptr<Expression> TernaryExpression::get_cond_expression(){
+    return std::move(this->cond_expression);
 }
 
-const std::unique_ptr<Expression>& TernaryExpression::get_true_expression(){
-    return this->true_expression;
+std::unique_ptr<Expression> TernaryExpression::get_true_expression(){
+    return std::move(this->true_expression);
 }
 
-const std::unique_ptr<Expression>& TernaryExpression::get_false_expression(){
-    return this->false_expression;
+std::unique_ptr<Expression> TernaryExpression::get_false_expression(){
+    return std::move(this->false_expression);
 }
 
 LogicalOrExpression::LogicalOrExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) : BinaryExpression(std::move(left), op, std::move(right)){}
@@ -103,11 +103,11 @@ void UnaryExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const Token& UnaryExpression::get_op(){
+Token UnaryExpression::get_op(){
     return this->op;
 }
-const std::unique_ptr<Expression>& UnaryExpression::get_base(){
-    return this->base;
+std::unique_ptr<Expression> UnaryExpression::get_base(){
+    return std::move(this->base);
 }
 
 // PostfixExpression
@@ -118,11 +118,11 @@ void PostfixExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const Token& PostfixExpression::get_op(){
+Token PostfixExpression::get_op(){
     return this->op;
 }
-const std::unique_ptr<Expression>& PostfixExpression::get_expression(){
-    return this->expression;
+std::unique_ptr<Expression> PostfixExpression::get_expression(){
+    return std::move(this->expression);
 }
 
 // SubscriptExpression
@@ -134,8 +134,8 @@ void SubscriptExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const std::vector<std::unique_ptr<Expression>>& SubscriptExpression::get_indexes(){
-    return this->indexes;
+std::vector<std::unique_ptr<Expression>> SubscriptExpression::get_indexes(){
+    return std::move(this->indexes);
 }
 
 // CallExpression
@@ -147,8 +147,8 @@ void CallExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const std::vector<std::unique_ptr<Expression>>& CallExpression::get_args(){
-    return this->args;
+std::vector<std::unique_ptr<Expression>> CallExpression::get_args(){
+    return std::move(this->args);
 }
 
 // AccessExpression
@@ -160,7 +160,7 @@ void AccessExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const Token& AccessExpression::get_member(){
+Token AccessExpression::get_member(){
     return this->member;
 }
 
@@ -172,8 +172,8 @@ void GroupExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const std::unique_ptr<Expression>& GroupExpression::get_base(){
-    return this->base;
+std::unique_ptr<Expression> GroupExpression::get_base(){
+    return std::move(this->base);
 }
 
 // LiteralNumExpression
@@ -185,7 +185,7 @@ void LiteralNumExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const int LiteralNumExpression::get_value(){
+int LiteralNumExpression::get_value(){
     return this->value;
 }
 
@@ -195,7 +195,7 @@ LiteralFloatExpression::LiteralFloatExpression(const Token& token){
     value = std::stod(token.value);
 }
 
-const double LiteralFloatExpression::get_value(){
+double LiteralFloatExpression::get_value(){
     return this->value;
 }
 
@@ -238,6 +238,6 @@ void IDexpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-const Token& IDexpression::get_token() {
+Token IDexpression::get_token() {
     return this->token;
 }

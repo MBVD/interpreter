@@ -8,8 +8,8 @@ ExpressionStatement::ExpressionStatement(std::unique_ptr<Expression> expression)
 
 void ExpressionStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::unique_ptr<Expression>& ExpressionStatement::get_expression(){
-    return this->expression;
+std::unique_ptr<Expression> ExpressionStatement::get_expression(){
+    return std::move(this->expression);
 }
 
 // DeclarationStatement
@@ -18,8 +18,8 @@ DeclarationStatement::DeclarationStatement(std::unique_ptr<VarDeclarator> declar
 
 void DeclarationStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::unique_ptr<VarDeclarator>& DeclarationStatement::get_declaration() {
-    return this->declaration;
+std::unique_ptr<VarDeclarator> DeclarationStatement::get_declaration() {
+    return std::move(this->declaration);
 }
 
 // ReturnStatement
@@ -30,8 +30,8 @@ ReturnStatement::ReturnStatement() : expression(nullptr){}
 
 void ReturnStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::unique_ptr<Expression>& ReturnStatement::get_expression() {
-    return this->expression;
+std::unique_ptr<Expression> ReturnStatement::get_expression() {
+    return std::move(this->expression);
 }
 
 // BlockStatement
@@ -40,8 +40,8 @@ BlockStatement::BlockStatement(std::vector<std::unique_ptr<Statement>> statement
 
 void BlockStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::vector<std::unique_ptr<Statement>>& BlockStatement::get_statements(){
-    return this->statements;
+std::vector<std::unique_ptr<Statement>> BlockStatement::get_statements(){
+    return std::move(this->statements);
 }
 
 // ConditionalStatement
@@ -60,16 +60,16 @@ ConditionalStatement::ConditionalStatement(std::unique_ptr<Expression> condition
 
 void ConditionalStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::unique_ptr<Expression>& ConditionalStatement::get_conditional(){
-    return this->conditional;
+std::unique_ptr<Expression> ConditionalStatement::get_conditional(){
+    return std::move(this->conditional);
 }
 
-const std::unique_ptr<Statement>& ConditionalStatement::get_true_statement(){
-    return this->true_statement;
+std::unique_ptr<Statement> ConditionalStatement::get_true_statement(){
+    return std::move(this->true_statement);
 }
 
-const std::unique_ptr<Statement>& ConditionalStatement::get_false_statement(){
-    return this->false_statement;
+std::unique_ptr<Statement> ConditionalStatement::get_false_statement(){
+    return std::move(this->false_statement);
 }
 
 // WhileStatement
@@ -79,12 +79,12 @@ WhileStatement::WhileStatement(std::unique_ptr<Expression> conditional,
 
 void WhileStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::unique_ptr<Expression>& WhileStatement::get_conditional(){
-    return this->conditional;
+std::unique_ptr<Expression> WhileStatement::get_conditional(){
+    return std::move(this->conditional);
 }
 
-const std::unique_ptr<Statement>& WhileStatement::get_statement(){
-    return this->statement;
+std::unique_ptr<Statement> WhileStatement::get_statement(){
+    return std::move(this->statement);
 }
 
 // DoWhileStatement
@@ -94,12 +94,12 @@ DoWhileStatement::DoWhileStatement(std::unique_ptr<Statement> statement,
 
 void DoWhileStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::unique_ptr<Statement>& DoWhileStatement::get_statement() {
-    return this->statement;
+std::unique_ptr<Statement> DoWhileStatement::get_statement() {
+    return std::move(this->statement);
 }
 
-const std::unique_ptr<Expression>& DoWhileStatement::get_expression(){
-    return this->expression;
+std::unique_ptr<Expression> DoWhileStatement::get_expression(){
+    return std::move(this->expression);
 }   
 
 // ForStatement
@@ -123,24 +123,24 @@ ForStatement::ForStatement(std::unique_ptr<Expression> init_expr,
 
 void ForStatement::accept(Visitor& visitor) { visitor.visit(this); }
 
-const std::unique_ptr<VarDeclarator>& ForStatement::get_var(){
-    return this->var;
+std::unique_ptr<VarDeclarator> ForStatement::get_var(){
+    return std::move(this->var);
 }
 
-const std::unique_ptr<Expression>& ForStatement::get_init_expr(){
-    return this->init_expr;
+std::unique_ptr<Expression> ForStatement::get_init_expr(){
+    return std::move(this->init_expr);
 }
 
-const std::unique_ptr<Expression>& ForStatement::get_cond_expr(){
-    return this->cond_expr;
+std::unique_ptr<Expression> ForStatement::get_cond_expr(){
+    return std::move(this->cond_expr);
 }
 
-const std::unique_ptr<Expression>& ForStatement::get_iter_expr(){
-    return this->iter_expr;
+std::unique_ptr<Expression> ForStatement::get_iter_expr(){
+    return std::move(this->iter_expr);
 }
 
-const std::unique_ptr<Statement>& ForStatement::get_statement(){
-    return this->statement;
+std::unique_ptr<Statement> ForStatement::get_statement(){
+    return std::move(this->statement);
 }
 
 // BreakStatement
