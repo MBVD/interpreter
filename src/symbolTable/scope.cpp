@@ -1,13 +1,19 @@
 #include <unordered_map>
 #include <set>
 #include "scope.hpp"
+#include "memory"
 
-Scope::Scope(std::unique_ptr<Scope>scope, std::unique_ptr<ASTNode> node) : 
-    prev_table(std::move(scope)), node(std::move(node)) {}
+Scope::Scope(std::unique_ptr<ASTNode> node) : 
+    node(std::move(node)) {}
 
-std::unique_ptr<Scope> Scope::get_prev_table() {
-    return std::move(this->prev_table);
+std::shared_ptr<Scope> Scope::get_prev_table() {
+    return this->prev_table;
 }
+
+std::shared_ptr<Scope> Scope::create_new_table(std::unique_ptr<ASTNode> node) {
+    auto scope = std::make_shared<Scope>(std::move(node));
+    return scope;
+}   
 
 Type Scope::match_variable(std::string name) {
     if (variables.find(name) != variables.end()){
