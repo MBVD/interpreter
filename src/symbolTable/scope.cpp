@@ -10,7 +10,8 @@ std::shared_ptr<Scope> Scope::get_prev_table() {
     return this->prev_table;
 }
 
-std::shared_ptr<Scope> Scope::create_new_table(std::unique_ptr<ASTNode> node) {
+std::shared_ptr<Scope> Scope::create_new_table(std::shared_ptr<Scope> prev_scope, std::unique_ptr<ASTNode> node) {
+    prev_scope = prev_scope;
     auto scope = std::make_shared<Scope>(std::move(node));
     return scope;
 }   

@@ -13,7 +13,7 @@ public:
     Scope(std::unique_ptr<ASTNode>); 
 
     std::shared_ptr<Scope> get_prev_table();
-    std::shared_ptr<Scope> create_new_table(std::unique_ptr<ASTNode>);
+    std::shared_ptr<Scope> create_new_table(std::shared_ptr<Scope> ,std::unique_ptr<ASTNode>);
     
     Type match_variable(std::string);
     StructType match_struct(std::string);
