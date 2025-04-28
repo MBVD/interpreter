@@ -1,6 +1,6 @@
 #include "analyzer.hpp"
 #include "token.hpp"
-#include "memory"
+#include <memory>
 
 std::unordered_map<std::string, Type> Analyzer::default_types = {
     {"int", IntegerType()},
@@ -73,41 +73,75 @@ void Analyzer::visit(IdDeclorator* node){
 }
 
 void Analyzer::visit(FuncDeclarator* node){
-    auto returnable_type = node->get_returnable_type();
+    auto returnable_type_token = node->get_returnable_type();
     auto name = node->get_name().value;
-    if (returnable_type.type == TokenType::ID){
-        auto struct_type = scope->match_struct(returnable_type.value); // вернет либо обьект либо экспешн что такой структуры нет
-        auto args = node->get_params();
-        std::vector<Type> type_args;
-        auto block = node->get_block();
-        scope = scope->create_new_table(scope, std::move(block));
-        for (auto& i : args){
-            this->visit(i.get()); // поверяем являются ли они в зоне видимости
-            type_args.push_back(current_type);
-            scope->push_variable(i->get_type().value, current_type);
-        }
-        this->visit(block.get());
-        auto type_returnable = scope->match_struct(returnable_type.value);
-        auto func = FuncType(type_returnable, type_args);
-        scope = scope->get_prev_table();
-        scope->push_func(name, func);
-        current_type = func;
+    auto default_type = get_type(returnable_type_token);
+    auto args = node->get_params();
+    auto block = node->get_block();
+    std::vector<Type> type_args;
+    scope = scope->create_new_table(scope, std::move(block));
+    for (auto& i : args){
+        this->visit(i.get()); // поверяем являются ли они в зоне видимости
+        type_args.push_back(current_type);
+        scope-> push_variable(i->get_type().value, current_type);
+    }
+    auto func = FuncType(default_type, type_args);
+    scope->push_func(name, func);
+    this->visit(block.get()); // заходим в наш блок
+    scope = scope->get_prev_table();
+    current_type = func;
+}
+
+void Analyzer::visit(ParamDeclarator* node) {
+    auto type = node->get_type();
+    auto id_declarator = node->get_declorator();
+    current_type = get_type(type);
+    this->visit(id_declarator.get());
+}
+
+void Analyzer::visit(StructDeclarator* node) {
+    auto id = node->get_id();
+    auto vars = node->get_vars();
+    std::unordered_map<std::string, Type> struct_vars;
+    for (auto& var : vars){
+        this->visit(var.get());
+        auto name = var->get_type().value;
+        struct_vars[name] = current_type;
+    }
+    auto str = StructType(struct_vars);
+    scope->push_struct(id.value, str);
+    current_type = str;
+}
+
+void Analyzer::visit(ComparisonExpression* node){
+    auto left = node->get_left();
+    auto right = node->get_right();
+    auto op = node->get_op();
+    this->visit(left.get());
+    auto left_type = current_type;
+    this->visit(right.get());
+    auto right_type = current_type;
+    if (dynamic_cast<StructType*>(&left_type)){
+        // найти оператор сравнения для него 
+        // либо конвертацию
     } else {
-        auto default_type = default_types.at(returnable_type.value);
-        auto args = node->get_params();
-        auto block = node->get_block();
-        std::vector<Type> type_args;
-        scope = scope->create_new_table(scope, std::move(block));
-        for (auto& i : args){
-            this->visit(i.get()); // поверяем являются ли они в зоне видимости
-            type_args.push_back(current_type);
-            scope-> push_variable(i->get_type().value, current_type);
-        }
-        auto func = FuncType(default_type, type_args);
-        this->visit(block.get()); // заходим в наш блок
-        scope = scope->get_prev_table();
-        scope->push_func(name, func);
-        current_type = func;
+        left_type = BoolType();
+    }
+    if (dynamic_cast<StructType*>(&right_type)){
+
+    } else {
+        right_type = BoolType();
+    }
+    
+
+}
+
+
+Type Analyzer::get_type(Token token){
+    if (token == TokenType::ID){
+        return scope->match_struct(token.value);
+    } else {
+        return default_types.at(token.value);
     }
 }
 

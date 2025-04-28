@@ -91,7 +91,7 @@ std::unique_ptr<BlockStatement> FuncDeclarator::get_block(){
 }
 
 // ParamDeclarator
-ParamDeclarator::ParamDeclarator(const Token& type, std::unique_ptr<Declarator> declorator)
+ParamDeclarator::ParamDeclarator(const Token& type, std::unique_ptr<InitDeclarator> declorator)
     : type(type), declorator(std::move(declorator)) {}
 
 void ParamDeclarator::accept(Visitor& visitor) {
@@ -102,7 +102,7 @@ Token ParamDeclarator::get_type() {
     return this->type;
 }
 
-std::unique_ptr<Declarator> ParamDeclarator::get_declorator() {
+std::unique_ptr<InitDeclarator> ParamDeclarator::get_declorator() {
     return std::move(this->declorator);
 }
 

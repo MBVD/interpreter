@@ -105,11 +105,10 @@ class EnumType : public Composite {
 // Указатели
 class PointerType : public Composite {
 public:
-    explicit PointerType(const Type* base = nullptr); // int* a;
-    PointerType(); // nullptr
-    const Type& get_base() const;
+    explicit PointerType(const Type* base); // int* a;
+    Type& get_base() const;
 private:
-    Type& base;
+    Type* base;
 };
 
 // Ссылки

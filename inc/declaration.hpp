@@ -69,13 +69,13 @@ private:
 
 class ParamDeclarator : public Declarator {
 public:
-    ParamDeclarator(const Token& type, std::unique_ptr<Declarator> declorator);
+    ParamDeclarator(const Token& type, std::unique_ptr<InitDeclarator> declorator);
     void accept(Visitor& visitor);
     Token get_type();
-    std::unique_ptr<Declarator> get_declorator();
+    std::unique_ptr<InitDeclarator> get_declorator();
 private:
     Token type; // может быть и id
-    std::unique_ptr<Declarator> declorator;
+    std::unique_ptr<InitDeclarator> declorator;
 };
 
 class StructDeclarator : public Declarator {

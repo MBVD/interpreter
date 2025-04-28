@@ -47,4 +47,12 @@ std::unordered_map<std::string, Type> StructType::get_members() const {
     return this->members;
 }
 
+PointerType::PointerType(const Type* base = nullptr) {
+    base = base;
+}
+
+Type& PointerType::get_base() const {
+    return *base;
+}
+
 
