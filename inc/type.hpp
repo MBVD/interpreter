@@ -105,8 +105,10 @@ class EnumType : public Composite {
 // Указатели
 class PointerType : public Composite {
 public:
-    explicit PointerType(const Type* base); // int* a;
-    Type& get_base() const;
+    explicit PointerType(const Type* base);
+    Type* get_base() const;
+    int get_star_count();
+    Type get_type_by_star_count(int x);
 private:
     Type* base;
 };
@@ -122,11 +124,9 @@ class LValueType : public RefType {
 };
 
 // Массивы
-class ArrayType : public Composite {
+class ArrayType : public PointerType {
 public:
-    ArrayType(const Type& base, int size); // Тип и размер массива
-    const std::vector<Type>& get_array() const;
+    ArrayType(const Type* base, int size); // Тип и размер массива
 private:
     int size;
-    std::vector<Type> array;
 };

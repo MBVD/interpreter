@@ -124,58 +124,107 @@ void Analyzer::visit(ComparisonExpression* node){
     if (dynamic_cast<StructType*>(&left_type)){
         // найти оператор сравнения для него 
         // либо конвертацию
-    } else {
-        left_type = BoolType();
     }
     if (dynamic_cast<StructType*>(&right_type)){
-
-    } else {
-        right_type = BoolType();
+        // 
     }
-    
 
-}
-
-void Analyzer::visit(ComparisonExpression* node) {
-
+    if (dynamic_cast<Arithmetic*>(&left_type) && dynamic_cast<Arithmetic*>(&right_type)) {
+        current_type = BoolType();
+    } else {
+        throw std::runtime_error("error ");
+    }
 }
 
 void Analyzer::visit(TernaryExpression* node) {
+    auto cond_expr = node->get_cond_expression();
+    auto true_expr = node->get_true_expression();
+    auto false_expr = node->get_false_expression();
+    this->visit(cond_expr.get());
+    auto cond_type = current_type;
+    this->visit(true_expr.get());
+    auto true_expr_type = current_type;
+    this->visit(false_expr.get());
+    auto false_expr_type = current_type;
+    if (!dynamic_cast<BoolType*>(&cond_type)) {
+        throw std::runtime_error("error in checking cond expression");
+    }
 
+    if (dynamic_cast<Composite*>(&true_expr_type)) {
+        // 
+    }
+    if (dynamic_cast<Composite*>(&false_expr_type)){
+        //
+    }
+
+    if(dynamic_cast<decltype(true_expr_type)*>(&false_expr_type)) { // значит тип правый конвертируется в левый тип
+        current_type = true_expr_type;
+    }
+    throw std::runtime_error("hello kitty");
 }
 
 void Analyzer::visit(BinaryExpression* node) {
+    auto left = node->get_left();
+    auto right = node->get_right();
+    auto op = node->get_op();
+    this->visit(left.get());
+    auto left_type = current_type;
+    this->visit(right.get());
+    auto right_type = current_type;
 
-}
-
-void Analyzer::visit(UnaryExpression* node) {
-
+    if (dynamic_cast<Composite*>(&left_type)) {
+        //
+    }
+    if (dynamic_cast<Composite*>(&right_type)) {
+        //
+    }
+    if (dynamic_cast<Arithmetic*>(&left_type) && dynamic_cast<Arithmetic*>(&right_type)) {
+        current_type = left_type;
+    }
+    throw std::runtime_error("hello kerropi");
 }
 
 void Analyzer::visit(PostfixExpression* node) {
-
-}
-
-void Analyzer::visit(SubscriptExpression* node) {
-
-}
-
-void Analyzer::visit(CallExpression* node) {
-
-}
-
-void Analyzer::visit(AccessExpression* node) {
-    auto expression = node->get_expression();
+    auto expression = node-> get_expression();
+    auto op = node->get_op(); // ну тут может быть только ++ или --
     this->visit(expression.get());
-    if (typeid(FuncType()) == typeid(current_type)){
-        auto* func_type = dynamic_cast<FuncType*>(&current_type);
-        current_type = func_type->get_returnable_type();
-    } else if (typeid(StructType()) == typeid(current_type)){
-        // найти в структуре оператор ()
-    } else {
-        throw ;
-    }   
+    auto expression_type = current_type;
+    if (!dynamic_cast<Arithmetic*>(&expression_type)) {
+        throw std::runtime_error("hello melodi");
+    }
+}
 
+void Analyzer::visit(SubscriptExpression* node) {// []
+    auto expression = node->get_expression();
+    auto indexes = node->get_indexes();
+    auto op = node->get_op();
+    this->visit(expression.get());
+    auto expression_type = current_type;
+    if (dynamic_cast<StructType*>(&expression_type)) {
+        // ищем оператор []
+    }
+    for (auto& i : indexes){
+        this->visit(i.get());
+        if (!dynamic_cast<IntegerType*>(&current_type)){
+            throw std::runtime_error("hello maru");
+        }
+    }
+    auto* pointer = dynamic_cast<PointerType*>(&expression_type);
+    if (!pointer) {
+        throw std::runtime_error("hello maru");    
+    }
+    if (indexes.size() >= pointer->get_star_count()) {
+        throw std::runtime_error("hello maru");
+    }
+    current_type = pointer->get_type_by_star_count(indexes.size());
+}
+
+void Analyzer::visit(CallExpression* node) { // (
+    
+}
+
+void Analyzer::visit(AccessExpression* node) { // ->
+    
 }
 
 void Analyzer::visit(LiteralNumExpression* node) {
@@ -196,7 +245,7 @@ void Analyzer::visit(LiteralStringExpression* node) {
 
 void Analyzer::visit(IDexpression* node) {
     try {
-        current_type = scope->match_function(node->get_token().value);
+        current_type = scope->match_function(node->get_token().value, std::vector<Type>{});
     } catch (...) {}
     current_type = scope->match_variable(node->get_token().value);
 }
