@@ -220,7 +220,19 @@ void Analyzer::visit(SubscriptExpression* node) {// []
 }
 
 void Analyzer::visit(CallExpression* node) { // (
-    
+    auto expression = node->get_expression();
+    auto op = node->get_op();
+    auto args = node->get_args();
+    this->visit(expression.get());
+    auto expression_type = current_type;
+    if (dynamic_cast<StructType*>(&expression_type)) {
+        //
+    }
+    auto* expression_func = dynamic_cast<FuncType*>(&expression_type);
+    if (!expression_func) {
+        throw std::runtime_error("hello there");
+    }
+    auto expr_func_args = expression_func->get_args();
 }
 
 void Analyzer::visit(AccessExpression* node) { // ->
