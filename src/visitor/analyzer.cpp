@@ -94,9 +94,9 @@ void Analyzer::visit(FuncDeclarator* node){
 
 void Analyzer::visit(ParamDeclarator* node) {
     auto type = node->get_type();
-    auto id_declarator = node->get_declorator();
+    auto init_declarator = node->get_declorator();
     current_type = get_type(type);
-    this->visit(id_declarator.get());
+    this->visit(init_declarator.get());
 }
 
 void Analyzer::visit(StructDeclarator* node) {
@@ -134,6 +134,75 @@ void Analyzer::visit(ComparisonExpression* node){
     }
     
 
+}
+
+void Analyzer::visit(ComparisonExpression* node) {
+
+}
+
+void Analyzer::visit(TernaryExpression* node) {
+
+}
+
+void Analyzer::visit(BinaryExpression* node) {
+
+}
+
+void Analyzer::visit(UnaryExpression* node) {
+
+}
+
+void Analyzer::visit(PostfixExpression* node) {
+
+}
+
+void Analyzer::visit(SubscriptExpression* node) {
+
+}
+
+void Analyzer::visit(CallExpression* node) {
+
+}
+
+void Analyzer::visit(AccessExpression* node) {
+    auto expression = node->get_expression();
+    this->visit(expression.get());
+    if (typeid(FuncType()) == typeid(current_type)){
+        auto* func_type = dynamic_cast<FuncType*>(&current_type);
+        current_type = func_type->get_returnable_type();
+    } else if (typeid(StructType()) == typeid(current_type)){
+        // найти в структуре оператор ()
+    } else {
+        throw ;
+    }   
+
+}
+
+void Analyzer::visit(LiteralNumExpression* node) {
+    current_type = IntegerType();
+}
+
+void Analyzer::visit(LiteralFloatExpression* node) {
+    current_type = FloatType();
+}
+
+void Analyzer::visit(LiteralCharExpression* node) {
+    current_type = CharType();
+}
+
+void Analyzer::visit(LiteralStringExpression* node) {
+    
+}
+
+void Analyzer::visit(IDexpression* node) {
+    try {
+        current_type = scope->match_function(node->get_token().value);
+    } catch (...) {}
+    current_type = scope->match_variable(node->get_token().value);
+}
+
+void Analyzer::visit(GroupExpression* node) {
+    this->visit(node->get_base().get());
 }
 
 
