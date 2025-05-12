@@ -56,7 +56,7 @@ Parser::param_ptr Parser::parse_param_declaration() {
     }
     index++;
     try {
-        Parser::decl_ptr decl = parse_init_declaration();
+        auto decl = parse_init_declaration();
         return std::make_unique<ParamDeclarator>(type, std::move(decl));
     } catch (declaration_parsing_error&) {
         throw parse_param_decl_error("");
