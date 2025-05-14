@@ -37,26 +37,25 @@ Parser::decl_ptr Parser::parse_declaration() {
     auto decl_index = index;
     try {
         return parse_var_declaration();
-    } catch (declaration_parsing_error&) {
-        // std::cout<<"failed to parse var_decl \n";
+    } catch (parse_var_decl_error&) {
+        std::cout<<"failed to parse var_decl \n";
     }
     try {
         return parse_func_declaration();
     } catch (parse_func_decl_error&){
-        // std::cout<<"failed to parse func_decl \n";
+        std::cout<<"failed to parse func_decl \n";
     }
 
     try {
         return parse_struct_declaration();
-    } catch (parse_struct_decl_error&){}
+    } catch (parse_struct_decl_error&){
+        std::cout<<"failed to parse struct";
+    }
     throw declaration_parsing_error("no decalarations");
 }
 
 Parser::statement_ptr Parser::parse_statement() {
     auto statement_index = index;
-    try {
-        return parse_expression_stetement();  
-    } catch (parse_expression_st_error&) {}
     try {
         return parse_decl_statement();
     } catch (parse_decl_st_error&) {}
@@ -84,6 +83,9 @@ Parser::statement_ptr Parser::parse_statement() {
     try {
         return parse_empty_statement();
     } catch (statement_parsing_error&){}
+    try {
+        return parse_expression_stetement();  
+    } catch (parse_expression_st_error&) {}
     throw statement_parsing_error("");
 }
 

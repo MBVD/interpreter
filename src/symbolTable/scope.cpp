@@ -35,30 +35,30 @@ StructType Scope::match_struct(std::string name){
 
 FuncType Scope::match_function(std::string name, std::vector<Type> args){
     auto range = functions.equal_range(name);
-    std::map<FuncType, int> functions; 
+    std::vector<FuncType> matched_functions;
     for (auto i = range.first; i != range.second; ++i){
-        functions.insert({i->second, 0}); // собрали все функции с этим именем
+        matched_functions.push_back(i->second); // собрали все функции с этим именем
     }
-    for (auto function : functions){
-        auto func_args = function.first.get_args();
+    for (auto& func : matched_functions){
+        auto func_args = func.get_args();
         if (func_args.size() != args.size()){
-            functions.erase(function.first);
+            continue;
         }
         bool match = true;
         for (size_t j = 0; j < args.size(); ++j) {
+            // TODO: Implement a proper type comparison (including inheritance and conversions)
             if (typeid(args[j]) != typeid(func_args[j])) {
                 match = false; // Если типы не совпадают, функция не подходит
                 break;
             }
-            // TODO реализовать чтоб типы были конвертируемы сейчас ищет только идеальное совпадение типов
         }
 
         if (match) {
-            return function.first; // Возвращаем первую подходящую функцию
+            return func; // Возвращаем первую подходящую функцию
         }
     }
-    if (prev_table.get() == nullptr){
-        throw; //throw exceptions no exist function;
+    if (prev_table == nullptr){
+        throw std::runtime_error("Function '" + name + "' with the specified arguments not found in scope.");
     }
     
     return prev_table->match_function(name, args);

@@ -14,8 +14,8 @@ Token VarDeclarator::get_type() {
     return this->type;
 }
 
-const std::vector<std::unique_ptr<InitDeclarator>>& VarDeclarator::get_init_declarators(){
-    return this->init_declarators;
+std::vector<std::unique_ptr<InitDeclarator>> VarDeclarator::get_init_declarators(){
+    return std::move(this->init_declarators);
 }
 
 // InitDeclarator
@@ -82,8 +82,8 @@ Token FuncDeclarator::get_name() {
     return this->name;
 }   
 
-const std::vector<std::unique_ptr<ParamDeclarator>>& FuncDeclarator::get_params(){
-    return this->params;
+std::vector<std::unique_ptr<ParamDeclarator>> FuncDeclarator::get_params(){
+    return std::move(this->params);
 }
 
 std::unique_ptr<BlockStatement> FuncDeclarator::get_block(){
@@ -118,6 +118,6 @@ Token StructDeclarator::get_id() {
     return this->id;
 }
 
-const std::vector<std::unique_ptr<VarDeclarator>>& StructDeclarator::get_vars(){
-    return this->vars;
+std::vector<std::unique_ptr<VarDeclarator>> StructDeclarator::get_vars(){
+    return std::move(this->vars);
 }

@@ -1,5 +1,6 @@
 #include "analyzer.hpp"
 #include "token.hpp"
+#include "type.hpp"
 #include <memory>
 
 std::unordered_map<std::string, Type> Analyzer::default_types = {
@@ -18,7 +19,11 @@ void Analyzer::analyze(TranslationUnit & unit){
 }
 
 void Analyzer::visit(ASTNode* node){
-    this->visit(node);
+    node->accept(*this);
+}
+
+void Analyzer::visit(Declarator* node){
+    node->accept(*this);
 }
 
 void Analyzer::visit(VarDeclarator* node){
@@ -113,6 +118,10 @@ void Analyzer::visit(StructDeclarator* node) {
     current_type = str;
 }
 
+void Analyzer::visit(Expression* node) {
+    node->accept(*this);
+}
+
 void Analyzer::visit(ComparisonExpression* node){
     auto left = node->get_left();
     auto right = node->get_right();
@@ -184,6 +193,55 @@ void Analyzer::visit(BinaryExpression* node) {
     throw std::runtime_error("hello kerropi");
 }
 
+void Analyzer::visit(UnaryExpression* node) {// ++ -- (int) 
+    auto base = node->get_base();
+    auto op = node->get_op();
+    base->accept(*this);
+    auto base_type = current_type;
+    switch(op.type) {
+        case TokenType::INCREMENT : {
+            if (dynamic_cast<Arithmetic*>(&base_type)) {
+                current_type = base_type;
+            } else {
+                throw std::runtime_error("hello kerropi");
+            }
+        } break;
+        case TokenType::DECREMENT : {
+            if (dynamic_cast<Arithmetic*>(&base_type)) {
+                current_type = base_type;
+            } else {
+                throw std::runtime_error("hello kerropi");
+            }
+        } break;
+        case TokenType::PLUS : {
+            if (dynamic_cast<Arithmetic*>(&base_type)) {
+                current_type = base_type;
+            } else {
+                throw std::runtime_error("hello kerropi");
+            }
+        } break;
+        case TokenType::MINUS : {
+            if (dynamic_cast<Arithmetic*>(&base_type)) {
+                current_type = base_type;
+            } else {
+                throw std::runtime_error("hello kerropi");
+            }
+        } break;
+        case TokenType::TYPE : {
+            if (dynamic_cast<Arithmetic*>(&base_type)) {
+                current_type = default_types.at(op.value);
+            } else {
+                throw std::runtime_error("hello kerropi");
+            }
+        }
+        case TokenType::BIT_NOT : {
+            if (!dynamic_cast<Arithmetic*>(&base_type)) {
+                throw std::runtime_error("hello kerropi");
+            }
+        } break;
+    }
+}
+
 void Analyzer::visit(PostfixExpression* node) {
     auto expression = node-> get_expression();
     auto op = node->get_op(); // ну тут может быть только ++ или --
@@ -236,7 +294,47 @@ void Analyzer::visit(CallExpression* node) { // (
 }
 
 void Analyzer::visit(AccessExpression* node) { // ->
-    
+    auto expression = node->get_expression();
+    auto member_token = node->get_member();
+
+    this->visit(expression.get());
+    Type expression_type = current_type;
+
+    // Check if the left-hand side is a pointer to a struct
+    if (auto pointer_type = dynamic_cast<PointerType*>(&expression_type)) {
+        Type* base_type = pointer_type->get_base();
+        if (!base_type) {
+            throw std::runtime_error("Error: Pointer dereference of incomplete type.");
+        }
+
+        if (auto struct_type = dynamic_cast<StructType*>(base_type)) {
+            auto members = struct_type->get_members();
+            auto member_name = member_token.value;
+
+            // Check if the member exists in the struct
+            if (members.find(member_name) != members.end()) {
+                current_type = members.at(member_name); // Set current_type to the type of the member
+            } else {
+                throw std::runtime_error("Error: Member '" + member_name + "' not found in struct.");
+            }
+        } else {
+            throw std::runtime_error("Error: Member access on non-struct type.");
+        }
+    }
+     else if (auto struct_type = dynamic_cast<StructType*>(&expression_type)) {
+            auto members = struct_type->get_members();
+            auto member_name = member_token.value;
+
+            // Check if the member exists in the struct
+            if (members.find(member_name) != members.end()) {
+                current_type = members.at(member_name); // Set current_type to the type of the member
+            } else {
+                throw std::runtime_error("Error: Member '" + member_name + "' not found in struct.");
+            }
+        }
+    else {
+        throw std::runtime_error("Error: Member access on non-struct type.");
+    }
 }
 
 void Analyzer::visit(LiteralNumExpression* node) {
@@ -264,6 +362,75 @@ void Analyzer::visit(IDexpression* node) {
 
 void Analyzer::visit(GroupExpression* node) {
     this->visit(node->get_base().get());
+}
+
+void Analyzer::visit(Statement* node) {
+    node->accept(*this);
+}
+
+void Analyzer::visit(BlockStatement* node) {
+    for (auto& s : node->get_statements())
+        this->visit(s.get());
+    scope = scope->get_prev_table();
+}
+
+void Analyzer::visit(DeclarationStatement* node) {
+    this->visit(node->get_declaration().get());
+}
+
+void Analyzer::visit(ExpressionStatement* node) {
+    this->visit(node->get_expression().get());
+}
+
+void Analyzer::visit(ConditionalStatement* node) {
+    this->visit(node->get_conditional().get());
+    this->visit(node->get_true_statement().get());
+    if (node->get_false_statement())
+        node->get_false_statement()->accept(*this);
+}
+
+void Analyzer::visit(WhileStatement* node) {
+    node->get_conditional()->accept(*this);
+    node->get_statement()->accept(*this);
+}
+
+void Analyzer::visit(ForStatement* node) {
+    if (node->get_init_expr())
+        node->get_init_expr()->accept(*this);
+
+    if (node->get_cond_expr())
+        node->get_cond_expr()->accept(*this);
+
+    if (node->get_iter_expr())
+        node->get_iter_expr()->accept(*this);
+        
+    node->get_statement()->accept(*this);
+}
+
+void Analyzer::visit(ReturnStatement* node) {
+    if (node->get_expression())
+        node->get_expression()->accept(*this);
+}
+
+void Analyzer::visit(BreakStatement* node) {
+    node->accept(*this);
+}
+
+void Analyzer::visit(ContinueStatement* node) {
+    node->accept(*this);
+}
+
+void Analyzer::visit(LoopStatement* node) {
+    node->accept(*this);
+}
+
+void Analyzer::visit(DoWhileStatement* node) {
+    node->get_statement()->accept(*this);
+    node->get_expression()->accept(*this);
+}
+
+void Analyzer::visit(EmptyStatement* node) {
+    node->accept(*this);
 }
 
 

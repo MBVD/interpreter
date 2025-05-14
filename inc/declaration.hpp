@@ -14,7 +14,7 @@ public:
     VarDeclarator(const Token& token, std::vector<std::unique_ptr<InitDeclarator>> init_declarators);
     void accept(Visitor& visitor);
     Token get_type();
-    const std::vector<std::unique_ptr<InitDeclarator>>& get_init_declarators();
+    std::vector<std::unique_ptr<InitDeclarator>> get_init_declarators();
 private:
     Token type; // может быть типом или id
     std::vector<std::unique_ptr<InitDeclarator>> init_declarators;
@@ -58,7 +58,7 @@ public:
     void accept(Visitor& visitor);
     Token get_returnable_type();
     Token get_name();
-    const std::vector<std::unique_ptr<ParamDeclarator>>& get_params();
+    std::vector<std::unique_ptr<ParamDeclarator>> get_params();
     std::unique_ptr<BlockStatement> get_block();
 private:
     Token returnable_type;
@@ -83,7 +83,7 @@ public:
     StructDeclarator(const Token& id, std::vector<std::unique_ptr<VarDeclarator>> vars);
     void accept(Visitor& visitor);
     Token get_id();
-    const std::vector<std::unique_ptr<VarDeclarator>>& get_vars();
+    std::vector<std::unique_ptr<VarDeclarator>> get_vars();
 private:
     Token id;
     std::vector<std::unique_ptr<VarDeclarator>> vars;

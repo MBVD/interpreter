@@ -48,6 +48,7 @@ int main(){
     std::cout<<"\n\n";
     Parser parser = Parser(tokens);
     auto unit = parser.parse();
+    std::cout<<"successed parse \n";
     Printer printer;
     printer.print(unit);
 }

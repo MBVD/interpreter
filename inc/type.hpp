@@ -37,21 +37,21 @@ public:
 // Все целочисленные типы
 class BoolType : public Integral {
 public:
-    explicit BoolType(std::any value = 0);
+    explicit BoolType();
 private:
     bool value;
 };
 
 class CharType : public Integral {
 public:
-    explicit CharType(std::any value = 0);
+    explicit CharType();
 private:
     char16_t value;
 };
 
 class IntegerType : public Integral {
 public:
-    explicit IntegerType(std::any value = 0);
+    explicit IntegerType();
 private:
     int8_t value;
 };
@@ -59,7 +59,7 @@ private:
 // Все типы с плавающей точкой
 class FloatType : public Arithmetic {
 public:
-    explicit FloatType(std::any value = 0);
+    FloatType();
 private:
     double value;
 };
@@ -105,7 +105,7 @@ class EnumType : public Composite {
 // Указатели
 class PointerType : public Composite {
 public:
-    explicit PointerType(const Type* base);
+    explicit PointerType(Type* base);
     Type* get_base() const;
     int get_star_count();
     Type get_type_by_star_count(int x);
