@@ -111,8 +111,17 @@ void Analyzer::visit(StructDeclarator* node) {
     scope = scope->create_new_table(scope);
     for (const auto& var : vars){
         var->accept(*this);
-        auto name = var->get_type().value;
-        struct_vars[name] = current_type;
+        auto var_type = current_type;
+        if (var->get_type().type == TokenType::ID){
+            var_type = scope->match_struct(var->get_type().value);
+        } else if (var->get_type().type == TokenType::TYPE){
+            var_type = default_types.at(var->get_type().value);
+        }
+        for (const auto& init_declorator : var->get_init_declarators()){
+            init_declorator->accept(*this);
+            auto name = init_declorator->get_declarator()->get_id().value;
+            struct_vars[name] = var_type;
+        }
     }
     scope = scope->get_prev_table();
     auto str = std::make_shared<StructType>(struct_vars);
@@ -191,8 +200,9 @@ void Analyzer::visit(BinaryExpression* node) {
     }
     if (dynamic_cast<Arithmetic*>(left_type.get()) && dynamic_cast<Arithmetic*>(right_type.get())) {
         current_type = compare_types(left_type, right_type);
+        return;
     }
-    throw std::runtime_error("hello kerropi");
+    throw std::runtime_error("hello kerropi1");
 }
 
 void Analyzer::visit(UnaryExpression* node) {// ++ -- (int) 
@@ -204,6 +214,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
         case TokenType::INCREMENT : {
             if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
+                return;
             } else {
                 throw std::runtime_error("hello kerropi");
             }
@@ -211,6 +222,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
         case TokenType::DECREMENT : {
             if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
+                return;
             } else {
                 throw std::runtime_error("hello kerropi");
             }
@@ -218,6 +230,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
         case TokenType::PLUS : {
             if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
+                return;
             } else {
                 throw std::runtime_error("hello kerropi");
             }
@@ -232,6 +245,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
         case TokenType::TYPE : {
             if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = default_types.at(op.value);
+                return;
             } else {
                 throw std::runtime_error("hello kerropi");
             }
