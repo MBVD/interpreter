@@ -10,23 +10,22 @@
 class Scope {
 public:
     ~Scope() = default;
-    Scope(std::unique_ptr<ASTNode>); 
-
+    Scope(std::shared_ptr<Scope> get_prev_table);
+    
     std::shared_ptr<Scope> get_prev_table();
-    std::shared_ptr<Scope> create_new_table(std::shared_ptr<Scope> ,std::unique_ptr<ASTNode>);
+    std::shared_ptr<Scope> create_new_table(std::shared_ptr<Scope>);
     
-    Type match_variable(std::string);
-    StructType match_struct(std::string);
-    FuncType match_function(std::string, std::vector<Type>);
+    std::shared_ptr<Type> match_variable(std::string);
+    std::shared_ptr<StructType> match_struct(std::string);
+    std::shared_ptr<FuncType> match_function(std::string, std::vector<std::shared_ptr<Type>>);
     
-    void push_variable(std::string, Type);
-    void push_struct(std::string, StructType);
-    void push_func(std::string, FuncType);
+    void push_variable(std::string, std::shared_ptr<Type>);
+    void push_struct(std::string, std::shared_ptr<StructType>);
+    void push_func(std::string, std::shared_ptr<FuncType>);
     
 private:
     std::shared_ptr<Scope>prev_table;
-    std::unique_ptr<ASTNode> node; // чему принадлежит эта облась видимости
-    std::unordered_map<std::string, Type> variables;
-    std::unordered_map<std::string, StructType> structs;
-    std::multimap<std::string, FuncType> functions;
+    std::unordered_map<std::string, std::shared_ptr<Type>> variables;
+    std::unordered_map<std::string, std::shared_ptr<StructType>> structs;
+    std::multimap<std::string, std::shared_ptr<FuncType>> functions;
 };

@@ -14,8 +14,8 @@ Token VarDeclarator::get_type() {
     return this->type;
 }
 
-std::vector<std::unique_ptr<InitDeclarator>> VarDeclarator::get_init_declarators(){
-    return std::move(this->init_declarators);
+const std::vector<std::unique_ptr<InitDeclarator>>& VarDeclarator::get_init_declarators(){
+    return this->init_declarators;
 }
 
 // InitDeclarator
@@ -29,12 +29,12 @@ void InitDeclarator::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-std::unique_ptr<IdDeclorator> InitDeclarator::get_declarator(){
-    return std::move(this->declarator);
+const std::unique_ptr<IdDeclorator>& InitDeclarator::get_declarator(){
+    return this->declarator;
 }
 
-std::unique_ptr<Expression> InitDeclarator::get_expression(){
-    return std::move(this->expression);
+const std::unique_ptr<Expression>& InitDeclarator::get_expression(){
+    return this->expression;
 }
 
 // IdDeclorator
@@ -59,7 +59,7 @@ IDDeclaratorType IdDeclorator::get_declorator_type(){
     return this->type;
 }
 
-std::unique_ptr<Expression> IdDeclorator::get_expression(){
+const std::unique_ptr<Expression>& IdDeclorator::get_expression(){
     return std::move(this->expression);
 }
 
@@ -82,12 +82,12 @@ Token FuncDeclarator::get_name() {
     return this->name;
 }   
 
-std::vector<std::unique_ptr<ParamDeclarator>> FuncDeclarator::get_params(){
-    return std::move(this->params);
+const std::vector<std::unique_ptr<ParamDeclarator>>& FuncDeclarator::get_params(){
+    return this->params;
 }
 
-std::unique_ptr<BlockStatement> FuncDeclarator::get_block(){
-    return std::move(this->block);
+const std::unique_ptr<BlockStatement>& FuncDeclarator::get_block(){
+    return this->block;
 }
 
 // ParamDeclarator
@@ -102,8 +102,8 @@ Token ParamDeclarator::get_type() {
     return this->type;
 }
 
-std::unique_ptr<InitDeclarator> ParamDeclarator::get_declorator() {
-    return std::move(this->declorator);
+const std::unique_ptr<InitDeclarator>& ParamDeclarator::get_declorator() {
+    return this->declorator;
 }
 
 // StructDeclarator
@@ -118,6 +118,6 @@ Token StructDeclarator::get_id() {
     return this->id;
 }
 
-std::vector<std::unique_ptr<VarDeclarator>> StructDeclarator::get_vars(){
-    return std::move(this->vars);
+const std::vector<std::unique_ptr<VarDeclarator>>& StructDeclarator::get_vars(){
+    return this->vars;
 }

@@ -14,7 +14,7 @@ public:
     VarDeclarator(const Token& token, std::vector<std::unique_ptr<InitDeclarator>> init_declarators);
     void accept(Visitor& visitor);
     Token get_type();
-    std::vector<std::unique_ptr<InitDeclarator>> get_init_declarators();
+    const std::vector<std::unique_ptr<InitDeclarator>>& get_init_declarators();
 private:
     Token type; // может быть типом или id
     std::vector<std::unique_ptr<InitDeclarator>> init_declarators;
@@ -25,8 +25,8 @@ public:
     InitDeclarator(std::unique_ptr<IdDeclorator> declarator);
     InitDeclarator(std::unique_ptr<IdDeclorator> declarator, std::unique_ptr<Expression> expression);
     void accept(Visitor& visitor);
-    std::unique_ptr<IdDeclorator> get_declarator();
-    std::unique_ptr<Expression> get_expression();
+    const std::unique_ptr<IdDeclorator>& get_declarator();
+    const std::unique_ptr<Expression>& get_expression();
 private:
     std::unique_ptr<IdDeclorator> declarator;
     std::unique_ptr<Expression> expression;
@@ -44,7 +44,7 @@ public:
     void accept(Visitor& visitor);
     Token get_id();
     IDDeclaratorType get_declorator_type();
-    std::unique_ptr<Expression> get_expression();
+    const std::unique_ptr<Expression>& get_expression();
 private:
     Token id;
     IDDeclaratorType type;
@@ -58,8 +58,8 @@ public:
     void accept(Visitor& visitor);
     Token get_returnable_type();
     Token get_name();
-    std::vector<std::unique_ptr<ParamDeclarator>> get_params();
-    std::unique_ptr<BlockStatement> get_block();
+    const std::vector<std::unique_ptr<ParamDeclarator>>& get_params();
+    const std::unique_ptr<BlockStatement>& get_block();
 private:
     Token returnable_type;
     Token name;
@@ -72,7 +72,7 @@ public:
     ParamDeclarator(const Token& type, std::unique_ptr<InitDeclarator> declorator);
     void accept(Visitor& visitor);
     Token get_type();
-    std::unique_ptr<InitDeclarator> get_declorator();
+    const std::unique_ptr<InitDeclarator>& get_declorator();
 private:
     Token type; // может быть и id
     std::unique_ptr<InitDeclarator> declorator;
@@ -83,7 +83,7 @@ public:
     StructDeclarator(const Token& id, std::vector<std::unique_ptr<VarDeclarator>> vars);
     void accept(Visitor& visitor);
     Token get_id();
-    std::vector<std::unique_ptr<VarDeclarator>> get_vars();
+    const std::vector<std::unique_ptr<VarDeclarator>>& get_vars();
 private:
     Token id;
     std::vector<std::unique_ptr<VarDeclarator>> vars;

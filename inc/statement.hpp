@@ -9,7 +9,7 @@ class ExpressionStatement : public Statement {
 public:
     ExpressionStatement(std::unique_ptr<Expression> expression);
     void accept(Visitor& visitor);
-    std::unique_ptr<Expression> get_expression();
+    const std::unique_ptr<Expression>& get_expression();
 private:
     std::unique_ptr<Expression> expression;
 };
@@ -18,7 +18,7 @@ class DeclarationStatement : public Statement {
 public:
     DeclarationStatement(std::unique_ptr<VarDeclarator> declaration);
     void accept(Visitor& visitor);
-    std::unique_ptr<VarDeclarator> get_declaration();
+    const std::unique_ptr<VarDeclarator>& get_declaration();
 private:
     std::unique_ptr<VarDeclarator> declaration;
 };
@@ -28,7 +28,7 @@ public:
     ReturnStatement(std::unique_ptr<Expression> expression);
     ReturnStatement();
     void accept(Visitor& visitor);
-     std::unique_ptr<Expression> get_expression();
+    const std::unique_ptr<Expression>& get_expression();
 private:
     std::unique_ptr<Expression> expression;
 };
@@ -52,7 +52,7 @@ public:
     BlockStatement(std::vector<std::unique_ptr<Statement>> statements);
     BlockStatement() = default;
     void accept(Visitor& visitor);
-     std::vector<std::unique_ptr<Statement>> get_statements();
+    const std::vector<std::unique_ptr<Statement>>& get_statements();
 private:
     std::vector<std::unique_ptr<Statement>> statements;
 };
@@ -65,9 +65,9 @@ public:
     ConditionalStatement(std::unique_ptr<Expression> conditional,
                          std::unique_ptr<Statement> true_statement);
     void accept(Visitor& visitor);
-     std::unique_ptr<Expression> get_conditional();
-     std::unique_ptr<Statement> get_true_statement();
-     std::unique_ptr<Statement> get_false_statement();
+    const std::unique_ptr<Expression>& get_conditional();
+    const std::unique_ptr<Statement>& get_true_statement();
+    const std::unique_ptr<Statement>& get_false_statement();
 private:
     std::unique_ptr<Expression> conditional;
     std::unique_ptr<Statement> true_statement;
@@ -85,8 +85,8 @@ public:
     WhileStatement(std::unique_ptr<Expression> conditional,
                    std::unique_ptr<Statement> statement);
     void accept(Visitor& visitor);
-     std::unique_ptr<Expression> get_conditional();
-     std::unique_ptr<Statement> get_statement();
+    const std::unique_ptr<Expression>& get_conditional();
+    const std::unique_ptr<Statement>& get_statement();
 private:
     std::unique_ptr<Expression> conditional;
     std::unique_ptr<Statement> statement;
@@ -97,8 +97,8 @@ public:
     DoWhileStatement(std::unique_ptr<Statement> statement,
                      std::unique_ptr<Expression> expression);
     void accept(Visitor& visitor);
-     std::unique_ptr<Statement> get_statement();
-     std::unique_ptr<Expression> get_expression();
+    const std::unique_ptr<Statement>& get_statement();
+    const std::unique_ptr<Expression>& get_expression();
 private:
     std::unique_ptr<Statement> statement;
     std::unique_ptr<Expression> expression;
@@ -117,11 +117,11 @@ public:
              
 
     void accept(Visitor& visitor);
-     std::unique_ptr<VarDeclarator> get_var();
-     std::unique_ptr<Expression> get_init_expr();
-     std::unique_ptr<Expression> get_cond_expr();
-     std::unique_ptr<Expression> get_iter_expr();
-     std::unique_ptr<Statement> get_statement();
+    const std::unique_ptr<VarDeclarator>& get_var();
+    const std::unique_ptr<Expression>& get_init_expr();
+    const std::unique_ptr<Expression>& get_cond_expr();
+    const std::unique_ptr<Expression>& get_iter_expr();
+    const std::unique_ptr<Statement>& get_statement();
 private:
     std::unique_ptr<VarDeclarator> var;
     std::unique_ptr<Expression> init_expr;

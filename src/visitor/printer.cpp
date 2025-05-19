@@ -2,8 +2,8 @@
 #include "printer.hpp"
 
 void Printer::print(TranslationUnit& unit){
-    for (auto& i : unit.get_nodes()){
-        this->visit(i.get());
+    for (const auto& i : unit.get_nodes()){
+        i->accept(*this);
     }
     std::cout<<"\n";
 }
@@ -21,10 +21,10 @@ void Printer::visit(Declarator* node){
 
 void Printer::visit(VarDeclarator* node) {
     std::cout << node->get_type() << " ";
-    auto declorators = node->get_init_declarators();
+    const auto& declorators = node->get_init_declarators();
     int sz = declorators.size(), cnt = 0;
-    for (auto& i : declorators) {
-        this->visit(i.get());
+    for (const auto& i : declorators) {
+        i->accept(*this);
         if (cnt != sz - 1) {
             std::cout << ", ";
         }
@@ -34,19 +34,19 @@ void Printer::visit(VarDeclarator* node) {
 }
 
 void Printer::visit(InitDeclarator* node) {
-    auto decl = node->get_declarator();
-    auto expr = node->get_expression();
-    this->visit(decl.get());
+    const auto& decl = node->get_declarator();
+    const auto& expr = node->get_expression();
+    decl->accept(*this);
     if (expr != nullptr){
         std::cout<<" = ";
+        expr->accept(*this);
     }
-    this->visit(expr.get());
 }
 
 void Printer::visit(IdDeclorator* node) {
     std::cout << node->get_id();
     auto type = node->get_declorator_type();
-    auto expr = node->get_expression();
+    const auto& expr = node->get_expression();
     switch (type) {
         case IDDeclaratorType::NONE: {
             break;
@@ -64,7 +64,10 @@ void Printer::visit(IdDeclorator* node) {
             break;
         }
     }
-    this->visit(expr.get());
+    if (expr == nullptr) {
+        return;
+    }
+    expr->accept(*this);
     if (type == IDDeclaratorType::ARRAY) {
         std::cout << "]";
     }
@@ -73,34 +76,34 @@ void Printer::visit(IdDeclorator* node) {
 void Printer::visit(FuncDeclarator* node) {
     auto type = node->get_returnable_type();
     auto id = node->get_name();
-    auto param_decls = node->get_params();
-    auto block = node->get_block();
+    const auto& param_decls = node->get_params();
+    const auto& block = node->get_block();
     std::cout << type << " " << id << " (";
     int sz = param_decls.size(), cnt = 0;
-    for (auto& i : param_decls) {
-        this->visit(i.get());
+    for (const auto& i : param_decls) {
+        i->accept(*this);
         if (cnt != sz - 1) {
             std::cout << ", ";
         }
         cnt++;
     }
     std::cout << ")";
-    this->visit(block.get());
+    block->accept(*this);
 }
 
 void Printer::visit(ParamDeclarator* node) {
     auto id = node->get_type();
-    auto decl = node->get_declorator();
+    const auto& decl = node->get_declorator();
     std::cout << id << " ";
-    this->visit(decl.get());
+    decl->accept(*this);
 }
 
 void Printer::visit(StructDeclarator* node) {
     auto id = node->get_id();
-    auto vars = node->get_vars();
+    const auto& vars = node->get_vars();
     std::cout << "struct " << id << "{ ";
-    for (auto& i : vars) {
-        this->visit(i.get());
+    for (const auto& i : vars) {
+        i->accept(*this);
     }
     std::cout << "}";
 }
@@ -113,67 +116,67 @@ void Printer::visit(Expression* node) {
 }
 
 void Printer::visit(ComparisonExpression* node) {
-    auto left = node->get_left();
-    auto right = node->get_right();
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
     auto op = node->get_op();
-    this->visit(left.get());
+    left->accept(*this);
     std::cout << " " << op << " ";
-    this->visit(right.get());
+    right->accept(*this);
 }
 
 void Printer::visit(TernaryExpression* node) {
-    auto cond_expr = node->get_cond_expression();
-    auto true_expr = node->get_true_expression();
-    auto false_expr = node->get_false_expression();
-    this->visit(cond_expr.get());
+    const auto& cond_expr = node->get_cond_expression();
+    const auto& true_expr = node->get_true_expression();
+    const auto& false_expr = node->get_false_expression();
+    cond_expr->accept(*this);
     std::cout << " ? ";
-    this->visit(true_expr.get());
+    true_expr->accept(*this);
     std::cout << " : ";
-    this->visit(false_expr.get());
+    false_expr->accept(*this);
 }
 
 void Printer::visit(BinaryExpression* node) {
-    auto left = node->get_left();
-    auto right = node->get_right();
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
     auto op = node->get_op();
-    this->visit(left.get());
+    left->accept(*this);
     std::cout << " " << op << " ";
-    this->visit(right.get());
+    right->accept(*this);
 }
 
 void Printer::visit(UnaryExpression* node) {
     auto op = node->get_op();
-    auto base = node->get_base();
+    const auto& base = node->get_base();
     std::cout << op;
     this->visit(base.get());
 }
 
 void Printer::visit(PostfixExpression* node){
-    auto base = node->get_expression();
+    const auto& base = node->get_expression();
     auto op = node->get_op();
-    this->visit(base.get());
+    base->accept(*this);
     std::cout<<op;
 }
 
 void Printer::visit(SubscriptExpression* node) {
-    auto expr = node->get_expression();
-    auto indexes = node->get_indexes();
-    this->visit(expr.get());
-    for (auto& i : indexes) {
+    const auto& expr = node->get_expression();
+    const auto& indexes = node->get_indexes();
+    expr->accept(*this);
+    for (const auto& i : indexes) {
         std::cout << "[";
-        this->visit(i.get());
+        i->accept(*this);
         std::cout << "]";
     }
 }
 
 void Printer::visit(CallExpression* node) {
-    auto expr = node->get_expression();
-    auto args = node->get_args();
-    this->visit(expr.get());
+    const auto& expr = node->get_expression();
+    const auto& args = node->get_args();
+    expr->accept(*this);
     std::cout << "(";
     int cnt = 0, sz = args.size();
-    for (auto& i : args) {
-        this->visit(i.get());
+    for (const auto& i : args) {
+        i->accept(*this);
         if (cnt != sz - 1) {
             std::cout << ", ";
         }
@@ -183,9 +186,9 @@ void Printer::visit(CallExpression* node) {
 }
 
 void Printer::visit(AccessExpression* node) {
-    auto expr = node->get_expression();
+    const auto& expr = node->get_expression();
     auto member = node->get_member();
-    this->visit(expr.get());
+    expr->accept(*this);
     std::cout<<"->";
     std::cout<<member;
 }
@@ -216,9 +219,9 @@ void Printer::visit(IDexpression* node){
 }
 
 void Printer::visit(GroupExpression* node) {
-    auto base = node->get_base();
+    const auto& base = node->get_base();
     std::cout<<"(";
-    this->visit(base.get());
+    base->accept(*this);
     std::cout<<")";
 }
 
@@ -230,21 +233,21 @@ void Printer::visit(Statement* node){
 }
 
 void Printer::visit(ExpressionStatement* node) {
-    auto base = node->get_expression();
-    this->visit(base.get());
+    const auto& base = node->get_expression();
+    base->accept(*this);
     std::cout<<";";
 }
 
 void Printer::visit(DeclarationStatement* node) {
-    auto var_decl = node->get_declaration();
-    this->visit(var_decl.get());
+    const auto& var_decl = node->get_declaration();
+    var_decl->accept(*this);
 }
 
 void Printer::visit(ReturnStatement* node) {
-    auto expr = node->get_expression();
+    const auto& expr = node->get_expression();
     std::cout<<"return ";
     if (expr != nullptr)
-        this->visit(expr.get());
+        expr->accept(*this);
     std::cout<<";";
 }
 
@@ -257,25 +260,25 @@ void Printer::visit(ContinueStatement*) {
 }
 
 void Printer::visit(BlockStatement* node) {
-    auto statements = node->get_statements();
+    const auto& statements = node->get_statements();
     std::cout << "{";
-    for (auto& i : statements) {
-        this->visit(i.get());
+    for (const auto& i : statements) {
+        i->accept(*this);
     }
     std::cout << "}";
 }
 
 void Printer::visit(ConditionalStatement* node) {
-    auto cond_expr = node->get_conditional();
-    auto true_statement = node->get_true_statement();
-    auto false_statement = node->get_false_statement();
+    const auto& cond_expr = node->get_conditional();
+    const auto& true_statement = node->get_true_statement();
+    const auto& false_statement = node->get_false_statement();
     std::cout << "if (";
-    this->visit(cond_expr.get());
+    cond_expr->accept(*this);
     std::cout << ")";
-    this->visit(true_statement.get());
+    true_statement->accept(*this);
     if (false_statement != nullptr) {
         std::cout << "else ";
-        this->visit(false_statement.get());
+        false_statement->accept(*this);
     }
 }
 
@@ -287,41 +290,41 @@ void Printer::visit(LoopStatement* node) {
 }
 
 void Printer::visit(WhileStatement* node) {
-    auto cond_expr = node->get_conditional();
-    auto statement = node->get_statement();
+    const auto& cond_expr = node->get_conditional();
+    const auto& statement = node->get_statement();
     std::cout << "while (";
-    this->visit(cond_expr.get());
+    cond_expr->accept(*this);
     std::cout << ")";
-    this->visit(statement.get());
+    statement->accept(*this);
 }
 
 void Printer::visit(DoWhileStatement* node) {
-    auto statement = node->get_statement();
-    auto expression = node->get_expression();
+    const auto& statement = node->get_statement();
+    const auto& expression = node->get_expression();
     std::cout<<"do ";
-    this->visit(statement.get());
+    statement->accept(*this);
     std::cout<<"while (";
-    this->visit(expression.get());
+    expression->accept(*this);
     std::cout<<");";
 }
 
 void Printer::visit(ForStatement* node) {
-    auto var_decl = node->get_var();
-    auto expr = node->get_init_expr();
-    auto cond_expr = node->get_cond_expr();
-    auto iter_expr = node->get_iter_expr();
-    auto statement = node->get_statement();
+    const auto& var_decl = node->get_var();
+    const auto& expr = node->get_init_expr();
+    const auto& cond_expr = node->get_cond_expr();
+    const auto& iter_expr = node->get_iter_expr();
+    const auto& statement = node->get_statement();
     std::cout << "for (";
     if (var_decl != nullptr) {
-        this->visit(var_decl.get());
+        var_decl->accept(*this);
     } else {
-        this->visit(expr.get());
+        expr->accept(*this);
     }
-    this->visit(cond_expr.get());
+    cond_expr->accept(*this);
     std::cout << ";";
-    this->visit(iter_expr.get());
+    iter_expr->accept(*this);
     std::cout << ")";
-    this->visit(statement.get());
+    statement->accept(*this);
 }
 
 void Printer::visit(EmptyStatement* node){

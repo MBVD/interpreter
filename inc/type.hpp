@@ -71,12 +71,12 @@ class Composite : public Type {
 // Тип функции
 class FuncType : public Composite {
 public:
-    FuncType(Type, std::vector<Type>);
-    Type get_returnable_type() const;
-    std::vector<Type> get_args() const;
+    FuncType(std::shared_ptr<Type>, std::vector<std::shared_ptr<Type>>);
+    std::shared_ptr<Type> get_returnable_type() const;
+    std::vector<std::shared_ptr<Type>> get_args() const;
 private:
-    Type returnable_type;
-    std::vector<Type> args;
+    std::shared_ptr<Type> returnable_type;
+    std::vector<std::shared_ptr<Type>> args;
 };
 
 // Тип записи
@@ -86,10 +86,10 @@ class Record : public Composite {
 // Все типы записей
 class StructType : public Record {
 public:
-    explicit StructType(const std::unordered_map<std::string, Type>);
-    std::unordered_map<std::string, Type> get_members() const;
+    explicit StructType(const std::unordered_map<std::string, std::shared_ptr<Type>>);
+    std::unordered_map<std::string, std::shared_ptr<Type>> get_members() const;
 private:
-    std::unordered_map<std::string, Type> members;
+    std::unordered_map<std::string, std::shared_ptr<Type>> members;
 };
 
 class ClassType : public Record {
@@ -105,12 +105,12 @@ class EnumType : public Composite {
 // Указатели
 class PointerType : public Composite {
 public:
-    explicit PointerType(Type* base);
-    Type* get_base() const;
+    explicit PointerType(std::shared_ptr<Type> base);
+    std::shared_ptr<Type> get_base() const;
     int get_star_count();
-    Type get_type_by_star_count(int x);
+    std::shared_ptr<Type> get_type_by_star_count(int x);
 private:
-    Type* base;
+    std::shared_ptr<Type> base;
 };
 
 // Ссылки
@@ -130,3 +130,5 @@ public:
 private:
     int size;
 };
+
+std::shared_ptr<Type> compare_types(std::shared_ptr<Type> left, std::shared_ptr<Type>right);

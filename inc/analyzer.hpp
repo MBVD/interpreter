@@ -9,7 +9,7 @@ public:
     Analyzer();
     void analyze(TranslationUnit &);
 private:
-    static std::unordered_map<std::string, Type> default_types;
+    static std::unordered_map<std::string, std::shared_ptr<Type>> default_types;
     void visit(ASTNode* ) final;
     void visit(Declarator*) final;
     void visit(VarDeclarator*) final;
@@ -49,7 +49,7 @@ private:
     void visit(ForStatement*) final;
     void visit(EmptyStatement*) final;
 
-    Type get_type(Token);
+    std::shared_ptr<Type> get_type(Token);
     std::shared_ptr<Scope> scope;
-    Type current_type;
+    std::shared_ptr<Type> current_type;
 };

@@ -37,20 +37,14 @@ Parser::decl_ptr Parser::parse_declaration() {
     auto decl_index = index;
     try {
         return parse_var_declaration();
-    } catch (parse_var_decl_error&) {
-        std::cout<<"failed to parse var_decl \n";
-    }
+    } catch (parse_var_decl_error&) {}
     try {
         return parse_func_declaration();
-    } catch (parse_func_decl_error&){
-        std::cout<<"failed to parse func_decl \n";
-    }
+    } catch (parse_func_decl_error&){}
 
     try {
         return parse_struct_declaration();
-    } catch (parse_struct_decl_error&){
-        std::cout<<"failed to parse struct";
-    }
+    } catch (parse_struct_decl_error&){}
     throw declaration_parsing_error("no decalarations");
 }
 

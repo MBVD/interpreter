@@ -3,18 +3,18 @@
 #include "type.hpp"
 #include <memory>
 
-std::unordered_map<std::string, Type> Analyzer::default_types = {
-    {"int", IntegerType()},
-    {"double", FloatType()},
-    {"float", FloatType()},
-    {"char", CharType()}
+std::unordered_map<std::string, std::shared_ptr<Type>> Analyzer::default_types = {
+    {"int", std::make_shared<IntegerType>()},
+    {"double", std::make_shared<FloatType>()},
+    {"float", std::make_shared<FloatType>()},
+    {"char", std::make_shared<CharType>()}
 };
 
-Analyzer::Analyzer() : scope(nullptr) {}
+Analyzer::Analyzer() : scope(std::make_shared<Scope>(nullptr)) {}
 
 void Analyzer::analyze(TranslationUnit & unit){
-    for (auto& i : unit.get_nodes()){
-        this->visit(i.get());
+    for (const auto& i : unit.get_nodes()){
+        i->accept(*this);
     }
 }
 
@@ -28,34 +28,34 @@ void Analyzer::visit(Declarator* node){
 
 void Analyzer::visit(VarDeclarator* node){
     auto type = node->get_type();
-    auto declarations = node->get_init_declarators();
+    const auto& declarations = node->get_init_declarators();
     if (type.type == TokenType::ID){
         // значит может быть какой то сложной фигней
         // значит если нет его в нашей таблице видимости значит ошиька семанитики. нет такого типа данных
-        for (auto& init_declorator : declarations){
+        for (const auto& init_declorator : declarations){
             current_type = scope->match_struct(type.value); // вернет либо обьект либо экспешн что такой структуры нет
-            this->visit(init_declorator.get());
+            init_declorator->accept(*this);
         }
     }
     if (type.type == TokenType::TYPE){
         // дефолтный типы по типу int char и тд
-        for (auto& init_declorator : declarations){
+        for (const auto& init_declorator : declarations){
             auto current_type = default_types.at(type.value);
-            this->visit(init_declorator.get());
+            init_declorator->accept(*this);
         }
     }
 }
 
 void Analyzer::visit(InitDeclarator* node) {
-    auto id_declarator = node->get_declarator();
-    auto expression = node->get_expression();
+    const auto& id_declarator = node->get_declarator();
+    const auto& expression = node->get_expression();
     if (expression != nullptr){
-        this->visit(expression.get()); // проходимся по expression и проверяем является ли он типом который может конвертироваться в нашу структуру
+        expression->accept(*this); // проходимся по expression и проверяем является ли он типом который может конвертироваться в нашу структуру
         // TODO нужно сделать метод который ищет какой scope для нашей структуры и там находить func - конструктор с таким параметром
         // if (typeid(current_type) == typeid(struct_type)) // пока так, потом будем проверять есть ли конструктор
     }
-    auto  expression_type = current_type;   
-    this->visit(id_declarator.get());
+    auto expression_type = current_type;   
+    id_declarator->accept(*this);
 }
 
 void Analyzer::visit(IdDeclorator* node){
@@ -81,39 +81,41 @@ void Analyzer::visit(FuncDeclarator* node){
     auto returnable_type_token = node->get_returnable_type();
     auto name = node->get_name().value;
     auto default_type = get_type(returnable_type_token);
-    auto args = node->get_params();
-    auto block = node->get_block();
-    std::vector<Type> type_args;
-    scope = scope->create_new_table(scope, std::move(block));
-    for (auto& i : args){
-        this->visit(i.get()); // поверяем являются ли они в зоне видимости
+    const auto& args = node->get_params();
+    const auto& block = node->get_block();
+    std::vector<std::shared_ptr<Type>> type_args;
+    scope = scope->create_new_table(scope);
+    for (const auto& i : args){
+        i->accept(*this); // поверяем являются ли они в зоне видимости
         type_args.push_back(current_type);
         scope-> push_variable(i->get_type().value, current_type);
     }
-    auto func = FuncType(default_type, type_args);
+    auto func = std::make_shared<FuncType>(default_type, type_args);
     scope->push_func(name, func);
-    this->visit(block.get()); // заходим в наш блок
+    block->accept(*this); // заходим в наш блок
     scope = scope->get_prev_table();
     current_type = func;
 }
 
 void Analyzer::visit(ParamDeclarator* node) {
     auto type = node->get_type();
-    auto init_declarator = node->get_declorator();
+    const auto& init_declarator = node->get_declorator();
     current_type = get_type(type);
-    this->visit(init_declarator.get());
+    init_declarator->accept(*this);
 }
 
 void Analyzer::visit(StructDeclarator* node) {
     auto id = node->get_id();
-    auto vars = node->get_vars();
-    std::unordered_map<std::string, Type> struct_vars;
-    for (auto& var : vars){
-        this->visit(var.get());
+    const auto& vars = node->get_vars();
+    std::unordered_map<std::string, std::shared_ptr<Type>> struct_vars;
+    scope = scope->create_new_table(scope);
+    for (const auto& var : vars){
+        var->accept(*this);
         auto name = var->get_type().value;
         struct_vars[name] = current_type;
     }
-    auto str = StructType(struct_vars);
+    scope = scope->get_prev_table();
+    auto str = std::make_shared<StructType>(struct_vars);
     scope->push_struct(id.value, str);
     current_type = str;
 }
@@ -123,119 +125,119 @@ void Analyzer::visit(Expression* node) {
 }
 
 void Analyzer::visit(ComparisonExpression* node){
-    auto left = node->get_left();
-    auto right = node->get_right();
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
     auto op = node->get_op();
-    this->visit(left.get());
+    left->accept(*this);
     auto left_type = current_type;
-    this->visit(right.get());
+    right->accept(*this);
     auto right_type = current_type;
-    if (dynamic_cast<StructType*>(&left_type)){
+    if (dynamic_cast<StructType*>(left_type.get())){
         // найти оператор сравнения для него 
         // либо конвертацию
     }
-    if (dynamic_cast<StructType*>(&right_type)){
+    if (dynamic_cast<StructType*>(right_type.get())){
         // 
     }
 
-    if (dynamic_cast<Arithmetic*>(&left_type) && dynamic_cast<Arithmetic*>(&right_type)) {
-        current_type = BoolType();
+    if (dynamic_cast<Arithmetic*>(left_type.get()) && dynamic_cast<Arithmetic*>(right_type.get())) {
+        current_type = std::make_shared<BoolType>();
     } else {
         throw std::runtime_error("error ");
     }
 }
 
 void Analyzer::visit(TernaryExpression* node) {
-    auto cond_expr = node->get_cond_expression();
-    auto true_expr = node->get_true_expression();
-    auto false_expr = node->get_false_expression();
-    this->visit(cond_expr.get());
+    const auto& cond_expr = node->get_cond_expression();
+    const auto& true_expr = node->get_true_expression();
+    const auto& false_expr = node->get_false_expression();
+    cond_expr->accept(*this);
     auto cond_type = current_type;
-    this->visit(true_expr.get());
+    true_expr->accept(*this);
     auto true_expr_type = current_type;
-    this->visit(false_expr.get());
+    false_expr->accept(*this);   
     auto false_expr_type = current_type;
-    if (!dynamic_cast<BoolType*>(&cond_type)) {
+    if (!dynamic_cast<BoolType*>(cond_type.get())) {
         throw std::runtime_error("error in checking cond expression");
     }
 
-    if (dynamic_cast<Composite*>(&true_expr_type)) {
+    if (dynamic_cast<Composite*>(true_expr_type.get())) {
         // 
     }
-    if (dynamic_cast<Composite*>(&false_expr_type)){
+    if (dynamic_cast<Composite*>(false_expr_type.get())){
         //
     }
 
-    if(dynamic_cast<decltype(true_expr_type)*>(&false_expr_type)) { // значит тип правый конвертируется в левый тип
+    if(dynamic_cast<decltype(true_expr_type)*>(false_expr_type.get())) { // значит тип правый конвертируется в левый тип
         current_type = true_expr_type;
     }
     throw std::runtime_error("hello kitty");
 }
 
 void Analyzer::visit(BinaryExpression* node) {
-    auto left = node->get_left();
-    auto right = node->get_right();
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
     auto op = node->get_op();
-    this->visit(left.get());
+    left->accept(*this);
     auto left_type = current_type;
-    this->visit(right.get());
+    right->accept(*this);
     auto right_type = current_type;
 
-    if (dynamic_cast<Composite*>(&left_type)) {
+    if (dynamic_cast<Composite*>(left_type.get())) {
         //
     }
-    if (dynamic_cast<Composite*>(&right_type)) {
+    if (dynamic_cast<Composite*>(right_type.get())) {
         //
     }
-    if (dynamic_cast<Arithmetic*>(&left_type) && dynamic_cast<Arithmetic*>(&right_type)) {
-        current_type = left_type;
+    if (dynamic_cast<Arithmetic*>(left_type.get()) && dynamic_cast<Arithmetic*>(right_type.get())) {
+        current_type = compare_types(left_type, right_type);
     }
     throw std::runtime_error("hello kerropi");
 }
 
 void Analyzer::visit(UnaryExpression* node) {// ++ -- (int) 
-    auto base = node->get_base();
+    const auto& base = node->get_base();
     auto op = node->get_op();
     base->accept(*this);
     auto base_type = current_type;
     switch(op.type) {
         case TokenType::INCREMENT : {
-            if (dynamic_cast<Arithmetic*>(&base_type)) {
+            if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
             } else {
                 throw std::runtime_error("hello kerropi");
             }
         } break;
         case TokenType::DECREMENT : {
-            if (dynamic_cast<Arithmetic*>(&base_type)) {
+            if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
             } else {
                 throw std::runtime_error("hello kerropi");
             }
         } break;
         case TokenType::PLUS : {
-            if (dynamic_cast<Arithmetic*>(&base_type)) {
+            if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
             } else {
                 throw std::runtime_error("hello kerropi");
             }
         } break;
         case TokenType::MINUS : {
-            if (dynamic_cast<Arithmetic*>(&base_type)) {
+            if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
             } else {
                 throw std::runtime_error("hello kerropi");
             }
         } break;
         case TokenType::TYPE : {
-            if (dynamic_cast<Arithmetic*>(&base_type)) {
+            if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = default_types.at(op.value);
             } else {
                 throw std::runtime_error("hello kerropi");
             }
         }
         case TokenType::BIT_NOT : {
-            if (!dynamic_cast<Arithmetic*>(&base_type)) {
+            if (!dynamic_cast<Arithmetic*>(base_type.get())) {
                 throw std::runtime_error("hello kerropi");
             }
         } break;
@@ -243,31 +245,31 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
 }
 
 void Analyzer::visit(PostfixExpression* node) {
-    auto expression = node-> get_expression();
+    const auto& expression = node-> get_expression();
     auto op = node->get_op(); // ну тут может быть только ++ или --
-    this->visit(expression.get());
+    expression->accept(*this);
     auto expression_type = current_type;
-    if (!dynamic_cast<Arithmetic*>(&expression_type)) {
+    if (!dynamic_cast<Arithmetic*>(expression_type.get())) {
         throw std::runtime_error("hello melodi");
     }
 }
 
 void Analyzer::visit(SubscriptExpression* node) {// []
-    auto expression = node->get_expression();
-    auto indexes = node->get_indexes();
+    const auto& expression = node->get_expression();
+    const auto& indexes = node->get_indexes();
     auto op = node->get_op();
-    this->visit(expression.get());
+    expression->accept(*this);  
     auto expression_type = current_type;
-    if (dynamic_cast<StructType*>(&expression_type)) {
+    if (dynamic_cast<StructType*>(expression_type.get())) {
         // ищем оператор []
     }
-    for (auto& i : indexes){
-        this->visit(i.get());
-        if (!dynamic_cast<IntegerType*>(&current_type)){
+    for (const auto& i : indexes){
+        i->accept(*this);
+        if (!dynamic_cast<IntegerType*>(current_type.get())){
             throw std::runtime_error("hello maru");
         }
     }
-    auto* pointer = dynamic_cast<PointerType*>(&expression_type);
+    auto* pointer = dynamic_cast<PointerType*>(expression_type.get());
     if (!pointer) {
         throw std::runtime_error("hello maru");    
     }
@@ -278,15 +280,15 @@ void Analyzer::visit(SubscriptExpression* node) {// []
 }
 
 void Analyzer::visit(CallExpression* node) { // (
-    auto expression = node->get_expression();
+    const auto& expression = node->get_expression();
     auto op = node->get_op();
-    auto args = node->get_args();
-    this->visit(expression.get());
+    const auto& args = node->get_args();
+    expression->accept(*this);
     auto expression_type = current_type;
-    if (dynamic_cast<StructType*>(&expression_type)) {
+    if (dynamic_cast<StructType*>(expression_type.get())) {
         //
     }
-    auto* expression_func = dynamic_cast<FuncType*>(&expression_type);
+    auto* expression_func = dynamic_cast<FuncType*>(expression_type.get());
     if (!expression_func) {
         throw std::runtime_error("hello there");
     }
@@ -294,20 +296,20 @@ void Analyzer::visit(CallExpression* node) { // (
 }
 
 void Analyzer::visit(AccessExpression* node) { // ->
-    auto expression = node->get_expression();
+    const auto& expression = node->get_expression();
     auto member_token = node->get_member();
 
-    this->visit(expression.get());
-    Type expression_type = current_type;
+    expression->accept(*this);
+    auto expression_type = current_type;
 
     // Check if the left-hand side is a pointer to a struct
-    if (auto pointer_type = dynamic_cast<PointerType*>(&expression_type)) {
-        Type* base_type = pointer_type->get_base();
+    if (auto pointer_type = dynamic_cast<PointerType*>(expression_type.get())) {
+        auto base_type = pointer_type->get_base();
         if (!base_type) {
             throw std::runtime_error("Error: Pointer dereference of incomplete type.");
         }
 
-        if (auto struct_type = dynamic_cast<StructType*>(base_type)) {
+        if (auto struct_type = dynamic_cast<StructType*>(base_type.get())) {
             auto members = struct_type->get_members();
             auto member_name = member_token.value;
 
@@ -321,7 +323,7 @@ void Analyzer::visit(AccessExpression* node) { // ->
             throw std::runtime_error("Error: Member access on non-struct type.");
         }
     }
-     else if (auto struct_type = dynamic_cast<StructType*>(&expression_type)) {
+     else if (auto struct_type = dynamic_cast<StructType*>(expression_type.get())) {
             auto members = struct_type->get_members();
             auto member_name = member_token.value;
 
@@ -338,15 +340,15 @@ void Analyzer::visit(AccessExpression* node) { // ->
 }
 
 void Analyzer::visit(LiteralNumExpression* node) {
-    current_type = IntegerType();
+    current_type = std::make_shared<IntegerType>();
 }
 
 void Analyzer::visit(LiteralFloatExpression* node) {
-    current_type = FloatType();
+    current_type = std::make_shared<FloatType>();
 }
 
 void Analyzer::visit(LiteralCharExpression* node) {
-    current_type = CharType();
+    current_type = std::make_shared<CharType>();
 }
 
 void Analyzer::visit(LiteralStringExpression* node) {
@@ -354,14 +356,11 @@ void Analyzer::visit(LiteralStringExpression* node) {
 }
 
 void Analyzer::visit(IDexpression* node) {
-    try {
-        current_type = scope->match_function(node->get_token().value, std::vector<Type>{});
-    } catch (...) {}
     current_type = scope->match_variable(node->get_token().value);
 }
 
 void Analyzer::visit(GroupExpression* node) {
-    this->visit(node->get_base().get());
+    node->get_base()->accept(*this);
 }
 
 void Analyzer::visit(Statement* node) {
@@ -369,22 +368,22 @@ void Analyzer::visit(Statement* node) {
 }
 
 void Analyzer::visit(BlockStatement* node) {
-    for (auto& s : node->get_statements())
-        this->visit(s.get());
+    for (const auto& s : node->get_statements())
+        s->accept(*this);
     scope = scope->get_prev_table();
 }
 
 void Analyzer::visit(DeclarationStatement* node) {
-    this->visit(node->get_declaration().get());
+    node->get_declaration()->accept(*this);
 }
 
 void Analyzer::visit(ExpressionStatement* node) {
-    this->visit(node->get_expression().get());
+    node->get_expression()->accept(*this);            
 }
 
 void Analyzer::visit(ConditionalStatement* node) {
-    this->visit(node->get_conditional().get());
-    this->visit(node->get_true_statement().get());
+    node->get_conditional()->accept(*this);
+    node->get_true_statement()->accept(*this);
     if (node->get_false_statement())
         node->get_false_statement()->accept(*this);
 }
@@ -434,7 +433,7 @@ void Analyzer::visit(EmptyStatement* node) {
 }
 
 
-Type Analyzer::get_type(Token token){
+std::shared_ptr<Type> Analyzer::get_type(Token token){
     if (token == TokenType::ID){
         return scope->match_struct(token.value);
     } else {

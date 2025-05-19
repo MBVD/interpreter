@@ -9,8 +9,8 @@ public:
     BinaryExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right);
     void accept(Visitor& visitor) override;
     Token get_op();
-    std::unique_ptr<Expression> get_left();
-    std::unique_ptr<Expression> get_right();
+    const std::unique_ptr<Expression>& get_left();
+    const std::unique_ptr<Expression>& get_right();
 private:
     Token op;
     std::unique_ptr<Expression> left;
@@ -35,9 +35,9 @@ public:
                         std::unique_ptr<Expression> true_expression,
                         std::unique_ptr<Expression> false_expression);
     void accept(Visitor& visitor) override;
-    std::unique_ptr<Expression> get_cond_expression();
-    std::unique_ptr<Expression> get_true_expression();
-    std::unique_ptr<Expression> get_false_expression();
+    const std::unique_ptr<Expression>& get_cond_expression();
+    const std::unique_ptr<Expression>& get_true_expression();
+    const std::unique_ptr<Expression>& get_false_expression();
 private:
     std::unique_ptr<Expression> cond_expression;
     std::unique_ptr<Expression> true_expression;
@@ -93,7 +93,7 @@ public:
     UnaryExpression(std::unique_ptr<Expression> base, const Token& op);
     void accept(Visitor& visitor) override;
     Token get_op();
-    std::unique_ptr<Expression> get_base();
+    const std::unique_ptr<Expression>& get_base();
 private:
     std::unique_ptr<Expression> base;
     Token op; // unary op or cast
@@ -104,7 +104,7 @@ public:
     PostfixExpression(std::unique_ptr<Expression> expression, const Token& op);
     virtual void accept(Visitor& visitor) override;
     Token get_op();
-    std::unique_ptr<Expression> get_expression();
+    const std::unique_ptr<Expression>& get_expression();
 private:
     std::unique_ptr<Expression> expression;
     Token op;
@@ -115,7 +115,7 @@ public:
     SubscriptExpression(std::unique_ptr<Expression> expression,
                         std::vector<std::unique_ptr<Expression>> indexes);
     void accept(Visitor& visitor) override;
-    std::vector<std::unique_ptr<Expression>> get_indexes();
+    const std::vector<std::unique_ptr<Expression>>& get_indexes();
 private:
     std::vector<std::unique_ptr<Expression>> indexes;
 };
@@ -125,7 +125,7 @@ public:
     CallExpression(std::unique_ptr<Expression> expression,
                    std::vector<std::unique_ptr<Expression>> args);
     void accept(Visitor& visitor) override;
-    std::vector<std::unique_ptr<Expression>> get_args();
+    const std::vector<std::unique_ptr<Expression>>& get_args();
 private:
     std::vector<std::unique_ptr<Expression>> args;
 };
@@ -189,7 +189,7 @@ class GroupExpression : public Expression {
 public:
     GroupExpression(std::unique_ptr<Expression> base);
     void accept(Visitor& visitor) override;
-    std::unique_ptr<Expression> get_base();
+    const std::unique_ptr<Expression>& get_base();
 private:
     std::unique_ptr<Expression> base;
 };

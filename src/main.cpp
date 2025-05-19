@@ -3,6 +3,7 @@
 #include "token.hpp"
 #include "parser.hpp"
 #include "printer.hpp"
+#include "analyzer.hpp"
 
 // void test_binary_expression_printer() {
 //     Token left_token(TokenType::LITERAL_NUM, "5");
@@ -51,4 +52,6 @@ int main(){
     std::cout<<"successed parse \n";
     Printer printer;
     printer.print(unit);
+    Analyzer analyzer;
+    analyzer.analyze(unit);
 }

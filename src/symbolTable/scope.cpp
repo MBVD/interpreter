@@ -1,53 +1,55 @@
 #include <unordered_map>
+#include <iostream>
 #include <set>
 #include "scope.hpp"
 #include "memory"
 
-Scope::Scope(std::unique_ptr<ASTNode> node) : 
-    node(std::move(node)) {}
+Scope::Scope(std::shared_ptr<Scope> prev_table  = nullptr) : 
+    prev_table(prev_table) {}
 
 std::shared_ptr<Scope> Scope::get_prev_table() {
     return this->prev_table;
 }
 
-std::shared_ptr<Scope> Scope::create_new_table(std::shared_ptr<Scope> prev_scope, std::unique_ptr<ASTNode> node) {
-    prev_scope = prev_scope;
-    auto scope = std::make_shared<Scope>(std::move(node));
+std::shared_ptr<Scope> Scope::create_new_table(std::shared_ptr<Scope> prev_scope) {
+    auto scope = std::make_shared<Scope>(prev_scope);
     return scope;
 }   
 
-Type Scope::match_variable(std::string name) {
+std::shared_ptr<Type> Scope::match_variable(std::string name) {
     if (variables.find(name) != variables.end()){
         return variables.at(name);
+    }
+    if (prev_table == nullptr){
+        throw std::runtime_error("Variable '" + name + "' not found in scope.");
     }
     return this->prev_table->match_variable(name); // возвращаем из старшей области видимости
 }
 
-StructType Scope::match_struct(std::string name){
+std::shared_ptr<StructType> Scope::match_struct(std::string name){
     if (structs.find(name) != structs.end()){
         return structs.at(name);
     }
     if (prev_table == nullptr){
-        throw; //some expression not found struct
+        throw std::runtime_error("Struct '" + name + "' not found in scope."); //some expression not found struct
     }
     return prev_table->match_struct(name);
 }
 
-FuncType Scope::match_function(std::string name, std::vector<Type> args){
+std::shared_ptr<FuncType> Scope::match_function(std::string name, std::vector<std::shared_ptr<Type>> args){
     auto range = functions.equal_range(name);
-    std::vector<FuncType> matched_functions;
+    std::vector<std::shared_ptr<FuncType>> matched_functions;
     for (auto i = range.first; i != range.second; ++i){
         matched_functions.push_back(i->second); // собрали все функции с этим именем
     }
     for (auto& func : matched_functions){
-        auto func_args = func.get_args();
+        auto func_args = func->get_args();
         if (func_args.size() != args.size()){
             continue;
         }
         bool match = true;
-        for (size_t j = 0; j < args.size(); ++j) {
-            // TODO: Implement a proper type comparison (including inheritance and conversions)
-            if (typeid(args[j]) != typeid(func_args[j])) {
+        for (int j = 0; j < args.size(); ++j) {
+            if (typeid(*args[j]) != typeid(*func_args[j])) {
                 match = false; // Если типы не совпадают, функция не подходит
                 break;
             }
@@ -64,14 +66,14 @@ FuncType Scope::match_function(std::string name, std::vector<Type> args){
     return prev_table->match_function(name, args);
 }
 
-void Scope::push_variable(std::string name, Type var) {
+void Scope::push_variable(std::string name, std::shared_ptr<Type> var) {
     variables.insert({name, var});
 }
 
-void Scope::push_struct(std::string name, StructType structure){
+void Scope::push_struct(std::string name, std::shared_ptr<StructType> structure){
     structs.insert({name, structure});
 }
 
-void Scope::push_func(std::string name, FuncType func) {
+void Scope::push_func(std::string name, std::shared_ptr<FuncType> func) {
     functions.insert({name, func});
 }

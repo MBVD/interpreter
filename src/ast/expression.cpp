@@ -13,12 +13,12 @@ Token BinaryExpression::get_op(){
     return this->op;
 }
 
-std::unique_ptr<Expression> BinaryExpression::get_left() {
-    return std::move(this->left);
+const std::unique_ptr<Expression>& BinaryExpression::get_left() {
+    return this->left;
 }
 
-std::unique_ptr<Expression> BinaryExpression::get_right() {
-    return std::move(this->right);
+const std::unique_ptr<Expression>& BinaryExpression::get_right() {
+    return this->right;
 }
 
 //CommaExpression
@@ -49,16 +49,16 @@ void TernaryExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-std::unique_ptr<Expression> TernaryExpression::get_cond_expression(){
-    return std::move(this->cond_expression);
+const std::unique_ptr<Expression>& TernaryExpression::get_cond_expression(){
+    return this->cond_expression;
 }
 
-std::unique_ptr<Expression> TernaryExpression::get_true_expression(){
-    return std::move(this->true_expression);
+const std::unique_ptr<Expression>& TernaryExpression::get_true_expression(){
+    return this->true_expression;
 }
 
-std::unique_ptr<Expression> TernaryExpression::get_false_expression(){
-    return std::move(this->false_expression);
+const std::unique_ptr<Expression>& TernaryExpression::get_false_expression(){
+    return this->false_expression;
 }
 
 LogicalOrExpression::LogicalOrExpression(std::unique_ptr<Expression> left, Token op, std::unique_ptr<Expression> right) : BinaryExpression(std::move(left), op, std::move(right)){}
@@ -106,8 +106,8 @@ void UnaryExpression::accept(Visitor& visitor) {
 Token UnaryExpression::get_op(){
     return this->op;
 }
-std::unique_ptr<Expression> UnaryExpression::get_base(){
-    return std::move(this->base);
+const std::unique_ptr<Expression>& UnaryExpression::get_base(){
+    return this->base;
 }
 
 // PostfixExpression
@@ -121,8 +121,8 @@ void PostfixExpression::accept(Visitor& visitor) {
 Token PostfixExpression::get_op(){
     return this->op;
 }
-std::unique_ptr<Expression> PostfixExpression::get_expression(){
-    return std::move(this->expression);
+const std::unique_ptr<Expression>& PostfixExpression::get_expression(){
+    return this->expression;
 }
 
 // SubscriptExpression
@@ -134,8 +134,8 @@ void SubscriptExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-std::vector<std::unique_ptr<Expression>> SubscriptExpression::get_indexes(){
-    return std::move(this->indexes);
+const std::vector<std::unique_ptr<Expression>>& SubscriptExpression::get_indexes(){
+    return this->indexes;
 }
 
 // CallExpression
@@ -147,8 +147,8 @@ void CallExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-std::vector<std::unique_ptr<Expression>> CallExpression::get_args(){
-    return std::move(this->args);
+const std::vector<std::unique_ptr<Expression>>& CallExpression::get_args(){
+    return this->args;
 }
 
 // AccessExpression
@@ -172,8 +172,8 @@ void GroupExpression::accept(Visitor& visitor) {
     visitor.visit(this);
 }
 
-std::unique_ptr<Expression> GroupExpression::get_base(){
-    return std::move(this->base);
+const std::unique_ptr<Expression>& GroupExpression::get_base(){
+    return this->base;
 }
 
 // LiteralNumExpression
