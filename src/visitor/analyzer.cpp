@@ -88,12 +88,13 @@ void Analyzer::visit(FuncDeclarator* node){
     for (const auto& i : args){
         i->accept(*this); // поверяем являются ли они в зоне видимости
         type_args.push_back(current_type);
-        scope-> push_variable(i->get_type().value, current_type);
+        scope->push_variable(i->get_type().value, current_type);
     }
     auto func = std::make_shared<FuncType>(default_type, type_args);
     scope->push_func(name, func);
     block->accept(*this); // заходим в наш блок
     scope = scope->get_prev_table();
+    scope->push_func(name, func);
     current_type = func;
 }
 
@@ -300,13 +301,30 @@ void Analyzer::visit(CallExpression* node) { // (
     expression->accept(*this);
     auto expression_type = current_type;
     if (dynamic_cast<StructType*>(expression_type.get())) {
-        //
+        // найти оператор ()
     }
     auto* expression_func = dynamic_cast<FuncType*>(expression_type.get());
     if (!expression_func) {
         throw std::runtime_error("hello there");
     }
     auto expr_func_args = expression_func->get_args();
+    for (auto function : matched_functions) {
+        auto func_args = function->get_args();
+        if (func_args.size() != args.size()) {
+            throw std::runtime_error("hello there");
+        }
+        for (int i = 0; i < args.size(); ++i) {
+            args[i]->accept(*this);
+            auto arg_type = current_type;
+            if (dynamic_cast<StructType*>(arg_type.get()) || dynamic_cast<StructType*>(args[i].get())) {
+                // запара по идее
+                throw std::runtime_error("call from struct");
+            }
+            if (!dynamic_cast<decltype(func_args[i].get())>(arg_type.get())) { // если не конвертируется типы
+                throw std::runtime_error("hello there");
+            }
+        }
+    }
 }
 
 void Analyzer::visit(AccessExpression* node) { // ->
@@ -370,7 +388,12 @@ void Analyzer::visit(LiteralStringExpression* node) {
 }
 
 void Analyzer::visit(IDexpression* node) {
-    current_type = scope->match_variable(node->get_token().value);
+    try {
+        current_type = scope->match_variable(node->get_token().value);
+    } catch (...) {
+        matched_functions = scope->match_functions(node->get_token().value);
+        current_type = matched_functions[0];
+    }
 }
 
 void Analyzer::visit(GroupExpression* node) {
@@ -384,7 +407,6 @@ void Analyzer::visit(Statement* node) {
 void Analyzer::visit(BlockStatement* node) {
     for (const auto& s : node->get_statements())
         s->accept(*this);
-    scope = scope->get_prev_table();
 }
 
 void Analyzer::visit(DeclarationStatement* node) {

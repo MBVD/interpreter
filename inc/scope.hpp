@@ -17,7 +17,7 @@ public:
     
     std::shared_ptr<Type> match_variable(std::string);
     std::shared_ptr<StructType> match_struct(std::string);
-    std::shared_ptr<FuncType> match_function(std::string, std::vector<std::shared_ptr<Type>>);
+    std::vector<std::shared_ptr<FuncType>> match_functions(std::string);
     
     void push_variable(std::string, std::shared_ptr<Type>);
     void push_struct(std::string, std::shared_ptr<StructType>);

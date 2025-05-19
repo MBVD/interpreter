@@ -52,4 +52,5 @@ private:
     std::shared_ptr<Type> get_type(Token);
     std::shared_ptr<Scope> scope;
     std::shared_ptr<Type> current_type;
+    std::vector<std::shared_ptr<FuncType>> matched_functions;
 };
