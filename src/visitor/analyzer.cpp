@@ -12,6 +12,16 @@ std::unordered_map<std::string, std::shared_ptr<Type>> Analyzer::default_types =
 
 Analyzer::Analyzer() : scope(std::make_shared<Scope>(nullptr)) {}
 
+bool Analyzer::can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to) {
+    if (from == to) return true;
+
+    if (dynamic_cast<const IntegerType*>(to.get()) && dynamic_cast<const IntegerType*>(from.get())) return true;
+    if (dynamic_cast<const FloatType*>(to.get()) && dynamic_cast<const FloatType*>(from.get())) return true;
+    if (dynamic_cast<const CharType*>(to.get()) && dynamic_cast<const CharType*>(from.get())) return true;
+    if (dynamic_cast<const BoolType*>(to.get()) && dynamic_cast<const BoolType*>(from.get())) return true;
+    return false;
+}
+
 void Analyzer::analyze(TranslationUnit & unit){
     for (const auto& i : unit.get_nodes()){
         i->accept(*this);
@@ -50,7 +60,16 @@ void Analyzer::visit(InitDeclarator* node) {
     const auto& id_declarator = node->get_declarator();
     const auto& expression = node->get_expression();
     if (expression != nullptr){
-        expression->accept(*this); // проходимся по expression и проверяем является ли он типом который может конвертироваться в нашу структуру
+        id_declarator->accept(*this);
+        auto id_decl_type = current_type;
+        expression->accept(*this); 
+        auto expression_type = current_type;
+        if (dynamic_cast<Arithmetic*>(id_decl_type.get()) && dynamic_cast<Arithmetic*>(expression_type.get())) {
+            current_type = id_decl_type;
+        } else {
+            throw std::runtime_error("not tknown conv");
+        }
+        // проходимся по expression и проверяем является ли он типом который может конвертироваться в нашу структуру
         // TODO нужно сделать метод который ищет какой scope для нашей структуры и там находить func - конструктор с таким параметром
         // if (typeid(current_type) == typeid(struct_type)) // пока так, потом будем проверять есть ли конструктор
     }
@@ -120,13 +139,13 @@ void Analyzer::visit(StructDeclarator* node) {
         for (const auto& init_declorator : var->get_init_declarators()){
             init_declorator->accept(*this);
             auto name = init_declorator->get_declarator()->get_id().value;
-            struct_vars[name] = var_type;
+            struct_vars[name] = current_type;
         }
     }
     scope = scope->get_prev_table();
-    auto str = std::make_shared<StructType>(struct_vars);
-    scope->push_struct(id.value, str);
-    current_type = str;
+    auto struc = std::make_shared<StructType>(struct_vars);
+    scope->push_struct(id.value, struc);
+    current_type = struc;
 }
 
 void Analyzer::visit(Expression* node) {
@@ -177,7 +196,7 @@ void Analyzer::visit(TernaryExpression* node) {
         //
     }
 
-    if(dynamic_cast<decltype(true_expr_type)*>(false_expr_type.get())) { // значит тип правый конвертируется в левый тип
+    if(can_convert(true_expr_type, false_expr_type)) { // значит тип правый конвертируется в левый тип
         current_type = true_expr_type;
     }
     throw std::runtime_error("hello kitty");

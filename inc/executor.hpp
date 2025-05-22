@@ -5,13 +5,14 @@
 #include "expression.hpp"
 #include "statement.hpp"
 #include "symbolTable.hpp"
-#include "anyEvaluator.hpp"
 
 class Executor : public Visitor {
 public:
     Executor();
     void execute(TranslationUnit&);
-    void visit(ASTNode* ) final;
+
+private:
+void visit(ASTNode* ) final;
     void visit(Declarator*) final;
     void visit(VarDeclarator*) final;
     void visit(InitDeclarator*) final;
@@ -50,7 +51,10 @@ public:
     void visit(ForStatement*) final;
     void visit(EmptyStatement*) final;
 
-private:
+    std::shared_ptr<Type> get_default_type(std::string);
+
+    static std::unordered_map<std::string, std::shared_ptr<Arithmetic>> default_types_values;
     std::shared_ptr<SymbolTable> table;
-    std::string current_namespace;
+    std::shared_ptr<Type> current_value;
+
 };

@@ -49,6 +49,8 @@ private:
     void visit(ForStatement*) final;
     void visit(EmptyStatement*) final;
 
+    bool can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to);
+
     std::shared_ptr<Type> get_type(Token);
     std::shared_ptr<Scope> scope;
     std::shared_ptr<Type> current_type;

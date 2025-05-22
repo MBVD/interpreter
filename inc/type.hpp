@@ -37,21 +37,21 @@ public:
 // Все целочисленные типы
 class BoolType : public Integral {
 public:
-    explicit BoolType();
+    explicit BoolType(std::any);
 private:
     bool value;
 };
 
 class CharType : public Integral {
 public:
-    explicit CharType();
+    explicit CharType(std::any);
 private:
     char16_t value;
 };
 
 class IntegerType : public Integral {
 public:
-    explicit IntegerType();
+    explicit IntegerType(std::any);
 private:
     int8_t value;
 };
@@ -59,7 +59,7 @@ private:
 // Все типы с плавающей точкой
 class FloatType : public Arithmetic {
 public:
-    FloatType();
+    FloatType(std::any);
 private:
     double value;
 };

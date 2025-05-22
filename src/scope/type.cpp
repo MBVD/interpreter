@@ -34,19 +34,19 @@ std::shared_ptr<Type> compare_types(std::shared_ptr<Type> left, std::shared_ptr<
 }
 
 // Integral
-Integral::Integral(std::any value) : Arithmetic(value){}
+Integral::Integral(std::any value = 0) : Arithmetic(value){}
 
 // BoolType
-BoolType::BoolType() : Integral(0) {}
+BoolType::BoolType(std::any value = 0) : Integral(value) {}
 
 // CharType
-CharType::CharType() : Integral(0) {}
+CharType::CharType(std::any value = 0) : Integral(value) {}
 
 // IntegerType
-IntegerType::IntegerType() : Integral(value) {}
+IntegerType::IntegerType(std::any value = 0) : Integral(value) {}
 
 // FloatType
-FloatType::FloatType() : Arithmetic(value) {}
+FloatType::FloatType(std::any value = 0) : Arithmetic(value) {}
 
 // FuncType
 FuncType::FuncType(std::shared_ptr<Type> returnable_type, std::vector<std::shared_ptr<Type>> args) : returnable_type(returnable_type), args(args) {}
