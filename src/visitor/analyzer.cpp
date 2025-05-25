@@ -12,6 +12,15 @@ std::unordered_map<std::string, std::shared_ptr<Type>> Analyzer::default_types =
 
 Analyzer::Analyzer() : scope(std::make_shared<Scope>(nullptr)) {}
 
+bool Analyzer::can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to) {
+    if (from == to) return true;
+
+    if (dynamic_cast<Arithmetic*>(from.get()) && dynamic_cast<Arithmetic*>(to.get())) {
+        return true; // Arithmetic types can be converted to each other
+    }
+    return false;
+}
+
 void Analyzer::analyze(TranslationUnit & unit){
     for (const auto& i : unit.get_nodes()){
         i->accept(*this);
@@ -34,13 +43,14 @@ void Analyzer::visit(VarDeclarator* node){
         // значит если нет его в нашей таблице видимости значит ошиька семанитики. нет такого типа данных
         for (const auto& init_declorator : declarations){
             current_type = scope->match_struct(type.value); // вернет либо обьект либо экспешн что такой структуры нет
+            std::cout<< "current type: " << type << std::endl;
             init_declorator->accept(*this);
         }
     }
     if (type.type == TokenType::TYPE){
         // дефолтный типы по типу int char и тд
         for (const auto& init_declorator : declarations){
-            auto current_type = default_types.at(type.value);
+            current_type = default_types.at(type.value);
             init_declorator->accept(*this);
         }
     }
@@ -50,7 +60,16 @@ void Analyzer::visit(InitDeclarator* node) {
     const auto& id_declarator = node->get_declarator();
     const auto& expression = node->get_expression();
     if (expression != nullptr){
-        expression->accept(*this); // проходимся по expression и проверяем является ли он типом который может конвертироваться в нашу структуру
+        id_declarator->accept(*this);
+        auto id_decl_type = current_type;
+        expression->accept(*this);
+        auto expression_type = current_type;
+        if (can_convert(expression_type, id_decl_type)) {
+            current_type = id_decl_type;
+        } else {
+            throw std::runtime_error("not tknown conv");
+        }
+        // проходимся по expression и проверяем является ли он типом который может конвертироваться в нашу структуру
         // TODO нужно сделать метод который ищет какой scope для нашей структуры и там находить func - конструктор с таким параметром
         // if (typeid(current_type) == typeid(struct_type)) // пока так, потом будем проверять есть ли конструктор
     }
@@ -63,6 +82,7 @@ void Analyzer::visit(IdDeclorator* node){
     auto type = node->get_declorator_type();
     switch(type){
         case IDDeclaratorType::NONE : {
+            std::cout<<"name "<< name << std::endl;
             scope->push_variable(name, current_type);
         } break;
         case IDDeclaratorType::POINTER : {
@@ -93,7 +113,6 @@ void Analyzer::visit(FuncDeclarator* node){
     auto func = std::make_shared<FuncType>(default_type, type_args);
     scope->push_func(name, func);
     block->accept(*this); // заходим в наш блок
-    scope = scope->get_prev_table();
     scope->push_func(name, func);
     current_type = func;
 }
@@ -121,13 +140,13 @@ void Analyzer::visit(StructDeclarator* node) {
         for (const auto& init_declorator : var->get_init_declarators()){
             init_declorator->accept(*this);
             auto name = init_declorator->get_declarator()->get_id().value;
-            struct_vars[name] = var_type;
+            struct_vars[name] = current_type;
         }
     }
     scope = scope->get_prev_table();
-    auto str = std::make_shared<StructType>(struct_vars);
-    scope->push_struct(id.value, str);
-    current_type = str;
+    auto struc = std::make_shared<StructType>(struct_vars);
+    scope->push_struct(id.value, struc);
+    current_type = struc;
 }
 
 void Analyzer::visit(Expression* node) {
@@ -178,7 +197,7 @@ void Analyzer::visit(TernaryExpression* node) {
         //
     }
 
-    if(dynamic_cast<decltype(true_expr_type)*>(false_expr_type.get())) { // значит тип правый конвертируется в левый тип
+    if(can_convert(true_expr_type, false_expr_type)) { // значит тип правый конвертируется в левый тип
         current_type = true_expr_type;
     }
     throw std::runtime_error("hello kitty");
@@ -301,7 +320,7 @@ void Analyzer::visit(CallExpression* node) { // (
     expression->accept(*this);
     auto expression_type = current_type;
     if (dynamic_cast<StructType*>(expression_type.get())) {
-        // найти оператор ()
+        //
     }
     auto* expression_func = dynamic_cast<FuncType*>(expression_type.get());
     if (!expression_func) {
@@ -316,9 +335,9 @@ void Analyzer::visit(CallExpression* node) { // (
         for (int i = 0; i < args.size(); ++i) {
             args[i]->accept(*this);
             auto arg_type = current_type;
-            if (dynamic_cast<StructType*>(arg_type.get()) || dynamic_cast<StructType*>(args[i].get())) {
+            if (!can_convert(arg_type, func_args[i])) { // если конвертируется типы
                 // запара по идее
-                throw std::runtime_error("call from struct");
+                throw std::runtime_error("not known conv");
             }
             if (!dynamic_cast<decltype(func_args[i].get())>(arg_type.get())) { // если не конвертируется типы
                 throw std::runtime_error("hello there");
@@ -407,6 +426,7 @@ void Analyzer::visit(Statement* node) {
 void Analyzer::visit(BlockStatement* node) {
     for (const auto& s : node->get_statements())
         s->accept(*this);
+    scope = scope->get_prev_table();
 }
 
 void Analyzer::visit(DeclarationStatement* node) {
