@@ -36,34 +36,17 @@ std::shared_ptr<StructType> Scope::match_struct(std::string name){
     return prev_table->match_struct(name);
 }
 
-std::shared_ptr<FuncType> Scope::match_function(std::string name, std::vector<std::shared_ptr<Type>> args){
+std::vector<std::shared_ptr<FuncType>> Scope::match_functions(std::string name){
     auto range = functions.equal_range(name);
     std::vector<std::shared_ptr<FuncType>> matched_functions;
     for (auto i = range.first; i != range.second; ++i){
         matched_functions.push_back(i->second); // собрали все функции с этим именем
     }
-    for (auto& func : matched_functions){
-        auto func_args = func->get_args();
-        if (func_args.size() != args.size()){
-            continue;
-        }
-        bool match = true;
-        for (int j = 0; j < args.size(); ++j) {
-            if (typeid(*args[j]) != typeid(*func_args[j])) {
-                match = false; // Если типы не совпадают, функция не подходит
-                break;
-            }
-        }
-
-        if (match) {
-            return func; // Возвращаем первую подходящую функцию
-        }
-    }
-    if (prev_table == nullptr){
-        throw std::runtime_error("Function '" + name + "' with the specified arguments not found in scope.");
-    }
-    
-    return prev_table->match_function(name, args);
+    if (prev_table != nullptr) {
+        auto prev_funcs = prev_table->match_functions(name);
+        matched_functions.insert(matched_functions.end(), prev_funcs.begin(), prev_funcs.end());
+    } 
+    return matched_functions;
 }
 
 void Scope::push_variable(std::string name, std::shared_ptr<Type> var) {

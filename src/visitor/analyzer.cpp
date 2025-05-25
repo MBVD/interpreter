@@ -15,10 +15,9 @@ Analyzer::Analyzer() : scope(std::make_shared<Scope>(nullptr)) {}
 bool Analyzer::can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to) {
     if (from == to) return true;
 
-    if (dynamic_cast<const IntegerType*>(to.get()) && dynamic_cast<const IntegerType*>(from.get())) return true;
-    if (dynamic_cast<const FloatType*>(to.get()) && dynamic_cast<const FloatType*>(from.get())) return true;
-    if (dynamic_cast<const CharType*>(to.get()) && dynamic_cast<const CharType*>(from.get())) return true;
-    if (dynamic_cast<const BoolType*>(to.get()) && dynamic_cast<const BoolType*>(from.get())) return true;
+    if (dynamic_cast<Arithmetic*>(from.get()) && dynamic_cast<Arithmetic*>(to.get())) {
+        return true; // Arithmetic types can be converted to each other
+    }
     return false;
 }
 
@@ -44,13 +43,14 @@ void Analyzer::visit(VarDeclarator* node){
         // значит если нет его в нашей таблице видимости значит ошиька семанитики. нет такого типа данных
         for (const auto& init_declorator : declarations){
             current_type = scope->match_struct(type.value); // вернет либо обьект либо экспешн что такой структуры нет
+            std::cout<< "current type: " << type << std::endl;
             init_declorator->accept(*this);
         }
     }
     if (type.type == TokenType::TYPE){
         // дефолтный типы по типу int char и тд
         for (const auto& init_declorator : declarations){
-            auto current_type = default_types.at(type.value);
+            current_type = default_types.at(type.value);
             init_declorator->accept(*this);
         }
     }
@@ -62,9 +62,9 @@ void Analyzer::visit(InitDeclarator* node) {
     if (expression != nullptr){
         id_declarator->accept(*this);
         auto id_decl_type = current_type;
-        expression->accept(*this); 
+        expression->accept(*this);
         auto expression_type = current_type;
-        if (dynamic_cast<Arithmetic*>(id_decl_type.get()) && dynamic_cast<Arithmetic*>(expression_type.get())) {
+        if (can_convert(expression_type, id_decl_type)) {
             current_type = id_decl_type;
         } else {
             throw std::runtime_error("not tknown conv");
@@ -82,6 +82,7 @@ void Analyzer::visit(IdDeclorator* node){
     auto type = node->get_declorator_type();
     switch(type){
         case IDDeclaratorType::NONE : {
+            std::cout<<"name "<< name << std::endl;
             scope->push_variable(name, current_type);
         } break;
         case IDDeclaratorType::POINTER : {
@@ -107,12 +108,12 @@ void Analyzer::visit(FuncDeclarator* node){
     for (const auto& i : args){
         i->accept(*this); // поверяем являются ли они в зоне видимости
         type_args.push_back(current_type);
-        scope-> push_variable(i->get_type().value, current_type);
+        scope->push_variable(i->get_type().value, current_type);
     }
     auto func = std::make_shared<FuncType>(default_type, type_args);
     scope->push_func(name, func);
     block->accept(*this); // заходим в наш блок
-    scope = scope->get_prev_table();
+    scope->push_func(name, func);
     current_type = func;
 }
 
@@ -326,6 +327,23 @@ void Analyzer::visit(CallExpression* node) { // (
         throw std::runtime_error("hello there");
     }
     auto expr_func_args = expression_func->get_args();
+    for (auto function : matched_functions) {
+        auto func_args = function->get_args();
+        if (func_args.size() != args.size()) {
+            throw std::runtime_error("hello there");
+        }
+        for (int i = 0; i < args.size(); ++i) {
+            args[i]->accept(*this);
+            auto arg_type = current_type;
+            if (!can_convert(arg_type, func_args[i])) { // если конвертируется типы
+                // запара по идее
+                throw std::runtime_error("not known conv");
+            }
+            if (!dynamic_cast<decltype(func_args[i].get())>(arg_type.get())) { // если не конвертируется типы
+                throw std::runtime_error("hello there");
+            }
+        }
+    }
 }
 
 void Analyzer::visit(AccessExpression* node) { // ->
@@ -389,7 +407,12 @@ void Analyzer::visit(LiteralStringExpression* node) {
 }
 
 void Analyzer::visit(IDexpression* node) {
-    current_type = scope->match_variable(node->get_token().value);
+    try {
+        current_type = scope->match_variable(node->get_token().value);
+    } catch (...) {
+        matched_functions = scope->match_functions(node->get_token().value);
+        current_type = matched_functions[0];
+    }
 }
 
 void Analyzer::visit(GroupExpression* node) {
