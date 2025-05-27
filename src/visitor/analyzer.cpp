@@ -232,7 +232,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
     auto base_type = current_type;
     switch(op.type) {
         case TokenType::INCREMENT : {
-            if (dynamic_cast<Arithmetic*>(base_type.get())) {
+            if (dynamic_cast<Integral*>(base_type.get())) {
                 current_type = base_type;
                 return;
             } else {
@@ -240,7 +240,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
             }
         } break;
         case TokenType::DECREMENT : {
-            if (dynamic_cast<Arithmetic*>(base_type.get())) {
+            if (dynamic_cast<Integral*>(base_type.get())) {
                 current_type = base_type;
                 return;
             } else {
@@ -263,7 +263,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
             }
         } break;
         case TokenType::TYPE : {
-            if (dynamic_cast<Arithmetic*>(base_type.get())) {
+            if (can_convert(base_type, get_type(op))) {
                 current_type = default_types.at(op.value);
                 return;
             } else {
@@ -271,7 +271,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
             }
         }
         case TokenType::BIT_NOT : {
-            if (!dynamic_cast<Arithmetic*>(base_type.get())) {
+            if (!dynamic_cast<Integral*>(base_type.get())) {
                 throw std::runtime_error("hello kerropi");
             }
         } break;
