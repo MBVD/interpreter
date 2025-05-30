@@ -190,7 +190,7 @@ void Analyzer::visit(TernaryExpression* node) {
     if(can_convert(true_expr_type, false_expr_type)) { // значит тип правый конвертируется в левый тип
         current_type = true_expr_type;
     }
-    throw std::runtime_error("hello kitty");
+    throw std::runtime_error("not valid ternary expression for this types");
 }
 
 void Analyzer::visit(BinaryExpression* node) {
@@ -212,7 +212,7 @@ void Analyzer::visit(BinaryExpression* node) {
         current_type = compare_types(left_type, right_type);
         return;
     }
-    throw std::runtime_error("hello kerropi1");
+    throw std::runtime_error("not valid binary expression for this types");
 }
 
 void Analyzer::visit(UnaryExpression* node) {// ++ -- (int) 
@@ -226,7 +226,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
                 current_type = base_type;
                 return;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid ++ operator for this type");
             }
         } break;
         case TokenType::DECREMENT : {
@@ -234,7 +234,7 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
                 current_type = base_type;
                 return;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid -- operator for this type");
             }
         } break;
         case TokenType::PLUS : {
@@ -242,14 +242,14 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
                 current_type = base_type;
                 return;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid + operator for this type");
             }
         } break;
         case TokenType::MINUS : {
             if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid - operator for this type");
             }
         } break;
         case TokenType::TYPE : {
@@ -257,12 +257,12 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
                 current_type = default_types.at(op.value);
                 return;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid cast to " + op.value);
             }
         }
         case TokenType::BIT_NOT : {
             if (!dynamic_cast<Integral*>(base_type.get())) {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("now valid ~ operator for this type");
             }
         } break;
     }
@@ -274,7 +274,7 @@ void Analyzer::visit(PostfixExpression* node) {
     expression->accept(*this);
     auto expression_type = current_type;
     if (!dynamic_cast<Arithmetic*>(expression_type.get())) {
-        throw std::runtime_error("hello melodi");
+        throw std::runtime_error("not valid " + op.value);
     }
 }
 
@@ -289,16 +289,16 @@ void Analyzer::visit(SubscriptExpression* node) {// []
     }
     auto* pointer = dynamic_cast<PointerType*>(expression_type.get());
     if (!pointer) {
-        throw std::runtime_error("hello maru");    
+        throw std::runtime_error("cant index non-pointer type");    
     }
     for (const auto& i : indexes){
         i->accept(*this);
         if (!dynamic_cast<IntegerType*>(current_type.get())){
-            throw std::runtime_error("hello maru");
+            throw std::runtime_error("cant get access to pointer with non-integer index");
         }
     }
     if (indexes.size() > pointer->get_star_count()) {
-        throw std::runtime_error("hello maru");
+        throw std::runtime_error("cant index pointer with more indexes than stars");
     }
     current_type = pointer->get_type_by_star_count(indexes.size());
 }
@@ -337,7 +337,7 @@ void Analyzer::visit(CallExpression* node) { // ()
         }
     }
     if (matched_functions.empty()) {
-        throw std::runtime_error("No matching function found for call expression.");
+        throw std::runtime_error("No matching function found for call expr");
     }
     auto index = *std::max_element(func_ranks.begin(), func_ranks.end());
     auto best_match = matched_functions[index];
