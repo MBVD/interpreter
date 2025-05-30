@@ -9,6 +9,7 @@
 class Type {
 public:
     virtual ~Type() = default;
+    virtual void print();
 };
 
 // Фундаментальные типы
@@ -37,21 +38,24 @@ public:
 // Все целочисленные типы
 class BoolType : public Integral {
 public:
-    explicit BoolType(std::any);
+    explicit BoolType();
+    void print();
 private:
     bool value;
 };
 
 class CharType : public Integral {
 public:
-    explicit CharType(std::any);
+    explicit CharType();
+    void print();
 private:
     char16_t value;
 };
 
 class IntegerType : public Integral {
 public:
-    explicit IntegerType(std::any);
+    explicit IntegerType();
+    void print();
 private:
     int8_t value;
 };
@@ -59,7 +63,8 @@ private:
 // Все типы с плавающей точкой
 class FloatType : public Arithmetic {
 public:
-    FloatType(std::any);
+    FloatType();
+    void print();
 private:
     double value;
 };
@@ -74,28 +79,30 @@ public:
     FuncType(std::shared_ptr<Type>, std::vector<std::shared_ptr<Type>>);
     std::shared_ptr<Type> get_returnable_type() const;
     std::vector<std::shared_ptr<Type>> get_args() const;
+    void print();
 private:
     std::shared_ptr<Type> returnable_type;
     std::vector<std::shared_ptr<Type>> args;
 };
 
 // Тип записи
-class Record : public Composite {
+class RecordType : public Composite {
 };
 
 // Все типы записей
-class StructType : public Record {
+class StructType : public RecordType {
 public:
     explicit StructType(const std::unordered_map<std::string, std::shared_ptr<Type>>);
     std::unordered_map<std::string, std::shared_ptr<Type>> get_members() const;
+    void print();
 private:
     std::unordered_map<std::string, std::shared_ptr<Type>> members;
 };
 
-class ClassType : public Record {
+class ClassType : public RecordType {
 };
 
-class Union : public Record {
+class Union : public RecordType {
 };
 
 // Перечисления
@@ -109,6 +116,7 @@ public:
     std::shared_ptr<Type> get_base() const;
     int get_star_count();
     std::shared_ptr<Type> get_type_by_star_count(int x);
+    void print();
 private:
     std::shared_ptr<Type> base;
 };
@@ -126,9 +134,9 @@ class LValueType : public RefType {
 // Массивы
 class ArrayType : public PointerType {
 public:
-    ArrayType(const Type* base, int size); // Тип и размер массива
-private:
-    int size;
+    ArrayType(std::shared_ptr<Type> base); // Тип и размер массива
+    void print();
 };
 
 std::shared_ptr<Type> compare_types(std::shared_ptr<Type> left, std::shared_ptr<Type>right);
+int getTypeRank(std::shared_ptr<Type> type);

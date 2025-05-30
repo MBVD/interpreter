@@ -4,7 +4,11 @@
 #include <string>
 #include <any>
 #include <memory>
+#include <iostream>
 
+void Type::print() {
+    std::cout << "Type\n";
+}
 // Arithmetic
 Arithmetic::Arithmetic(std::any value) : value(value) {}
 
@@ -23,10 +27,8 @@ int getTypeRank(std::shared_ptr<Type> type) {
 std::shared_ptr<Type> compare_types(std::shared_ptr<Type> left, std::shared_ptr<Type> right) {
     int left_rank = getTypeRank(left);
     int right_rank = getTypeRank(right);
-
-    if (left_rank == right_rank) {
-        return left;
-    } else if (left_rank > right_rank) {
+    
+    if (left_rank >= right_rank) {
         return left;
     } else {
         return right;
@@ -39,14 +41,30 @@ Integral::Integral(std::any value = 0) : Arithmetic(value){}
 // BoolType
 BoolType::BoolType(std::any value = 0) : Integral(value) {}
 
+void BoolType::print() {
+    std::cout << "BoolType\n";
+}
+
 // CharType
 CharType::CharType(std::any value = 0) : Integral(value) {}
+
+void CharType::print() {
+    std::cout << "CharType\n";
+}
 
 // IntegerType
 IntegerType::IntegerType(std::any value = 0) : Integral(value) {}
 
+void IntegerType::print() {
+    std::cout << "IntegerType\n";
+}
+
 // FloatType
 FloatType::FloatType(std::any value = 0) : Arithmetic(value) {}
+
+void FloatType::print() {
+    std::cout << "FloatType\n";
+}
 
 // FuncType
 FuncType::FuncType(std::shared_ptr<Type> returnable_type, std::vector<std::shared_ptr<Type>> args) : returnable_type(returnable_type), args(args) {}
@@ -59,11 +77,32 @@ std::vector<std::shared_ptr<Type>> FuncType::get_args() const {
     return this->args;
 }
 
+void FuncType::print() {
+    std::cout << "FuncType with returnable type: ";
+    if (returnable_type) {
+        returnable_type->print();
+    } else {
+        std::cout << "nullptr\n";
+    }
+    std::cout << "Args: ";
+    for (const auto& arg : args) {
+        if (arg) {
+            arg->print();
+        } else {
+            std::cout << "nullptr\n";
+        }
+    }
+}
+
 // StructType
 StructType::StructType(const std::unordered_map<std::string, std::shared_ptr<Type>> members) : members(members) {}
 
 std::unordered_map<std::string, std::shared_ptr<Type>> StructType::get_members() const {
     return this->members;
+}
+
+void StructType::print() {
+    std::cout << "FloatType\n";
 }
 
 // PointerType
@@ -97,4 +136,24 @@ std::shared_ptr<Type> PointerType::get_type_by_star_count(int star_count) {
         }
     }
     return current;
+}
+
+void PointerType::print() {
+    std::cout << "PointerType to ";
+    if (base) {
+        base->print();
+    } else {
+        std::cout << "nullptr\n";
+    }
+}
+
+ArrayType::ArrayType(std::shared_ptr<Type> base) : PointerType(base) {}
+
+void ArrayType::print() {
+    std::cout << "ArrayType of ";
+    if (get_base()) {
+        get_base()->print();
+    } else {
+        std::cout << "nullptr\n";
+    }
 }

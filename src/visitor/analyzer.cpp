@@ -2,6 +2,7 @@
 #include "token.hpp"
 #include "type.hpp"
 #include <memory>
+#include <algorithm>
 
 std::unordered_map<std::string, std::shared_ptr<Type>> Analyzer::default_types = {
     {"int", std::make_shared<IntegerType>()},
@@ -16,7 +17,7 @@ bool Analyzer::can_convert(const std::shared_ptr<Type>& from, const std::shared_
     if (from == to) return true;
 
     if (dynamic_cast<Arithmetic*>(from.get()) && dynamic_cast<Arithmetic*>(to.get())) {
-        return true; // Arithmetic types can be converted to each other
+        return true;
     }
     return false;
 }
@@ -38,21 +39,9 @@ void Analyzer::visit(Declarator* node){
 void Analyzer::visit(VarDeclarator* node){
     auto type = node->get_type();
     const auto& declarations = node->get_init_declarators();
-    if (type.type == TokenType::ID){
-        // значит может быть какой то сложной фигней
-        // значит если нет его в нашей таблице видимости значит ошиька семанитики. нет такого типа данных
-        for (const auto& init_declorator : declarations){
-            current_type = scope->match_struct(type.value); // вернет либо обьект либо экспешн что такой структуры нет
-            std::cout<< "current type: " << type << std::endl;
-            init_declorator->accept(*this);
-        }
-    }
-    if (type.type == TokenType::TYPE){
-        // дефолтный типы по типу int char и тд
-        for (const auto& init_declorator : declarations){
-            current_type = default_types.at(type.value);
-            init_declorator->accept(*this);
-        }
+    for (const auto& init_declorator : declarations){
+        current_type = get_type(type);
+        init_declorator->accept(*this);
     }
 }
 
@@ -72,29 +61,32 @@ void Analyzer::visit(InitDeclarator* node) {
         // проходимся по expression и проверяем является ли он типом который может конвертироваться в нашу структуру
         // TODO нужно сделать метод который ищет какой scope для нашей структуры и там находить func - конструктор с таким параметром
         // if (typeid(current_type) == typeid(struct_type)) // пока так, потом будем проверять есть ли конструктор
-    }
-    auto expression_type = current_type;   
-    id_declarator->accept(*this);
+    } else {
+        id_declarator->accept(*this);
+    }      
 }
 
 void Analyzer::visit(IdDeclorator* node){
     auto name = node->get_id().value;
     auto type = node->get_declorator_type();
+    if (scope->contains_symbol(name)) {
+        throw std::runtime_error("Symbol '" + name + "' already exists in scope.");
+    }
     switch(type){
         case IDDeclaratorType::NONE : {
-            std::cout<<"name "<< name << std::endl;
-            scope->push_variable(name, current_type);
+
         } break;
         case IDDeclaratorType::POINTER : {
-            // создать тип данных pointer 
+            current_type = std::make_shared<PointerType>(current_type);
         } break;
         case IDDeclaratorType::ARRAY : {
-            // создать тип данных массив
+            current_type = std::make_shared<ArrayType>(current_type);
         } break;
         case IDDeclaratorType::REF : {
             // создать тип данных сссылка
         } break;
     }
+    scope->push_symbol(name, std::make_shared<VarSymbol>(current_type));
 }
 
 void Analyzer::visit(FuncDeclarator* node){
@@ -106,14 +98,14 @@ void Analyzer::visit(FuncDeclarator* node){
     std::vector<std::shared_ptr<Type>> type_args;
     scope = scope->create_new_table(scope);
     for (const auto& i : args){
-        i->accept(*this); // поверяем являются ли они в зоне видимости
+        i->accept(*this);
         type_args.push_back(current_type);
-        scope->push_variable(i->get_type().value, current_type);
+        scope->push_symbol(i->get_type().value, std::make_shared<VarSymbol>(current_type));
     }
     auto func = std::make_shared<FuncType>(default_type, type_args);
-    scope->push_func(name, func);
+    scope->push_symbol(name, std::make_shared<FuncSymbol>(func));
     block->accept(*this); // заходим в наш блок
-    scope->push_func(name, func);
+    scope->push_symbol(name, std::make_shared<FuncSymbol>(func));
     current_type = func;
 }
 
@@ -127,25 +119,23 @@ void Analyzer::visit(ParamDeclarator* node) {
 void Analyzer::visit(StructDeclarator* node) {
     auto id = node->get_id();
     const auto& vars = node->get_vars();
-    std::unordered_map<std::string, std::shared_ptr<Type>> struct_vars;
     scope = scope->create_new_table(scope);
     for (const auto& var : vars){
         var->accept(*this);
         auto var_type = current_type;
-        if (var->get_type().type == TokenType::ID){
-            var_type = scope->match_struct(var->get_type().value);
-        } else if (var->get_type().type == TokenType::TYPE){
-            var_type = default_types.at(var->get_type().value);
-        }
-        for (const auto& init_declorator : var->get_init_declarators()){
-            init_declorator->accept(*this);
-            auto name = init_declorator->get_declarator()->get_id().value;
-            struct_vars[name] = current_type;
-        }
+        var_type = get_type(var->get_type());
+    }
+    auto scope_multi_vars = scope->get_symbols();
+    std::unordered_map<std::string, std::shared_ptr<Type>> struct_vars;
+    std::unordered_map<std::string, std::shared_ptr<Symbol>> scope_vars;
+    for (auto var : scope_multi_vars) {
+        struct_vars[var.first] = var.second->type;
+        scope_vars[var.first] = var.second;
     }
     scope = scope->get_prev_table();
     auto struc = std::make_shared<StructType>(struct_vars);
-    scope->push_struct(id.value, struc);
+    auto struc_symbol = std::make_shared<Record>(struc, scope_vars);
+    scope->push_symbol(id.value, struc_symbol);
     current_type = struc;
 }
 
@@ -200,7 +190,7 @@ void Analyzer::visit(TernaryExpression* node) {
     if(can_convert(true_expr_type, false_expr_type)) { // значит тип правый конвертируется в левый тип
         current_type = true_expr_type;
     }
-    throw std::runtime_error("hello kitty");
+    throw std::runtime_error("not valid ternary expression for this types");
 }
 
 void Analyzer::visit(BinaryExpression* node) {
@@ -222,7 +212,7 @@ void Analyzer::visit(BinaryExpression* node) {
         current_type = compare_types(left_type, right_type);
         return;
     }
-    throw std::runtime_error("hello kerropi1");
+    throw std::runtime_error("not valid binary expression for this types");
 }
 
 void Analyzer::visit(UnaryExpression* node) {// ++ -- (int) 
@@ -232,19 +222,19 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
     auto base_type = current_type;
     switch(op.type) {
         case TokenType::INCREMENT : {
-            if (dynamic_cast<Arithmetic*>(base_type.get())) {
+            if (dynamic_cast<Integral*>(base_type.get())) {
                 current_type = base_type;
                 return;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid ++ operator for this type");
             }
         } break;
         case TokenType::DECREMENT : {
-            if (dynamic_cast<Arithmetic*>(base_type.get())) {
+            if (dynamic_cast<Integral*>(base_type.get())) {
                 current_type = base_type;
                 return;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid -- operator for this type");
             }
         } break;
         case TokenType::PLUS : {
@@ -252,27 +242,27 @@ void Analyzer::visit(UnaryExpression* node) {// ++ -- (int)
                 current_type = base_type;
                 return;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid + operator for this type");
             }
         } break;
         case TokenType::MINUS : {
             if (dynamic_cast<Arithmetic*>(base_type.get())) {
                 current_type = base_type;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid - operator for this type");
             }
         } break;
         case TokenType::TYPE : {
-            if (dynamic_cast<Arithmetic*>(base_type.get())) {
+            if (can_convert(base_type, get_type(op))) {
                 current_type = default_types.at(op.value);
                 return;
             } else {
-                throw std::runtime_error("hello kerropi");
+                throw std::runtime_error("not valid cast to " + op.value);
             }
         }
         case TokenType::BIT_NOT : {
-            if (!dynamic_cast<Arithmetic*>(base_type.get())) {
-                throw std::runtime_error("hello kerropi");
+            if (!dynamic_cast<Integral*>(base_type.get())) {
+                throw std::runtime_error("now valid ~ operator for this type");
             }
         } break;
     }
@@ -284,7 +274,7 @@ void Analyzer::visit(PostfixExpression* node) {
     expression->accept(*this);
     auto expression_type = current_type;
     if (!dynamic_cast<Arithmetic*>(expression_type.get())) {
-        throw std::runtime_error("hello melodi");
+        throw std::runtime_error("not valid " + op.value);
     }
 }
 
@@ -297,23 +287,23 @@ void Analyzer::visit(SubscriptExpression* node) {// []
     if (dynamic_cast<StructType*>(expression_type.get())) {
         // ищем оператор []
     }
+    auto* pointer = dynamic_cast<PointerType*>(expression_type.get());
+    if (!pointer) {
+        throw std::runtime_error("cant index non-pointer type");    
+    }
     for (const auto& i : indexes){
         i->accept(*this);
         if (!dynamic_cast<IntegerType*>(current_type.get())){
-            throw std::runtime_error("hello maru");
+            throw std::runtime_error("cant get access to pointer with non-integer index");
         }
     }
-    auto* pointer = dynamic_cast<PointerType*>(expression_type.get());
-    if (!pointer) {
-        throw std::runtime_error("hello maru");    
-    }
-    if (indexes.size() >= pointer->get_star_count()) {
-        throw std::runtime_error("hello maru");
+    if (indexes.size() > pointer->get_star_count()) {
+        throw std::runtime_error("cant index pointer with more indexes than stars");
     }
     current_type = pointer->get_type_by_star_count(indexes.size());
 }
 
-void Analyzer::visit(CallExpression* node) { // (
+void Analyzer::visit(CallExpression* node) { // ()
     const auto& expression = node->get_expression();
     auto op = node->get_op();
     const auto& args = node->get_args();
@@ -327,7 +317,10 @@ void Analyzer::visit(CallExpression* node) { // (
         throw std::runtime_error("hello there");
     }
     auto expr_func_args = expression_func->get_args();
-    for (auto function : matched_functions) {
+    /* поиск лучшей фукнции*/
+    std::vector<int> func_ranks(matched_functions.size(), 0);
+    for (auto function_it = matched_functions.begin(); function_it != matched_functions.end(); ++function_it) {
+        auto function = *function_it;
         auto func_args = function->get_args();
         if (func_args.size() != args.size()) {
             throw std::runtime_error("hello there");
@@ -336,14 +329,20 @@ void Analyzer::visit(CallExpression* node) { // (
             args[i]->accept(*this);
             auto arg_type = current_type;
             if (!can_convert(arg_type, func_args[i])) { // если конвертируется типы
-                // запара по идее
-                throw std::runtime_error("not known conv");
-            }
-            if (!dynamic_cast<decltype(func_args[i].get())>(arg_type.get())) { // если не конвертируется типы
-                throw std::runtime_error("hello there");
+                matched_functions.erase(function_it);
+                continue;
+            } else {
+                func_ranks[std::distance(matched_functions.begin(), function_it)]+= getTypeRank(func_args[i]) - getTypeRank(arg_type);
             }
         }
     }
+    if (matched_functions.empty()) {
+        throw std::runtime_error("No matching function found for call expr");
+    }
+    auto index = *std::max_element(func_ranks.begin(), func_ranks.end());
+    auto best_match = matched_functions[index];
+    matched_functions.clear();
+    current_type = best_match->get_returnable_type();
 }
 
 void Analyzer::visit(AccessExpression* node) { // ->
@@ -353,7 +352,6 @@ void Analyzer::visit(AccessExpression* node) { // ->
     expression->accept(*this);
     auto expression_type = current_type;
 
-    // Check if the left-hand side is a pointer to a struct
     if (auto pointer_type = dynamic_cast<PointerType*>(expression_type.get())) {
         auto base_type = pointer_type->get_base();
         if (!base_type) {
@@ -364,27 +362,26 @@ void Analyzer::visit(AccessExpression* node) { // ->
             auto members = struct_type->get_members();
             auto member_name = member_token.value;
 
-            // Check if the member exists in the struct
             if (members.find(member_name) != members.end()) {
-                current_type = members.at(member_name); // Set current_type to the type of the member
+                current_type = members.at(member_name);
             } else {
                 throw std::runtime_error("Error: Member '" + member_name + "' not found in struct.");
             }
         } else {
             throw std::runtime_error("Error: Member access on non-struct type.");
         }
-    }
-     else if (auto struct_type = dynamic_cast<StructType*>(expression_type.get())) {
-            auto members = struct_type->get_members();
-            auto member_name = member_token.value;
+    } else if (auto struct_type = dynamic_cast<StructType*>(expression_type.get())) {
+        auto members = struct_type->get_members();
+        auto member_name = member_token.value;
 
-            // Check if the member exists in the struct
-            if (members.find(member_name) != members.end()) {
-                current_type = members.at(member_name); // Set current_type to the type of the member
-            } else {
-                throw std::runtime_error("Error: Member '" + member_name + "' not found in struct.");
-            }
+        if (members.find(member_name) != members.end()) {
+            std::cout<<"HERE\n";
+            current_type = members.at(member_name);
+            current_type->print();
+        } else {
+            throw std::runtime_error("Error: Member '" + member_name + "' not found in struct.");
         }
+    }
     else {
         throw std::runtime_error("Error: Member access on non-struct type.");
     }
@@ -407,11 +404,15 @@ void Analyzer::visit(LiteralStringExpression* node) {
 }
 
 void Analyzer::visit(IDexpression* node) {
-    try {
-        current_type = scope->match_variable(node->get_token().value);
-    } catch (...) {
-        matched_functions = scope->match_functions(node->get_token().value);
-        current_type = matched_functions[0];
+    current_type = scope->match_global(node->get_token().value)->type;
+    if (dynamic_cast<FuncType*>(current_type.get())) {
+        auto functions = scope->match_range(node->get_token().value);
+        for (auto function : functions) {
+            auto func_type = std::dynamic_pointer_cast<FuncType>(function->type);
+            if (func_type) {
+                matched_functions.push_back(func_type);
+            }
+        }
     }
 }
 
@@ -491,7 +492,7 @@ void Analyzer::visit(EmptyStatement* node) {
 
 std::shared_ptr<Type> Analyzer::get_type(Token token){
     if (token == TokenType::ID){
-        return scope->match_struct(token.value);
+        return scope->match_global(token.value)->type;
     } else {
         return default_types.at(token.value);
     }

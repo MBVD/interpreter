@@ -16,47 +16,48 @@ std::shared_ptr<Scope> Scope::create_new_table(std::shared_ptr<Scope> prev_scope
     return scope;
 }   
 
-std::shared_ptr<Type> Scope::match_variable(std::string name) {
-    if (variables.find(name) != variables.end()){
-        return variables.at(name);
+bool Scope::contains_symbol(std::string name) {
+    return symbolTable.find(name) != symbolTable.end();
+}
+
+std::shared_ptr<Symbol> Scope::match_global(std::string name) {
+    if (contains_symbol(name)) {
+        return symbolTable.find(name)->second;
     }
     if (prev_table == nullptr){
-        throw std::runtime_error("Variable '" + name + "' not found in scope.");
+        throw std::runtime_error("Symbol '" + name + "' not found in scope.");
     }
-    return this->prev_table->match_variable(name); // возвращаем из старшей области видимости
+    return this->prev_table->match_global(name); // возвращаем из старшей области видимости
 }
 
-std::shared_ptr<StructType> Scope::match_struct(std::string name){
-    if (structs.find(name) != structs.end()){
-        return structs.at(name);
+std::shared_ptr<Symbol> Scope::match_local(std::string name) {
+    if (contains_symbol(name)) {
+        return symbolTable.find(name)->second;
     }
-    if (prev_table == nullptr){
-        throw std::runtime_error("Struct '" + name + "' not found in scope."); //some expression not found struct
+    throw std::runtime_error("Symbol '" + name + "' not found in local scope.");
+}
+
+std::vector<std::shared_ptr<Symbol>> Scope::match_range(std::string name) {
+    std::vector<std::shared_ptr<Symbol>> result;
+    auto range = symbolTable.equal_range(name); // Получаем диапазон элементов с одинаковым ключом
+    for (auto it = range.first; it != range.second; ++it) {
+        result.push_back(it->second);
     }
-    return prev_table->match_struct(name);
-}
-
-std::vector<std::shared_ptr<FuncType>> Scope::match_functions(std::string name){
-    auto range = functions.equal_range(name);
-    std::vector<std::shared_ptr<FuncType>> matched_functions;
-    for (auto i = range.first; i != range.second; ++i){
-        matched_functions.push_back(i->second); // собрали все функции с этим именем
+    if (result.empty() && prev_table != nullptr) {
+        return this->prev_table->match_range(name); // Ищем в старшей области видимости
     }
-    if (prev_table != nullptr) {
-        auto prev_funcs = prev_table->match_functions(name);
-        matched_functions.insert(matched_functions.end(), prev_funcs.begin(), prev_funcs.end());
-    } 
-    return matched_functions;
+    if (result.empty()) {
+        throw std::runtime_error("Symbol '" + name + "' not found in scope.");
+    }
+    return result;
 }
 
-void Scope::push_variable(std::string name, std::shared_ptr<Type> var) {
-    variables.insert({name, var});
-}
-
-void Scope::push_struct(std::string name, std::shared_ptr<StructType> structure){
-    structs.insert({name, structure});
-}
-
-void Scope::push_func(std::string name, std::shared_ptr<FuncType> func) {
-    functions.insert({name, func});
+void Scope::push_symbol(std::string name, std::shared_ptr<Symbol> symbol) {
+    if (dynamic_cast<FuncSymbol*>(symbol.get()) && contains_symbol(name)) {
+        
+    }
+    if (contains_symbol(name)) {
+        throw std::runtime_error("Symbol '" + name + "' already exists in scope. in scope");
+    }
+    symbolTable.insert({name, symbol});
 }
