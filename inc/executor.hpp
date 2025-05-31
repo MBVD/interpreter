@@ -1,18 +1,20 @@
 #pragma once
 #include <any>
+#include <memory>
+#include <unordered_map>
 #include "visitor.hpp"
 #include "declaration.hpp"
 #include "expression.hpp"
 #include "statement.hpp"
-#include "symbolTable.hpp"
+#include "scope.hpp"
+#include "token.hpp"
 
 class Executor : public Visitor {
 public:
     Executor();
     void execute(TranslationUnit&);
-
 private:
-void visit(ASTNode* ) final;
+    void visit(ASTNode* ) final;
     void visit(Declarator*) final;
     void visit(VarDeclarator*) final;
     void visit(InitDeclarator*) final;
@@ -51,10 +53,16 @@ void visit(ASTNode* ) final;
     void visit(ForStatement*) final;
     void visit(EmptyStatement*) final;
 
-    std::shared_ptr<Type> get_default_type(std::string);
+    std::shared_ptr<Symbol> match_symbol (const Token& token);
+    bool is_record_type(const std::shared_ptr<Type>& type);
+    bool count_bool(std::any, Token&, std::any);
+    std::any binary_operation(std::any, Token&, std::any);
+    std::any unary_operation(std::any, Token&);
+    std::any postgix_operation(std::any, Token&);
+    bool can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to);
 
-    static std::unordered_map<std::string, std::shared_ptr<Arithmetic>> default_types_values;
-    std::shared_ptr<SymbolTable> table;
-    std::shared_ptr<Type> current_value;
-
+    std::shared_ptr<Symbol> current_value;
+    std::shared_ptr<Scope> symbolTable;
+    std::vector<std::shared_ptr<FuncType>> matched_functions;
+    static std::unordered_map<std::string, std::shared_ptr<Symbol>> default_types;
 };

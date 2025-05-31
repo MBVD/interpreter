@@ -24,9 +24,13 @@ struct Symbol {
 struct VarSymbol : public Symbol {
     VarSymbol(const std::shared_ptr<Type>& type, bool is_const = false)
         : Symbol(type, is_const) {}
+    VarSymbol(const std::shared_ptr<Type>& type, std::any value, bool is_const = false)
+        : Symbol(type, is_const), value(value) {}
     bool is_var() {
         return true;
     }
+
+    std::any value;
 };
 
 struct FuncSymbol : public Symbol {

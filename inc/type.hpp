@@ -76,13 +76,15 @@ class Composite : public Type {
 // Тип функции
 class FuncType : public Composite {
 public:
-    FuncType(std::shared_ptr<Type>, std::vector<std::shared_ptr<Type>>);
+    FuncType(std::shared_ptr<Type>, std::vector<std::shared_ptr<Type>>, const std::unique_ptr<BlockStatement>&);
     std::shared_ptr<Type> get_returnable_type() const;
     std::vector<std::shared_ptr<Type>> get_args() const;
+    const std::unique_ptr<FuncDeclarator>& get_func_declarator();
     void print();
 private:
     std::shared_ptr<Type> returnable_type;
     std::vector<std::shared_ptr<Type>> args;
+    const std::unique_ptr<FuncDeclarator>& func_declarator;
 };
 
 // Тип записи
@@ -97,6 +99,7 @@ public:
     void print();
 private:
     std::unordered_map<std::string, std::shared_ptr<Type>> members;
+    std::weak_ptr<Symbol> symbol;
 };
 
 class ClassType : public RecordType {

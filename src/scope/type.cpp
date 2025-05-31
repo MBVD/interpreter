@@ -1,4 +1,5 @@
 #include "type.hpp"
+#include "statement.hpp"
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -39,35 +40,35 @@ std::shared_ptr<Type> compare_types(std::shared_ptr<Type> left, std::shared_ptr<
 Integral::Integral(std::any value = 0) : Arithmetic(value){}
 
 // BoolType
-BoolType::BoolType(std::any value = 0) : Integral(value) {}
+BoolType::BoolType() : Integral(value) {}
 
 void BoolType::print() {
     std::cout << "BoolType\n";
 }
 
 // CharType
-CharType::CharType(std::any value = 0) : Integral(value) {}
+CharType::CharType() : Integral(value) {}
 
 void CharType::print() {
     std::cout << "CharType\n";
 }
 
 // IntegerType
-IntegerType::IntegerType(std::any value = 0) : Integral(value) {}
+IntegerType::IntegerType() : Integral(value) {}
 
 void IntegerType::print() {
     std::cout << "IntegerType\n";
 }
 
 // FloatType
-FloatType::FloatType(std::any value = 0) : Arithmetic(value) {}
+FloatType::FloatType() : Arithmetic(value) {}
 
 void FloatType::print() {
     std::cout << "FloatType\n";
 }
 
 // FuncType
-FuncType::FuncType(std::shared_ptr<Type> returnable_type, std::vector<std::shared_ptr<Type>> args) : returnable_type(returnable_type), args(args) {}
+FuncType::FuncType(std::shared_ptr<Type> returnable_type, std::vector<std::shared_ptr<Type>> args, const std::unique_ptr<BlockStatement>& block) : returnable_type(returnable_type), args(args), block(block) {}
 
 std::shared_ptr<Type> FuncType::get_returnable_type() const {
     return this->returnable_type;

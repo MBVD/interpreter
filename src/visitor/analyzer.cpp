@@ -92,6 +92,7 @@ void Analyzer::visit(IdDeclorator* node){
 void Analyzer::visit(FuncDeclarator* node){
     auto returnable_type_token = node->get_returnable_type();
     auto name = node->get_name().value;
+    const auto& block = node->get_block();
     auto default_type = get_type(returnable_type_token);
     const auto& args = node->get_params();
     const auto& block = node->get_block();
@@ -102,7 +103,7 @@ void Analyzer::visit(FuncDeclarator* node){
         type_args.push_back(current_type);
         scope->push_symbol(i->get_type().value, std::make_shared<VarSymbol>(current_type));
     }
-    auto func = std::make_shared<FuncType>(default_type, type_args);
+    auto func = std::make_shared<FuncType>(default_type, type_args, block);
     scope->push_symbol(name, std::make_shared<FuncSymbol>(func));
     block->accept(*this); // заходим в наш блок
     scope->push_symbol(name, std::make_shared<FuncSymbol>(func));
@@ -126,6 +127,7 @@ void Analyzer::visit(StructDeclarator* node) {
         var_type = get_type(var->get_type());
     }
     auto scope_multi_vars = scope->get_symbols();
+    scope = scope->get_prev_table();
     std::unordered_map<std::string, std::shared_ptr<Type>> struct_vars;
     std::unordered_map<std::string, std::shared_ptr<Symbol>> scope_vars;
     for (auto var : scope_multi_vars) {
