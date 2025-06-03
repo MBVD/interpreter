@@ -180,7 +180,7 @@ void Executor::visit(BinaryExpression* node) {
     right->accept(*this);
     auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
     auto right_any_val = dynamic_cast<VarSymbol*>(right_value.get())->value;
-    current_value = std::make_shared<VarSymbol>(compare_types(left_value->type, right_value->type), binary_operation(left_value, op, right_value));
+    current_value = binary_operation(left_value, op, right_value);
 }
 
 void Executor::visit(UnaryExpression* node) {// ++ -- (int) 
@@ -188,7 +188,7 @@ void Executor::visit(UnaryExpression* node) {// ++ -- (int)
     auto op = node->get_op();
     base->accept(*this);
     auto base_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
-    current_value = std::make_shared<VarSymbol>(base_value->type ,unary_operation(base_value, op));
+    current_value = unary_operation(base_value, op);
 }
 
 void Executor::visit(PostfixExpression* node){
@@ -196,7 +196,7 @@ void Executor::visit(PostfixExpression* node){
     auto op = node->get_op();
     base->accept(*this);
     auto base_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
-    current_value = std::make_shared<VarSymbol>(base_value->type, postgix_operation(base_value, op));
+    current_value = postgix_operation(base_value, op);
 }
 
 void Executor::visit(SubscriptExpression* node) { //[]
