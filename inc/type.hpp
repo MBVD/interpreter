@@ -1,4 +1,5 @@
 #pragma once
+#include "declaration.hpp"
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -84,13 +85,14 @@ public:
 private:
     std::shared_ptr<Type> returnable_type;
     std::vector<std::shared_ptr<Type>> args;
-    const std::unique_ptr<FuncDeclarator>& func_declarator;
+    const std::unique_ptr<BlockStatement>& block;
 };
 
 // Тип записи
 class RecordType : public Composite {
 };
 
+class Symbol;
 // Все типы записей
 class StructType : public RecordType {
 public:

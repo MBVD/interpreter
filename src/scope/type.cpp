@@ -1,5 +1,6 @@
 #include "type.hpp"
-#include "statement.hpp"
+#include <memory>
+#include "declaration.hpp"
 #include <vector>
 #include <unordered_map>
 #include <string>

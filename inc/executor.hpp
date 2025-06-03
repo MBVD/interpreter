@@ -56,9 +56,9 @@ private:
     std::shared_ptr<Symbol> match_symbol (const Token& token);
     bool is_record_type(const std::shared_ptr<Type>& type);
     bool count_bool(std::any, Token&, std::any);
-    std::any binary_operation(std::any, Token&, std::any);
-    std::any unary_operation(std::any, Token&);
-    std::any postgix_operation(std::any, Token&);
+    std::shared_ptr<VarSymbol> binary_operation(std::shared_ptr<VarSymbol>, Token&, std::shared_ptr<VarSymbol>);
+    std::shared_ptr<VarSymbol> unary_operation(std::shared_ptr<VarSymbol>, Token&);
+    std::shared_ptr<VarSymbol> postgix_operation(std::shared_ptr<VarSymbol>, Token&);
     bool can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to);
 
     std::shared_ptr<Symbol> current_value;

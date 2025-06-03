@@ -95,7 +95,6 @@ void Analyzer::visit(FuncDeclarator* node){
     const auto& block = node->get_block();
     auto default_type = get_type(returnable_type_token);
     const auto& args = node->get_params();
-    const auto& block = node->get_block();
     std::vector<std::shared_ptr<Type>> type_args;
     scope = scope->create_new_table(scope);
     for (const auto& i : args){
