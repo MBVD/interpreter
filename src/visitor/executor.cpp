@@ -1,5 +1,6 @@
 #include "executor.hpp"
 #include <algorithm>
+#include <cmath>
 #include "type.hpp"
 
 Executor::Executor() : symbolTable(std::make_shared<Scope>(nullptr)) {};
@@ -62,7 +63,6 @@ void Executor::visit(InitDeclarator* node) {
     const auto& expression = node->get_expression();
     if (expression != nullptr){
         expression->accept(*this);
-        auto value = current_value;
         id_declarator->accept(*this);
     } else {
         id_declarator->accept(*this);
@@ -102,8 +102,7 @@ void Executor::visit(FuncDeclarator* node) {
         symbolTable->push_symbol(i->get_type().value, std::make_shared<VarSymbol>(current_value->type));
     }
     auto func = std::make_shared<FuncType>(default_type, type_args, block);
-    symbolTable->push_symbol(name, std::make_shared<FuncSymbol>(func));
-    block->accept(*this); // заходим в наш блок
+    symbolTable = symbolTable->get_prev_table();
     symbolTable->push_symbol(name, std::make_shared<FuncSymbol>(func));
 }
 
@@ -143,18 +142,13 @@ void Executor::visit(ComparisonExpression* node){
     const auto& right = node->get_right();
     auto op = node->get_op();
     left->accept(*this);
-    auto left_value = current_value;
+    auto left_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
     right->accept(*this);
-    auto right_value = current_value;
-    auto left_type = dynamic_cast<VarSymbol*>(left_value.get())->type;
-    auto right_type = dynamic_cast<VarSymbol*>(right_value.get())->type;
-    if (is_record_type(left_type) || is_record_type(right_type)) {
-        // TODO
-    }
-    auto left_any_val = dynamic_cast<VarSymbol*>(left_value.get())->value;
-    auto right_any_val = dynamic_cast<VarSymbol*>(right_value.get())->value;
-    auto counted = count_bool(left_any_val, op, right_any_val);
-    current_value = std::make_shared<VarSymbol>(std::make_shared<BoolType>(), counted);
+    auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    auto left_type = left_value->type;
+    auto right_type = right_value->type;
+    auto counted = binary_operation(left_value, op, right_value);
+    current_value = counted;
 }
 
 void Executor::visit(TernaryExpression* node) {
@@ -180,6 +174,102 @@ void Executor::visit(BinaryExpression* node) {
     right->accept(*this);
     auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
     auto right_any_val = dynamic_cast<VarSymbol*>(right_value.get())->value;
+    current_value = binary_operation(left_value, op, right_value);
+}
+
+void Executor::visit(CommaExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    right->accept(*this);
+}
+
+void Executor::visit(AssignmentExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    right->accept(*this);
+    auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    
+    if (left_value->is_const) {
+        throw std::runtime_error("Cannot assign to a constant variable:");
+    }
+    
+    current_value = assignment_operation(left_value, op, right_value);
+
+}
+
+void Executor::visit(LogicalOrExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    right->accept(*this);
+    auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    
+    current_value = binary_operation(left_value, op, right_value);
+}
+
+void Executor::visit(LogicalAndExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    right->accept(*this);
+    auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    
+    current_value = binary_operation(left_value, op, right_value);
+}
+
+void Executor::visit(BiteIncOrExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    right->accept(*this);
+    auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    
+    current_value = binary_operation(left_value, op, right_value);
+}
+
+void Executor::visit(BiteExcOrExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    right->accept(*this);
+    auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    
+    current_value = binary_operation(left_value, op, right_value);
+}
+
+void Executor::visit(BiteAndExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    right->accept(*this);
+    auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    
+    current_value = binary_operation(left_value, op, right_value);  
+}
+
+void Executor::visit(ShiftExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    right->accept(*this);
+    auto right_value = std::dynamic_pointer_cast<VarSymbol>(current_value);
+    
     current_value = binary_operation(left_value, op, right_value);
 }
 
@@ -226,9 +316,6 @@ void Executor::visit(CallExpression* node) {
     for (auto function_it = matched_functions.begin(); function_it != matched_functions.end(); ++function_it) {
         auto function = *function_it;
         auto func_args = function->get_args();
-        if (func_args.size() != args.size()) {
-            throw std::runtime_error("hello there");
-        }
         for (int i = 0; i < args.size(); ++i) {
             args[i]->accept(*this);
             auto arg_type = current_value->type;
@@ -239,9 +326,6 @@ void Executor::visit(CallExpression* node) {
                 func_ranks[std::distance(matched_functions.begin(), function_it)]+= getTypeRank(func_args[i]) - getTypeRank(arg_type);
             }
         }
-    }
-    if (matched_functions.empty()) {
-        throw std::runtime_error("No matching function found for call expr");
     }
     auto index = *std::max_element(func_ranks.begin(), func_ranks.end());
     auto best_match = matched_functions[index];
@@ -358,7 +442,7 @@ void Executor::visit(WhileStatement* node) {
             break; // выход из цикла, если условие ложно
         }
         
-        statement->accept(*this);
+        statement->accept(*this);// TODO отлавливать ошибки в циклах
     }
 }
 void Executor::visit(DoWhileStatement* node) {
@@ -402,4 +486,562 @@ void Executor::visit(EmptyStatement* node) {
     return;
 }
 
+bool Executor::is_record_type(const std::shared_ptr<Type>& type){
+    return dynamic_cast<RecordType*>(type.get()) != nullptr || dynamic_cast<StructType*>(type.get()) != nullptr;
+}
+
+std::shared_ptr<VarSymbol> Executor::binary_operation(std::shared_ptr<VarSymbol> left, Token& op, std::shared_ptr<VarSymbol> right) {
+    if (is_record_type(left->type) || is_record_type(right->type)) {
+        // TODO
+    } else {
+        switch (op.type) {
+            case TokenType::PLUS: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value + right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value + right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value + right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<FloatType>(), left_value + right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+            case TokenType::MINUS: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value - right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value - right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value - right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<FloatType>(), left_value - right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::MULTIPLY: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value * right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value * right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value * right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<FloatType>(), left_value * right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break; 
+            case TokenType::DIVIDE: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value / right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value / right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value / right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<FloatType>(), left_value / right_value);
+                    }
+                } else if (left->type->is_char()) {
+                    
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::POWER: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), std::pow(left_value, right_value));
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), std::pow(left_value, static_cast<int>(right_value)));
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), std::pow(left_value, static_cast<int>(right_value)));
+                    }
+                } else if (left->type->is_char()) {
+                    
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::MODULO: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value % right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value % right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value % right_value);
+                    }
+                } else if (left->type->is_char()) {
+                    
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::BIT_AND: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value & right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value & static_cast<int>(right_value));
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value & static_cast<int>(right_value));
+                    }
+                } else if (left->type->is_char()) {
+                    
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::BIT_OR: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value | right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value | static_cast<int>(right_value));
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value | static_cast<int>(right_value));
+                    }
+                } else if (left->type->is_char()) {
+                    
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::BIT_XOR: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value ^ right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value ^ static_cast<int>(right_value));
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value ^ static_cast<int>(right_value));
+                    }
+                } else if (left->type->is_char()) {
+                    
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::LEFT_SHIFT: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value << right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value << static_cast<int>(right_value));
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value << static_cast<int>(right_value));
+                    }
+                } else if (left->type->is_char()) {
+                    
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::RIGHT_SHIFT: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value >> right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value >> static_cast<int>(right_value));
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value >> static_cast<int>(right_value));
+                    }
+                } else if (left->type->is_char()) {
+                    
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+                    
+                }
+            } break;
+            case TokenType::GREATER: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value > right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value > right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value > right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value > right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+            case TokenType::LESS: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value < right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value < right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value < right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value < right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+            case TokenType::GREATER_EQUAL: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value >= right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value >= right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value >= right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value >= right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+            case TokenType::LESS_EQUAL: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value <= right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value <= right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value <= right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value <= right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+            case TokenType::EQUAL: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value == right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value == right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value == right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value == right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+            case TokenType::NOT_EQUAL: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value != right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value != right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value != right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value != right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+            case TokenType::AND: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value && right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value && right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value && right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value && right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+            case TokenType::OR: {
+                if (left->type->is_integer()) {
+                    is_rvalue = true;
+                    auto left_value = std::any_cast<int>(left->value);
+                    if (right->type->is_integer()) {
+                        auto right_value = std::any_cast<int>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value || right_value);
+                    } else if (right->type->is_char()) {
+                        auto right_value = std::any_cast<char>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value || right_value);
+                    } else if (right->type->is_bool()) {
+                        auto right_value = std::any_cast<bool>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value || right_value);
+                    } else if (right->type->is_floating()) {
+                        auto right_value = std::any_cast<double>(right->value);
+                        return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), left_value || right_value);
+                    }
+                } else if (left->type->is_char()) {
+
+                } else if (left->type->is_bool()) {
+
+                } else if (left->type->is_floating()){
+
+                }
+            } break;
+        }
+    }
+}
+
+std::shared_ptr<VarSymbol> Executor::assignment_operation(std::shared_ptr<VarSymbol> left, Token& op, std::shared_ptr<VarSymbol> right) {
+    if (is_record_type(left->type) || is_record_type(right->type)) {
+        // TODO
+    } else {
+        if (is_rvalue) {
+            throw std::runtime_error("Cannot assign to an rvalue");
+        }
+        if (left->type != right->type) {
+            if (left->type->is_integer() && right->type->is_floating()) {
+                auto right_value = std::any_cast<double>(right->value);
+                left->value = static_cast<int>(right_value);
+            } else if (left->type->is_floating() && right->type->is_integer()) {
+                auto right_value = std::any_cast<int>(right->value);
+                left->value = static_cast<double>(right_value);
+            } else if (left->type->is_char() && right->type->is_integer()) {
+                auto right_value = std::any_cast<int>(right->value);
+                left->value = static_cast<char>(right_value);
+            } else if (left->type->is_bool() && right->type->is_integer()) {
+                auto right_value = std::any_cast<int>(right->value);
+                left->value = static_cast<bool>(right_value);
+            }
+        } else {
+            left->value = right->value;
+        }
+    }
+}
+
+std::shared_ptr<VarSymbol> Executor::unary_operation(std::shared_ptr<VarSymbol> left, Token& op) {
+    if (is_record_type(left->type)) {
+        
+    } else {
+        if (left->type->is_integer()) {
+            is_rvalue = true;
+            auto left_value = std::any_cast<int>(left->value);
+            switch (op.type) {
+                case TokenType::PLUS: {
+                    return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value);
+                }
+                case TokenType::MINUS: {
+                    return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), -left_value);
+                }
+                case TokenType::BIT_NOT: {
+                    return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), ~left_value);
+                }
+                case TokenType::NOT: {
+                    return std::make_shared<VarSymbol>(std::make_shared<BoolType>(), !left_value);
+                } case TokenType::INCREMENT: {
+                    left->value = left_value + 1;
+                    return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value + 1);
+                }
+                case TokenType::DECREMENT: {
+                    left->value = left_value - 1;
+                    return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value + 1);
+                }
+            }
+        } else if (left->type->is_char()) {
+            // TODO
+        } else if (left->type->is_bool()) {
+            // TODO
+        } else if (left->type->is_floating()) {
+            // TODO
+        }
+    }
+}
+
+std::shared_ptr<VarSymbol> Executor::postgix_operation(std::shared_ptr<VarSymbol> left, Token& op){
+    if (is_record_type(left->type)) {
+        
+    } else {
+        if (left->type->is_integer()) {
+            is_rvalue = false;
+            auto left_value = std::any_cast<int>(left->value);
+            switch (op.type) {
+                case TokenType::INCREMENT: {
+                    left->value = left_value + 1;
+                    return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value);
+                }
+                case TokenType::DECREMENT: {
+                    left->value = left_value - 1;
+                    return std::make_shared<VarSymbol>(std::make_shared<IntegerType>(), left_value);
+                }
+            }
+        } else if (left->type->is_char()) {
+            // TODO
+        } else if (left->type->is_bool()) {
+            // TODO
+        } else if (left->type->is_floating()) {
+            // TODO
+        }
+    }
+}   
 

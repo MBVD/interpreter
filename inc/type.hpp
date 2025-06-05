@@ -11,6 +11,48 @@ class Type {
 public:
     virtual ~Type() = default;
     virtual void print();
+    virtual bool is_arithmetic() const {
+        return false;
+    };
+    virtual bool is_integral() const {
+        return false;
+    }
+    virtual bool is_integer() const {
+        return false;
+    }
+    virtual bool is_bool() const {
+        return false;
+    }
+    virtual bool is_char() const {
+        return false;
+    }
+    virtual bool is_floating() const {
+        return false;
+    }
+    virtual bool is_composite() const {
+        return false;
+    }
+    virtual bool is_fundamental() const {
+        return false;
+    }
+    virtual bool is_pointer() const {
+        return false;
+    }
+    virtual bool is_record() const {
+        return false;
+    }
+    virtual bool is_enum() const {
+        return false;
+    }
+    virtual bool is_array() const {
+        return false;
+    }
+    virtual bool is_void() const {
+        return false;
+    }
+    virtual bool is_nullptr() const {
+        return false;
+    }
 };
 
 // Фундаментальные типы
@@ -27,6 +69,9 @@ class Arithmetic : public Fundamental {
 public:
     Arithmetic(std::any);
     std::any get_any_value();
+    bool is_arithmetic() const override {
+        return true;
+    }
 private:
     std::any value;
 };
@@ -34,6 +79,9 @@ private:
 class Integral : public Arithmetic {
 public:
     Integral(std::any);
+    bool is_integral() const override {
+        return true;
+    }
 };
 
 // Все целочисленные типы
@@ -41,6 +89,9 @@ class BoolType : public Integral {
 public:
     explicit BoolType();
     void print();
+    bool is_bool() const override {
+        return true;
+    }
 private:
     bool value;
 };
@@ -49,6 +100,9 @@ class CharType : public Integral {
 public:
     explicit CharType();
     void print();
+    bool is_char() const override {
+        return true;
+    }
 private:
     char16_t value;
 };
@@ -57,6 +111,9 @@ class IntegerType : public Integral {
 public:
     explicit IntegerType();
     void print();
+    bool is_integer() const override {
+        return true;
+    }
 private:
     int8_t value;
 };
@@ -66,6 +123,9 @@ class FloatType : public Arithmetic {
 public:
     FloatType();
     void print();
+    bool is_floating() const override {
+        return true;
+    }
 private:
     double value;
 };

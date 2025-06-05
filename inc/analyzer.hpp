@@ -20,9 +20,17 @@ private:
     void visit(StructDeclarator*) final;
 
     void visit(Expression*) final;
-    void visit(ComparisonExpression*) final;
-    void visit(TernaryExpression*) final;
     void visit(BinaryExpression*) final;
+    void visit(CommaExpression*) final;
+    void visit(AssignmentExpression*) final;
+    void visit(TernaryExpression*) final;
+    void visit(LogicalOrExpression*) final;
+    void visit(LogicalAndExpression*) final;
+    void visit(BiteIncOrExpression*) final;
+    void visit(BiteExcOrExpression*) final;
+    void visit(BiteAndExpression*) final;
+    void visit(ComparisonExpression*) final;
+    void visit(ShiftExpression*) final;
     void visit(UnaryExpression*) final;
     void visit(PostfixExpression*) final;
     void visit(SubscriptExpression*) final;

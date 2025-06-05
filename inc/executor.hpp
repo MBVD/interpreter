@@ -24,9 +24,17 @@ private:
     void visit(StructDeclarator*) final;
 
     void visit(Expression*) final;
-    void visit(ComparisonExpression*) final;
-    void visit(TernaryExpression*) final;
     void visit(BinaryExpression*) final;
+    void visit(CommaExpression*) final;
+    void visit(AssignmentExpression*) final;
+    void visit(TernaryExpression*) final;
+    void visit(LogicalOrExpression*) final;
+    void visit(LogicalAndExpression*) final;
+    void visit(BiteIncOrExpression*) final;
+    void visit(BiteExcOrExpression*) final;
+    void visit(BiteAndExpression*) final;
+    void visit(ComparisonExpression*) final;
+    void visit(ShiftExpression*) final;
     void visit(UnaryExpression*) final;
     void visit(PostfixExpression*) final;
     void visit(SubscriptExpression*) final;
@@ -55,8 +63,8 @@ private:
 
     std::shared_ptr<Symbol> match_symbol (const Token& token);
     bool is_record_type(const std::shared_ptr<Type>& type);
-    bool count_bool(std::any, Token&, std::any);
     std::shared_ptr<VarSymbol> binary_operation(std::shared_ptr<VarSymbol>, Token&, std::shared_ptr<VarSymbol>);
+    std::shared_ptr<VarSymbol> assignment_operation(std::shared_ptr<VarSymbol>, Token&, std::shared_ptr<VarSymbol>);
     std::shared_ptr<VarSymbol> unary_operation(std::shared_ptr<VarSymbol>, Token&);
     std::shared_ptr<VarSymbol> postgix_operation(std::shared_ptr<VarSymbol>, Token&);
     bool can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to);
@@ -65,4 +73,5 @@ private:
     std::shared_ptr<Scope> symbolTable;
     std::vector<std::shared_ptr<FuncType>> matched_functions;
     static std::unordered_map<std::string, std::shared_ptr<Symbol>> default_types;
+    bool is_rvalue = false;
 };
