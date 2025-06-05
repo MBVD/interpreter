@@ -105,7 +105,16 @@ void Executor::visit(IdDeclorator* node){
             
         } break;
         case IDDeclaratorType::ARRAY : {
-            symbolTable->push_symbol(name, std::make_shared<VarSymbol>(std::make_shared<ArrayType>(current_value->type)));
+            auto array_element_type = std::dynamic_pointer_cast<VarSymbol>(current_value);
+            const auto& expression = node->get_expression();
+            expression->accept(*this);
+            auto size = std::any_cast<int>(std::dynamic_pointer_cast<VarSymbol>(current_value)->value);
+            std::vector<std::shared_ptr<Symbol>> array_elements;
+            for (int i = 0; i < size; ++i) {
+                auto array_element = std::make_shared<VarSymbol>(array_element_type->type, array_element_type->value);
+                array_elements.push_back(array_element);
+            }
+            symbolTable->push_symbol(name, std::make_shared<VarSymbol>(std::make_shared<ArrayType>(current_value->type, array_elements)));
         } break;
     }
 }
@@ -320,9 +329,15 @@ void Executor::visit(SubscriptExpression* node) { //[]
     if (expression_value->is_record()) {
         
     }
+    std::vector<int> indexes_values;
     for (const auto& index : indexes) {
         index->accept(*this);
-        auto index_value = current_value;
+        auto index_value = std::any_cast<int>(std::dynamic_pointer_cast<VarSymbol>(current_value)->value);
+        indexes_values.push_back(index_value);
+    }
+    if (expression_value->type->is_array()) {
+        auto array_type = std::dynamic_pointer_cast<ArrayType>(expression_value->type);
+        current_value = array_type->get_by_ids(indexes_values, 0);
     }
 }
 void Executor::visit(CallExpression* node) {
@@ -1627,7 +1642,7 @@ std::shared_ptr<VarSymbol> Executor::assignment_operation(std::shared_ptr<VarSym
         if (is_rvalue) {
             throw std::runtime_error("Cannot assign to an rvalue");
         }
-        if (left->type != right->type) {
+        if (getTypeRank(left->type) != getTypeRank(right->type)) {
             if (left->type->is_integer() && right->type->is_floating()) {
                 auto right_value = std::any_cast<double>(right->value);
                 left->value = static_cast<int>(right_value);
@@ -1645,6 +1660,7 @@ std::shared_ptr<VarSymbol> Executor::assignment_operation(std::shared_ptr<VarSym
             left->value = right->value;
         }
     }
+    return left;
 }
 
 std::shared_ptr<VarSymbol> Executor::unary_operation(std::shared_ptr<VarSymbol> left, Token& op) {

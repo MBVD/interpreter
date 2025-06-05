@@ -160,11 +160,15 @@ Parser::id_ptr Parser::parse_id_declaration() {
         throw parse_id_decl_error("");
     }
     index++;
-    if (id_modifiers.contains(id.type)) {
-        auto id_type = id_modifiers[id.type];
+    if (id_modifiers.contains(tokens[index].type)) {
+        auto id_type = id_modifiers[tokens[index].type];
         if (this->tokens[index] == TokenType::INDEX_LEFT) {
             index++;
             auto expr = parse_expression();
+            if(this->tokens[index] != TokenType::INDEX_RIGHT){
+                throw parse_id_decl_error("");
+            }
+            index++;
             return std::make_unique<IdDeclorator>(id, id_type, std::move(expr));
         }
         return std::make_unique<IdDeclorator>(id, id_type);

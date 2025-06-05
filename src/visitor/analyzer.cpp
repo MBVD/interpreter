@@ -80,7 +80,8 @@ void Analyzer::visit(IdDeclorator* node){
             current_type = std::make_shared<PointerType>(current_type);
         } break;
         case IDDeclaratorType::ARRAY : {
-            current_type = std::make_shared<ArrayType>(current_type);
+            auto array = std::make_shared<ArrayType>(current_type);
+            current_type = std::make_shared<PointerType>(array); // массивы в C++ это указатели
         } break;
         case IDDeclaratorType::REF : {
             // создать тип данных сссылка

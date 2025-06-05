@@ -151,6 +151,8 @@ void PointerType::print() {
 
 ArrayType::ArrayType(std::shared_ptr<Type> base) : PointerType(base) {}
 
+ArrayType::ArrayType(std::shared_ptr<Type> base, std::vector<std::shared_ptr<Symbol>> elements) : PointerType(base), elements(elements) {}
+
 void ArrayType::print() {
     std::cout << "ArrayType of ";
     if (get_base()) {
@@ -158,4 +160,11 @@ void ArrayType::print() {
     } else {
         std::cout << "nullptr\n";
     }
+}
+
+std::shared_ptr<Symbol> ArrayType::get_by_ids(std::vector<int>& indexes, int vec_index) {
+    if (vec_index == indexes.size()) {
+        return elements[indexes[vec_index]];
+    }
+    return get_by_ids(indexes, vec_index + 1);
 }

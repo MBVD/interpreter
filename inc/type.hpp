@@ -180,6 +180,9 @@ public:
     int get_star_count();
     std::shared_ptr<Type> get_type_by_star_count(int x);
     void print();
+    bool is_array() const {
+        return true;
+    }
 private:
     std::shared_ptr<Type> base;
 };
@@ -197,8 +200,15 @@ class LValueType : public RefType {
 // Массивы
 class ArrayType : public PointerType {
 public:
-    ArrayType(std::shared_ptr<Type> base); // Тип и размер массива
+    ArrayType(std::shared_ptr<Type> base);
+    ArrayType(std::shared_ptr<Type> base, std::vector<std::shared_ptr<Symbol>>); 
     void print();
+    std::shared_ptr<Symbol> get_by_ids(std::vector<int>&, int);
+    bool is_array() const {
+        return true;
+    }
+private:
+    std::vector<std::shared_ptr<Symbol>> elements;
 };
 
 std::shared_ptr<Type> compare_types(std::shared_ptr<Type> left, std::shared_ptr<Type>right);

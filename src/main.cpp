@@ -37,6 +37,7 @@ void test_binary_parser() {
 int main(){
     // test_binary_expression_printer();
     std::cout<<"\n";
+    std::any a = 1;
     // test_binary_parser();
     std::string source_code((std::istreambuf_iterator<char>(std::cin)),
                             std::istreambuf_iterator<char>());
@@ -44,14 +45,18 @@ int main(){
     std::cout<<source_code<<"\n";
     Lexer lexer = Lexer(source_code);
     std::vector<Token>tokens = lexer();
+    for (auto i : tokens){
+        std::cout<<"["<<i<<"] ";
+    }
     std::cout<<"\n\n";
     Parser parser = Parser(tokens);
     auto unit = parser.parse();
     std::cout<<"successed parse \n";
-    Analyzer analyzer;
-    analyzer.analyze(unit);
     Printer printer;
     printer.print(unit);
+    Analyzer analyzer;
+    analyzer.analyze(unit);
+    std::cout<<"analyze finished \n";
     Executor executor;
     executor.execute(unit);
     std::cout<<"\n\n";
