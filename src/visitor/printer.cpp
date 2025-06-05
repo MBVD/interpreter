@@ -115,6 +115,72 @@ void Printer::visit(Expression* node) {
     node->accept(*this);
 }
 
+void Printer::visit(CommaExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    std::cout << ", ";
+    right->accept(*this);
+}
+
+void Printer::visit(AssignmentExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    std::cout << " " << op << " ";
+    right->accept(*this);
+}
+
+void Printer::visit(LogicalOrExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    std::cout << " || ";
+    right->accept(*this);
+}
+
+void Printer::visit(LogicalAndExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    std::cout << " && ";
+    right->accept(*this);
+}
+
+void Printer::visit(BiteIncOrExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    std::cout << " | ";
+    right->accept(*this);
+}
+
+void Printer::visit(BiteExcOrExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    std::cout << " ^ ";
+    right->accept(*this);
+}
+
+void Printer::visit(BiteAndExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    std::cout << " & ";
+    right->accept(*this);
+}
+
+void Printer::visit(ShiftExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    std::cout << " " << op << " ";
+    right->accept(*this);
+}
+
 void Printer::visit(ComparisonExpression* node) {
     const auto& left = node->get_left();
     const auto& right = node->get_right();

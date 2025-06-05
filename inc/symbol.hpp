@@ -34,15 +34,16 @@ struct VarSymbol : public Symbol {
 };
 
 struct FuncSymbol : public Symbol {
-    FuncSymbol(const std::shared_ptr<FuncType>& type, bool is_const = false)
-        : Symbol(type, is_const) {}
+    FuncSymbol(const std::shared_ptr<FuncType>& type, FuncDeclarator* node, bool is_const = false)
+        : Symbol(type, is_const), func_declarator(node) {}
     bool is_func() {
         return true; 
     }
+    FuncDeclarator* func_declarator = nullptr;
 };
 
 struct Record : public Symbol {
-    Record(const std::shared_ptr<RecordType>& type, const std::unordered_map<std::string, std::shared_ptr<Symbol>>& ,bool is_const = false)
+    Record(const std::shared_ptr<RecordType>& type, const std::unordered_map<std::string, std::shared_ptr<Symbol>>& fields ,bool is_const = false)
         : Symbol(type, is_const), fields(fields){}
     bool is_record() { 
         return true; 

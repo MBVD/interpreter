@@ -22,6 +22,19 @@ bool Scope::contains_symbol(std::string name) {
 
 std::shared_ptr<Symbol> Scope::match_global(std::string name) {
     if (contains_symbol(name)) {
+        if (symbolTable.find(name)->second->is_func()) {
+            for (auto [it, end] = symbolTable.equal_range(name); it != end; ++it) {
+                if (it->second->is_func()) {
+                    mathched_functions.push_back(std::dynamic_pointer_cast<FuncSymbol>(it->second));
+                }
+            }
+            if (prev_table != nullptr){
+                prev_table->match_global(name); // ищем в старшей области видимости
+                mathched_functions.insert(mathched_functions.end(), prev_table->mathched_functions.begin(), prev_table->mathched_functions.end());
+            }
+        } else{
+            mathched_functions.clear();
+        }
         return symbolTable.find(name)->second;
     }
     if (prev_table == nullptr){

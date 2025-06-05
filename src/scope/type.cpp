@@ -69,7 +69,7 @@ void FloatType::print() {
 }
 
 // FuncType
-FuncType::FuncType(std::shared_ptr<Type> returnable_type, std::vector<std::shared_ptr<Type>> args, const std::unique_ptr<BlockStatement>& block) : returnable_type(returnable_type), args(args), block(block) {}
+FuncType::FuncType(std::shared_ptr<Type> returnable_type, std::vector<std::shared_ptr<Type>> args) : returnable_type(returnable_type), args(args) {}
 
 std::shared_ptr<Type> FuncType::get_returnable_type() const {
     return this->returnable_type;

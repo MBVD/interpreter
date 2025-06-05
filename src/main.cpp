@@ -4,6 +4,7 @@
 #include "parser.hpp"
 #include "printer.hpp"
 #include "analyzer.hpp"
+#include "executor.hpp"
 
 // void test_binary_expression_printer() {
 //     Token left_token(TokenType::LITERAL_NUM, "5");
@@ -43,15 +44,15 @@ int main(){
     std::cout<<source_code<<"\n";
     Lexer lexer = Lexer(source_code);
     std::vector<Token>tokens = lexer();
-    for (auto i : tokens){
-        std::cout<<"["<<i<<"] ";
-    }
     std::cout<<"\n\n";
     Parser parser = Parser(tokens);
     auto unit = parser.parse();
     std::cout<<"successed parse \n";
-    Printer printer;
-    printer.print(unit);
     Analyzer analyzer;
     analyzer.analyze(unit);
+    Printer printer;
+    printer.print(unit);
+    Executor executor;
+    executor.execute(unit);
+    std::cout<<"\n\n";
 }

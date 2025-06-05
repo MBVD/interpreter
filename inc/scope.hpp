@@ -23,10 +23,13 @@ public:
     std::multimap<std::string, std::shared_ptr<Symbol>> get_symbols() {
         return symbolTable;
     }
-
+    std::vector<std::shared_ptr<FuncSymbol>> get_mathched_functions() {
+        return mathched_functions;
+    }
     
     void push_symbol(std::string, std::shared_ptr<Symbol>);
 private:
     std::shared_ptr<Scope>prev_table;
+    std::vector<std::shared_ptr<FuncSymbol>> mathched_functions;
     std::multimap<std::string, std::shared_ptr<Symbol>> symbolTable;
 };

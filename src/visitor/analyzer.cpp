@@ -102,10 +102,10 @@ void Analyzer::visit(FuncDeclarator* node){
         type_args.push_back(current_type);
         scope->push_symbol(i->get_type().value, std::make_shared<VarSymbol>(current_type));
     }
-    auto func = std::make_shared<FuncType>(default_type, type_args, block);
-    scope->push_symbol(name, std::make_shared<FuncSymbol>(func));
+    auto func = std::make_shared<FuncType>(default_type, type_args);
+    scope->push_symbol(name, std::make_shared<FuncSymbol>(func, node));
     block->accept(*this); // заходим в наш блок
-    scope->push_symbol(name, std::make_shared<FuncSymbol>(func));
+    scope->push_symbol(name, std::make_shared<FuncSymbol>(func, node));
     current_type = func;
 }
 
@@ -126,7 +126,6 @@ void Analyzer::visit(StructDeclarator* node) {
         var_type = get_type(var->get_type());
     }
     auto scope_multi_vars = scope->get_symbols();
-    scope = scope->get_prev_table();
     std::unordered_map<std::string, std::shared_ptr<Type>> struct_vars;
     std::unordered_map<std::string, std::shared_ptr<Symbol>> scope_vars;
     for (auto var : scope_multi_vars) {
@@ -194,6 +193,122 @@ void Analyzer::visit(TernaryExpression* node) {
     throw std::runtime_error("not valid ternary expression for this types");
 }
 
+void Analyzer::visit(LogicalOrExpression* node){
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    auto left_type = current_type;
+    right->accept(*this);
+    auto right_type = current_type;
+
+    if (can_convert(std::make_shared<BoolType>(), left_type) && can_convert(std::make_shared<BoolType>(), right_type)) {
+        current_type = std::make_shared<BoolType>();
+        return;
+    }
+    throw std::runtime_error("not valid logical or expression for this types");
+}
+
+void Analyzer::visit(LogicalAndExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    auto left_type = current_type;
+    right->accept(*this);
+    auto right_type = current_type;
+
+    if (can_convert(std::make_shared<BoolType>(), left_type) && can_convert(std::make_shared<BoolType>(), right_type)) {
+        current_type = std::make_shared<BoolType>();
+        return;
+    }
+    throw std::runtime_error("not valid logical and expression for this types");
+}
+
+void Analyzer::visit(BiteIncOrExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    auto left_type = current_type;
+    right->accept(*this);
+    auto right_type = current_type;
+
+    if (dynamic_cast<StructType*>(left_type.get())) {
+        // найти оператор побитового или для него
+        // либо конвертацию
+    }
+
+    if (dynamic_cast<StructType*>(right_type.get())) {
+        // 
+    }
+
+    if (dynamic_cast<Integral*>(left_type.get()) && dynamic_cast<Integral*>(right_type.get())) {
+        current_type = left_type;
+        return;
+    }
+    throw std::runtime_error("not valid bitwise or expression for this types");
+}
+
+void Analyzer::visit(BiteExcOrExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    auto left_type = current_type;
+    right->accept(*this);
+    auto right_type = current_type;
+
+    if (dynamic_cast<Integral*>(left_type.get()) && dynamic_cast<Integral*>(right_type.get())) {
+        current_type = left_type;
+        return;
+    }
+    throw std::runtime_error("not valid bitwise xor expression for this types");
+}
+
+void Analyzer::visit(BiteAndExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    auto left_type = current_type;
+    right->accept(*this);
+    auto right_type = current_type;
+
+    if (dynamic_cast<StructType*>(left_type.get())) {
+        // найти оператор побитового и для него
+        // либо конвертацию
+    }
+    if (dynamic_cast<StructType*>(right_type.get())) {
+        // 
+    }
+
+    if (dynamic_cast<Integral*>(left_type.get()) && dynamic_cast<Integral*>(right_type.get())) {
+        current_type = left_type;
+        return;
+    }
+    throw std::runtime_error("not valid bitwise and expression for this types");
+}
+
+void Analyzer::visit(ShiftExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_type = current_type;
+    right->accept(*this);
+    auto right_type = current_type;
+
+    if (dynamic_cast<StructType*>(left_type.get())) {
+        // найти оператор сдвига для него
+        // либо конвертацию
+    }
+    if (dynamic_cast<StructType*>(right_type.get())) {
+        // 
+    }
+
+    if (dynamic_cast<Integral*>(left_type.get()) && dynamic_cast<Integral*>(right_type.get())) {
+        current_type = left_type;
+        return;
+    }
+    throw std::runtime_error("not valid shift expression for this types");
+}
+
 void Analyzer::visit(BinaryExpression* node) {
     const auto& left = node->get_left();
     const auto& right = node->get_right();
@@ -214,6 +329,37 @@ void Analyzer::visit(BinaryExpression* node) {
         return;
     }
     throw std::runtime_error("not valid binary expression for this types");
+}
+
+void Analyzer::visit(CommaExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    left->accept(*this);
+    right->accept(*this);
+}
+
+void Analyzer::visit(AssignmentExpression* node) {
+    const auto& left = node->get_left();
+    const auto& right = node->get_right();
+    auto op = node->get_op();
+    left->accept(*this);
+    auto left_type = current_type;
+    right->accept(*this);
+    auto right_type = current_type;
+
+    if (dynamic_cast<StructType*>(left_type.get())) {
+        // найти оператор присваивания для него
+        // либо конвертацию
+    }
+    if (dynamic_cast<StructType*>(right_type.get())) {
+        // 
+    }
+
+    if (can_convert(right_type, left_type)) { // значит тип правый конвертируется в левый тип
+        current_type = left_type;
+        return;
+    }
+    throw std::runtime_error("not valid assignment expression for this types");
 }
 
 void Analyzer::visit(UnaryExpression* node) {// ++ -- (int) 
@@ -376,9 +522,7 @@ void Analyzer::visit(AccessExpression* node) { // ->
         auto member_name = member_token.value;
 
         if (members.find(member_name) != members.end()) {
-            std::cout<<"HERE\n";
             current_type = members.at(member_name);
-            current_type->print();
         } else {
             throw std::runtime_error("Error: Member '" + member_name + "' not found in struct.");
         }

@@ -71,7 +71,6 @@ private:
 
     std::shared_ptr<Symbol> current_value;
     std::shared_ptr<Scope> symbolTable;
-    std::vector<std::shared_ptr<FuncType>> matched_functions;
     static std::unordered_map<std::string, std::shared_ptr<Symbol>> default_types;
     bool is_rvalue = false;
 };
