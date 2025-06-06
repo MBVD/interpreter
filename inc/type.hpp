@@ -203,6 +203,9 @@ public:
     ArrayType(std::shared_ptr<Type> base);
     ArrayType(std::shared_ptr<Type> base, std::vector<std::shared_ptr<Symbol>>); 
     void print();
+    std::vector<std::shared_ptr<Symbol>> get_elements() const {
+        return elements;
+    }
     std::shared_ptr<Symbol> get_by_ids(std::vector<int>&, int);
     bool is_array() const {
         return true;

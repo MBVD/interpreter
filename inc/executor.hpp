@@ -8,6 +8,7 @@
 #include "statement.hpp"
 #include "scope.hpp"
 #include "token.hpp"
+#include <functional>
 
 class Executor : public Visitor {
 public:
@@ -73,4 +74,6 @@ private:
     std::shared_ptr<Scope> symbolTable;
     static std::unordered_map<std::string, std::shared_ptr<Symbol>> default_types;
     bool is_rvalue = false;
+    bool is_library_function = false;
+    static std::unordered_map<std::string, std::function<std::shared_ptr<Symbol>(std::vector<std::shared_ptr<Symbol>>)>> libary_functions;
 };

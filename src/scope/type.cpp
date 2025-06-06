@@ -115,7 +115,7 @@ std::shared_ptr<Type> PointerType::get_base() const {
 }
 
 int PointerType::get_star_count() {
-    int count = 0;
+    int count = 1;
     auto current = base;
     while (current) {
         if (auto pointer = dynamic_cast<PointerType*>(current.get())) {
@@ -130,7 +130,7 @@ int PointerType::get_star_count() {
 
 std::shared_ptr<Type> PointerType::get_type_by_star_count(int star_count) {
     auto current = base;
-    for (int i = 0; i < star_count; ++i) {
+    for (int i = 1; i < star_count; ++i) {
         if (auto pointer = dynamic_cast<PointerType*>(current.get())) {
             current = pointer->get_base();
         } else {
@@ -163,8 +163,8 @@ void ArrayType::print() {
 }
 
 std::shared_ptr<Symbol> ArrayType::get_by_ids(std::vector<int>& indexes, int vec_index) {
-    if (vec_index == indexes.size()) {
+    if (vec_index == indexes.size() - 1) {
         return elements[indexes[vec_index]];
     }
-    return get_by_ids(indexes, vec_index + 1);
+    return std::dynamic_pointer_cast<ArrayType>(get_base())->get_by_ids(indexes, vec_index + 1);
 }

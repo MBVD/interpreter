@@ -3,6 +3,7 @@
 #include "visitor.hpp"
 #include "scope.hpp"
 #include "type.hpp"
+#include <functional>
 
 class Analyzer : public Visitor {
 public:
@@ -63,4 +64,5 @@ private:
     std::shared_ptr<Scope> scope;
     std::shared_ptr<Type> current_type;
     std::vector<std::shared_ptr<FuncType>> matched_functions;
+    static std::unordered_map<std::string, std::function<std::shared_ptr<Type>(std::vector<std::shared_ptr<Type>>)>> libary_functions;
 };

@@ -11,6 +11,29 @@ std::unordered_map<std::string, std::shared_ptr<Type>> Analyzer::default_types =
     {"char", std::make_shared<CharType>()}
 };
 
+std::unordered_map<std::string, std::function<std::shared_ptr<Type>(std::vector<std::shared_ptr<Type>>)>> Analyzer::libary_functions = {
+    {"printf", [](std::vector<std::shared_ptr<Type>> args) -> std::shared_ptr<Type> {
+        if (args.size() < 1 || !args[0]->is_array() || !dynamic_pointer_cast<ArrayType>(args[0])->get_base()->is_char()) {
+            throw std::runtime_error("printf requires at least one argument of type string.");
+        }
+        auto str = std::dynamic_pointer_cast<ArrayType>(args[0]);
+        std::string output;
+        auto elements = std::dynamic_pointer_cast<ArrayType>(str)->get_elements();
+        for (auto i = 1; i < args.size(); ++i) {
+            if (args[i]->is_char()) {
+                continue;
+            } else if (args[i]->is_integer()) {
+                continue;
+            } else if (args[i]->is_floating()) {
+                continue;
+            } else {
+                throw std::runtime_error("Unsupported type for printf.");
+            }
+        }
+        return std::make_shared<VoidType>(); // Return void type
+    }}
+};
+
 Analyzer::Analyzer() : scope(std::make_shared<Scope>(nullptr)) {}
 
 bool Analyzer::can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to) {
@@ -80,8 +103,16 @@ void Analyzer::visit(IdDeclorator* node){
             current_type = std::make_shared<PointerType>(current_type);
         } break;
         case IDDeclaratorType::ARRAY : {
-            auto array = std::make_shared<ArrayType>(current_type);
-            current_type = std::make_shared<PointerType>(array); // массивы в C++ это указатели
+            auto array_element_type = current_type;
+            const auto& expression = node->get_expression();
+            expression->accept(*this);
+            if (!current_type->is_integer()){
+                throw std::runtime_error("Array size must be an integer type.");
+            }
+            std::vector<std::shared_ptr<Symbol>> array_elements;
+            auto array_element = std::make_shared<VarSymbol>(array_element_type);
+            array_elements.push_back(array_element);
+            current_type = std::make_shared<ArrayType>(array_element_type, array_elements);
         } break;
         case IDDeclaratorType::REF : {
             // создать тип данных сссылка
@@ -446,6 +477,7 @@ void Analyzer::visit(SubscriptExpression* node) {// []
         }
     }
     if (indexes.size() > pointer->get_star_count()) {
+        std::cout<<indexes.size()<<" "<<pointer->get_star_count()<<"\n";
         throw std::runtime_error("cant index pointer with more indexes than stars");
     }
     current_type = pointer->get_type_by_star_count(indexes.size());
@@ -455,6 +487,17 @@ void Analyzer::visit(CallExpression* node) { // ()
     const auto& expression = node->get_expression();
     auto op = node->get_op();
     const auto& args = node->get_args();
+    auto id_expr = dynamic_cast<IDexpression*>(expression.get());
+    if (id_expr && libary_functions.contains(id_expr->get_token().value)) {
+        auto func = libary_functions[id_expr->get_token().value];
+        std::vector<std::shared_ptr<Type>> func_args;
+        for (const auto& arg : args) {
+            arg->accept(*this);
+            func_args.push_back(current_type);
+        }
+        current_type = func(func_args);
+        return;
+    }
     expression->accept(*this);
     auto expression_type = current_type;
     if (dynamic_cast<StructType*>(expression_type.get())) {
@@ -546,7 +589,15 @@ void Analyzer::visit(LiteralCharExpression* node) {
 }
 
 void Analyzer::visit(LiteralStringExpression* node) {
-    
+    auto value = node->get_value();
+    auto char_type = std::make_shared<CharType>();
+    std::vector<std::shared_ptr<Symbol>> char_symbols;
+    for (auto i = 0; i < value.size(); ++i) {
+        auto symbol = value[i];
+        auto char_symbol = std::make_shared<VarSymbol>(char_type, std::make_any<char>(symbol));
+        char_symbols.push_back(char_symbol);
+    }
+    current_type = std::make_shared<ArrayType>(char_type, char_symbols);
 }
 
 void Analyzer::visit(IDexpression* node) {
