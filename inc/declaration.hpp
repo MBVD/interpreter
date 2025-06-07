@@ -64,6 +64,7 @@ private:
     Token returnable_type;
     Token name;
     std::vector<std::unique_ptr<ParamDeclarator>> params;
+    std::vector<std::unique_ptr<FuncDeclarator>> methods; // для функции с параметрами по умолчанию
     std::unique_ptr<BlockStatement> block;
 };
 
@@ -80,11 +81,13 @@ private:
 
 class StructDeclarator : public Declarator {
 public:
-    StructDeclarator(const Token& id, std::vector<std::unique_ptr<VarDeclarator>> vars);
+    StructDeclarator(const Token& id, std::vector<std::unique_ptr<VarDeclarator>> vars, std::vector<std::unique_ptr<FuncDeclarator>> methods);
     void accept(Visitor& visitor);
     Token get_id();
     const std::vector<std::unique_ptr<VarDeclarator>>& get_vars();
+    const std::vector<std::unique_ptr<FuncDeclarator>>& get_methods();
 private:
     Token id;
     std::vector<std::unique_ptr<VarDeclarator>> vars;
+    std::vector<std::unique_ptr<FuncDeclarator>> methods;
 };

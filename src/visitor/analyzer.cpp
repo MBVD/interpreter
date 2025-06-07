@@ -151,22 +151,25 @@ void Analyzer::visit(ParamDeclarator* node) {
 void Analyzer::visit(StructDeclarator* node) {
     auto id = node->get_id();
     const auto& vars = node->get_vars();
+    const auto& methods = node->get_methods();
     scope = scope->create_new_table(scope);
     for (const auto& var : vars){
         var->accept(*this);
         auto var_type = current_type;
-        var_type = get_type(var->get_type());
+    }
+    for (const auto& method : methods) {
+        method->accept(*this);
+        auto method_type = current_type;
     }
     auto scope_multi_vars = scope->get_symbols();
     std::unordered_map<std::string, std::shared_ptr<Type>> struct_vars;
-    std::unordered_map<std::string, std::shared_ptr<Symbol>> scope_vars;
     for (auto var : scope_multi_vars) {
         struct_vars[var.first] = var.second->type;
-        scope_vars[var.first] = var.second;
     }
     scope = scope->get_prev_table();
     auto struc = std::make_shared<StructType>(struct_vars);
-    auto struc_symbol = std::make_shared<Record>(struc, scope_vars);
+    auto struc_symbol = std::make_shared<Record>(struc, scope_multi_vars);
+    struc->set_symbol(struc_symbol.get());
     scope->push_symbol(id.value, struc_symbol);
     current_type = struc;
 }
@@ -523,7 +526,7 @@ void Analyzer::visit(CallExpression* node) { // ()
                 matched_functions.erase(function_it);
                 continue;
             } else {
-                func_ranks[std::distance(matched_functions.begin(), function_it)]+= getTypeRank(func_args[i]) - getTypeRank(arg_type);
+                func_ranks[std::distance(matched_functions.begin(), function_it)] += std::abs(getTypeRank(func_args[i]) - getTypeRank(arg_type));
             }
         }
     }
@@ -552,8 +555,15 @@ void Analyzer::visit(AccessExpression* node) { // ->
         if (auto struct_type = dynamic_cast<StructType*>(base_type.get())) {
             auto members = struct_type->get_members();
             auto member_name = member_token.value;
-
+            std::cout<<"HERE\n";
             if (members.find(member_name) != members.end()) {
+                if (current_type->is_func()){
+                    auto matched_functions_symb = dynamic_cast<Record*>(std::dynamic_pointer_cast<StructType>(current_type)->get_symbol())->fields->get_mathched_functions();
+                    matched_functions.clear();
+                    for (auto i : matched_functions) {
+                        matched_functions.push_back(std::dynamic_pointer_cast<FuncType>(i));
+                    }
+                }
                 current_type = members.at(member_name);
             } else {
                 throw std::runtime_error("Error: Member '" + member_name + "' not found in struct.");
@@ -566,6 +576,19 @@ void Analyzer::visit(AccessExpression* node) { // ->
         auto member_name = member_token.value;
 
         if (members.find(member_name) != members.end()) {
+            current_type = members.at(member_name);
+            if (current_type->is_func()){
+                auto struct_type  = std::dynamic_pointer_cast<StructType>(expression_type)->get_symbol();
+                auto fields = dynamic_cast<Record*>(struct_type)->fields;
+                fields->match_global(member_name);
+                auto matched_functions_symb = fields->get_mathched_functions();
+                matched_functions.clear();
+                std::cout<<matched_functions_symb.size()<<"\n";
+                for (auto i : matched_functions_symb) {
+                    matched_functions.push_back(std::dynamic_pointer_cast<FuncType>(i->type));
+                }
+                std::cout<<"matched functions size: "<<matched_functions.size()<<"\n";
+            }
             current_type = members.at(member_name);
         } else {
             throw std::runtime_error("Error: Member '" + member_name + "' not found in struct.");

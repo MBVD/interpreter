@@ -1,5 +1,7 @@
 #include <type.hpp>
 
+class Scope;
+
 struct Symbol {
     Symbol(const std::shared_ptr<Type>& type, bool is_const = false)
         : type(type), is_const(is_const) {}
@@ -41,13 +43,12 @@ struct FuncSymbol : public Symbol {
     }
     FuncDeclarator* func_declarator = nullptr;
 };
-
 struct Record : public Symbol {
-    Record(const std::shared_ptr<RecordType>& type, const std::unordered_map<std::string, std::shared_ptr<Symbol>>& fields ,bool is_const = false)
-        : Symbol(type, is_const), fields(fields){}
+    Record(const std::shared_ptr<RecordType>& type, const std::multimap<std::string, std::shared_ptr<Symbol>> fields ,bool is_const = false)
+        : Symbol(type, is_const), fields(std::make_shared<Scope>(fields)){}
     bool is_record() { 
         return true; 
     }
 
-    std::unordered_map<std::string, std::shared_ptr<Symbol>> fields;
+    std::shared_ptr<Scope> fields;
 };

@@ -9,7 +9,6 @@
 #include "scope.hpp"
 #include "token.hpp"
 #include <functional>
-
 class Executor : public Visitor {
 public:
     Executor();
@@ -69,7 +68,8 @@ private:
     std::shared_ptr<VarSymbol> unary_operation(std::shared_ptr<VarSymbol>, Token&);
     std::shared_ptr<VarSymbol> postgix_operation(std::shared_ptr<VarSymbol>, Token&);
     bool can_convert(const std::shared_ptr<Type>& from, const std::shared_ptr<Type>& to);
-
+    
+    std::vector<std::shared_ptr<FuncSymbol>> matched_functions;
     std::shared_ptr<Symbol> current_value;
     std::shared_ptr<Scope> symbolTable;
     static std::unordered_map<std::string, std::shared_ptr<Symbol>> default_types;

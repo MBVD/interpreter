@@ -25,8 +25,6 @@ std::unordered_map<std::string, std::function<std::shared_ptr<Symbol>(std::vecto
             auto char_value = std::any_cast<char>(std::dynamic_pointer_cast<VarSymbol>(element)->value);
             output += char_value;
         }
-        
-        args.size() == 1 ? std::cout<<output<<"\n" : std::cout<<"\0";
         for (auto i = 1; i<args.size(); ++i) {
             if (!args[i]->is_var()) {
                 throw std::runtime_error("All arguments after format string must be variables.");
@@ -39,6 +37,7 @@ std::unordered_map<std::string, std::function<std::shared_ptr<Symbol>(std::vecto
             } else if (var->type->is_char()) {
                 output.replace(output.find("%c"), 2, std::to_string(std::any_cast<char>(var->value)));
             } else {
+                std::cout<<var->type<<"\n";
                 throw std::runtime_error("Unsupported type for printf: ");
             }
         }
@@ -125,7 +124,7 @@ void Executor::visit(IdDeclorator* node){
                 auto record_type = std::dynamic_pointer_cast<RecordType>(current_value->type);
                 if (record_type) {
                     auto record_symbol = std::dynamic_pointer_cast<Record>(current_value);
-                    symbolTable->push_symbol(name, std::make_shared<Record>(record_type, record_symbol->fields));
+                    symbolTable->push_symbol(name, std::make_shared<Record>(record_type, record_symbol->fields->get_symbols()));
                 }
             } else if (!is_rvalue) {
                 symbolTable->push_symbol(name, current_value);
@@ -187,16 +186,17 @@ void Executor::visit(StructDeclarator* node) {
     for (const auto& var : vars) {
         var->accept(*this);
     }
+    for (const auto& method : node->get_methods()) {
+        method->accept(*this);
+    }
     auto scope_multi_vars = symbolTable->get_symbols();
     symbolTable = symbolTable->get_prev_table();
     std::unordered_map<std::string, std::shared_ptr<Type>> struct_vars;
-    std::unordered_map<std::string, std::shared_ptr<Symbol>> scope_vars;
     for (auto var : scope_multi_vars) {
         struct_vars[var.first] = var.second->type;
-        scope_vars[var.first] = var.second;
     }
     auto struc = std::make_shared<StructType>(struct_vars);
-    auto struc_symbol = std::make_shared<Record>(struc, scope_vars);
+    auto struc_symbol = std::make_shared<Record>(struc, scope_multi_vars);
     symbolTable->push_symbol(id.value, struc_symbol);
 }
 
@@ -394,10 +394,9 @@ void Executor::visit(CallExpression* node) {
     }
     expression->accept(*this);
     auto expression_value = current_value;
-    if (expression_value->is_record()) {
-        // TODO
+    if (expression_value->type->is_record()) {
+        
     }
-    auto matched_functions = symbolTable->get_mathched_functions();
     std::vector<int> func_ranks(matched_functions.size(), 0);
     for (auto function_it = matched_functions.begin(); function_it != matched_functions.end(); ++function_it) {
         auto function = *function_it;
@@ -413,11 +412,12 @@ void Executor::visit(CallExpression* node) {
                 matched_functions.erase(function_it);
                 continue;
             } else {
-                func_ranks[std::distance(matched_functions.begin(), function_it)]+= getTypeRank(func_args[i]) - getTypeRank(arg_type);
+                func_ranks[std::distance(matched_functions.begin(), function_it)] += std::abs(getTypeRank(func_args[i]) - getTypeRank(arg_type));
             }
         }
     }
-    auto index = *std::max_element(func_ranks.begin(), func_ranks.end());
+    auto min_element_it = std::min_element(func_ranks.begin(), func_ranks.end());
+    auto index = std::distance(func_ranks.begin(), min_element_it);
     auto best_match = matched_functions[index];
     symbolTable = symbolTable->create_new_table(symbolTable);
     auto* func_decl_sp = dynamic_pointer_cast<FuncSymbol>(best_match)->func_declarator;
@@ -428,6 +428,7 @@ void Executor::visit(CallExpression* node) {
         args[i]->accept(*this);
         symbolTable->push_symbol(param_name, current_value);
     }
+    symbolTable = symbolTable->get_prev_table();
     matched_functions.clear();
     func_decl_sp->get_block()->accept(*this);
 };
@@ -439,7 +440,10 @@ void Executor::visit(AccessExpression* node) {
     auto expression_value = current_value;
     if (expression_value->is_record()) {
         auto record = std::dynamic_pointer_cast<Record>(expression_value);
-        auto member_symbol = record->fields[member.value];
+        auto member_symbol = record->fields->match_global(member.value);
+        if (member_symbol->is_func()){
+            matched_functions = record->fields->get_mathched_functions();
+        }
         current_value = member_symbol;
     }
 };
@@ -469,6 +473,11 @@ void Executor::visit(LiteralStringExpression* node) {
 void Executor::visit(IDexpression* node) {
     auto token = node->get_token();
     current_value = match_symbol(token);
+    if (current_value->is_func()) {
+        matched_functions = symbolTable->get_mathched_functions();
+        std::cout<<matched_functions.size() << " matched functions found for " << token.value << "\n";
+        is_library_function = libary_functions.contains(token.value);
+    }
 };
 void Executor::visit(GroupExpression* node) {
     const auto& base = node->get_base();
@@ -493,7 +502,6 @@ void Executor::visit(DeclarationStatement* node){
 void Executor::visit(ReturnStatement* node) {
     const auto& expression = node->get_expression();
     expression->accept(*this);
-    auto return_value = current_value;
     throw std::runtime_error("Return statement encountered with value:"); // TODO сделать отдельные exceptions для каждого случая
 }
 void Executor::visit(BreakStatement* node) {

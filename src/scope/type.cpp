@@ -97,7 +97,11 @@ void FuncType::print() {
 }
 
 // StructType
-StructType::StructType(const std::unordered_map<std::string, std::shared_ptr<Type>> members) : members(members) {}
+StructType::StructType(const std::unordered_map<std::string, std::shared_ptr<Type>> members, Symbol* symbol) : members(members), symbol(symbol) {}
+
+Symbol* StructType::get_symbol() const {
+    return this->symbol;
+}
 
 std::unordered_map<std::string, std::shared_ptr<Type>> StructType::get_members() const {
     return this->members;

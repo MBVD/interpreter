@@ -107,8 +107,8 @@ const std::unique_ptr<InitDeclarator>& ParamDeclarator::get_declorator() {
 }
 
 // StructDeclarator
-StructDeclarator::StructDeclarator(const Token& id, std::vector<std::unique_ptr<VarDeclarator>> vars)
-    : id(id), vars(std::move(vars)) {}
+StructDeclarator::StructDeclarator(const Token& id, std::vector<std::unique_ptr<VarDeclarator>> vars, std::vector<std::unique_ptr<FuncDeclarator>> methods)
+    : id(id), vars(std::move(vars)), methods(std::move(methods)) {}
 
 void StructDeclarator::accept(Visitor& visitor) {
     visitor.visit(this);
@@ -120,4 +120,8 @@ Token StructDeclarator::get_id() {
 
 const std::vector<std::unique_ptr<VarDeclarator>>& StructDeclarator::get_vars(){
     return this->vars;
+}
+
+const std::vector<std::unique_ptr<FuncDeclarator>>& StructDeclarator::get_methods(){
+    return this->methods;
 }

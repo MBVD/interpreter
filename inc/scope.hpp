@@ -12,6 +12,8 @@ class Scope {
 public:
     ~Scope() = default;
     Scope(std::shared_ptr<Scope> get_prev_table);
+    Scope(const std::multimap<std::string, std::shared_ptr<Symbol>> symbolTable) 
+        : symbolTable(symbolTable), prev_table(nullptr) {}
     
     std::shared_ptr<Scope> get_prev_table();
     std::shared_ptr<Scope> create_new_table(std::shared_ptr<Scope>);

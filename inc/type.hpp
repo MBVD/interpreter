@@ -53,6 +53,9 @@ public:
     virtual bool is_nullptr() const {
         return false;
     }
+    virtual bool is_func() const {
+        return false;
+    }
 };
 
 // Фундаментальные типы
@@ -141,6 +144,9 @@ public:
     std::shared_ptr<Type> get_returnable_type() const;
     std::vector<std::shared_ptr<Type>> get_args() const;
     void print();
+    bool is_func() const {
+        return true;
+    }
 private:
     std::shared_ptr<Type> returnable_type;
     std::vector<std::shared_ptr<Type>> args;
@@ -154,12 +160,16 @@ class Symbol;
 // Все типы записей
 class StructType : public RecordType {
 public:
-    explicit StructType(const std::unordered_map<std::string, std::shared_ptr<Type>>);
+    explicit StructType(const std::unordered_map<std::string, std::shared_ptr<Type>>, Symbol* symbol = nullptr);
     std::unordered_map<std::string, std::shared_ptr<Type>> get_members() const;
+    Symbol* get_symbol() const;
+    void set_symbol(Symbol* sym) {
+        symbol = sym;
+    }
     void print();
 private:
     std::unordered_map<std::string, std::shared_ptr<Type>> members;
-    std::weak_ptr<Symbol> symbol;
+    Symbol* symbol;
 };
 
 class ClassType : public RecordType {

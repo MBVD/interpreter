@@ -2,7 +2,7 @@
 #include "exceptions.hpp"
 #include <iostream>
 
-Parser::decl_ptr Parser::parse_func_declaration() {
+Parser::func_ptr Parser::parse_func_declaration() {
     auto func_index = this->index;
     auto returnable_type = this->tokens[index];
     if (returnable_type != TokenType::ID && returnable_type != TokenType::TYPE) {
@@ -82,19 +82,26 @@ Parser::struct_ptr Parser::parse_struct_declaration() {
     index++;
 
     std::vector<Parser::var_ptr> vars;
+    std::vector<Parser::func_ptr> methods;
     while (this->tokens[index] != TokenType::BRACE_RIGHT && this->tokens[index] != TokenType::END) {
+        auto var_index = index;
         try {
             vars.push_back(parse_var_declaration());
         } catch (parse_var_decl_error&) {
-            index = struct_index;
-            throw parse_struct_decl_error("");
+            index = var_index;
+            try {
+                methods.push_back(parse_func_declaration());
+            } catch (parse_func_decl_error&) {
+                index = struct_index;
+                throw parse_struct_decl_error("");
+            }
         }
     }
     if (this->tokens[index++] != TokenType::BRACE_RIGHT) {
         index = struct_index;
         throw parse_struct_decl_error("");
     }
-    return std::make_unique<StructDeclarator>(id, std::move(vars));
+    return std::make_unique<StructDeclarator>(id, std::move(vars), std::move(methods));
 }
 
 Parser::var_ptr Parser::parse_var_declaration() {

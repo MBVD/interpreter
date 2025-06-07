@@ -19,6 +19,7 @@ public:
     using id_ptr = std::unique_ptr<IdDeclorator>;
     using param_ptr = std::unique_ptr<ParamDeclarator>;
     using struct_ptr = std::unique_ptr<StructDeclarator>;
+    using func_ptr = std::unique_ptr<FuncDeclarator>;
     
     using expr_ptr = std::unique_ptr<Expression>;
     using ternary_expr_ptr = std::unique_ptr<TernaryExpression>;
@@ -69,7 +70,7 @@ private:
     init_ptr parse_init_declaration();
     id_ptr parse_id_declaration();
 
-    decl_ptr parse_func_declaration();
+    func_ptr parse_func_declaration();
     param_ptr parse_param_declaration();
     struct_ptr parse_struct_declaration();
     

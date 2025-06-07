@@ -68,6 +68,7 @@ std::vector<std::shared_ptr<Symbol>> Scope::match_range(std::string name) {
 void Scope::push_symbol(std::string name, std::shared_ptr<Symbol> symbol) {
     if (dynamic_cast<FuncSymbol*>(symbol.get()) && contains_symbol(name)) {
         symbolTable.insert({name, symbol});
+        return;
     }
     if (contains_symbol(name)) {
         throw std::runtime_error("Symbol '" + name + "' already exists in scope. in scope");
